@@ -1,20 +1,17 @@
-import { useState } from 'react'
-import { Button } from './components/ui/button'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { LandingPage } from './pages/LandingPage'
+import { DocsPage } from './pages/DocsPage'
+import { BlogPage } from './pages/BlogPage'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-
-      <Button onClick={() => setCount((count) => count + 1)}>
-        count is: {count}
-      </Button>
-    
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/docs/*" element={<DocsPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
