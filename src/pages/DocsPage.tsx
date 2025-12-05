@@ -315,7 +315,7 @@ function MarkdownDocPage({ slug }: { slug: string }) {
             </Button>
           </Link>
           <a 
-            href={`https://github.com/H34R7L3s/CyberPump/edit/main/docs/${doc?.file || ''}`}
+            href={`https://github.com/H34R7L3s/CyberPump/edit/main/src/docs/${doc?.file || ''}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-muted-foreground hover:text-accent"

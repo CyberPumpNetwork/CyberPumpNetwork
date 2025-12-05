@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { getDocBySlug } from './docs'
 
 // Import all markdown files from the docs directory using Vite's import.meta.glob
-const markdownFiles = import.meta.glob('/docs/**/*.md', { 
+const markdownFiles = import.meta.glob('/src/docs/**/*.md', { 
   query: '?raw',
   import: 'default',
 })
@@ -28,7 +28,7 @@ export function useMarkdownContent(slug: string) {
         }
 
         // Construct the path to the markdown file
-        const filePath = `/docs/${doc.file}`
+        const filePath = `/src/docs/${doc.file}`
         
         // Check if the file exists in our glob
         if (markdownFiles[filePath]) {

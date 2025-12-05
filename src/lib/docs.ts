@@ -7,7 +7,7 @@ export interface DocPage {
   description?: string
   category: string
   order?: number
-  file: string // path relative to /docs folder
+  file: string // path relative to /src/docs folder
 }
 
 export const docsConfig: DocPage[] = [
@@ -18,7 +18,7 @@ export const docsConfig: DocPage[] = [
     description: 'Your Kaspa Ecosystem Hub by The IT CyberSpace',
     category: 'Getting Started',
     order: 1,
-    file: 'index.md',
+    file: 'getting-started/index.md',
   },
   {
     slug: 'basics',
@@ -26,7 +26,7 @@ export const docsConfig: DocPage[] = [
     description: 'Learn the fundamentals of Kaspa',
     category: 'Getting Started',
     order: 2,
-    file: 'basics.md',
+    file: 'basics/basics.md',
   },
   {
     slug: 'kasme-info',
@@ -34,7 +34,7 @@ export const docsConfig: DocPage[] = [
     description: 'Information about the kas.me platform',
     category: 'Getting Started',
     order: 3,
-    file: 'kasme-info.md',
+    file: 'getting-started/kasme-info.md',
   },
   {
     slug: 'getting-started',
@@ -42,7 +42,7 @@ export const docsConfig: DocPage[] = [
     description: 'How to get started with kas.me',
     category: 'Getting Started',
     order: 4,
-    file: 'infocenter/guides/getting-started.md',
+    file: 'platform/infocenter/guides/getting-started.md',
   },
 
   // Tokenomics
@@ -52,7 +52,7 @@ export const docsConfig: DocPage[] = [
     description: 'Overview of $CYPU tokenomics',
     category: 'Tokenomics',
     order: 1,
-    file: 'tokenomics.md',
+    file: 'tokenomics/tokenomics.md',
   },
   {
     slug: 'det-tokenomics',
@@ -134,7 +134,7 @@ export const docsConfig: DocPage[] = [
     description: 'Explore kas.me features',
     category: 'Platform',
     order: 1,
-    file: 'infocenter/features.md',
+    file: 'platform/infocenter/features.md',
   },
   {
     slug: 'det-features',
@@ -142,7 +142,7 @@ export const docsConfig: DocPage[] = [
     description: 'In-depth feature breakdown',
     category: 'Platform',
     order: 2,
-    file: 'infocenter/features/det_features.md',
+    file: 'platform/infocenter/features/det_features.md',
   },
   {
     slug: 'free-features',
@@ -150,7 +150,7 @@ export const docsConfig: DocPage[] = [
     description: 'Features available for free',
     category: 'Platform',
     order: 3,
-    file: 'infocenter/features/free_features.md',
+    file: 'platform/infocenter/features/free_features.md',
   },
   {
     slug: 'explorer',
@@ -158,7 +158,7 @@ export const docsConfig: DocPage[] = [
     description: 'Kaspa blockchain explorer',
     category: 'Platform',
     order: 4,
-    file: 'infocenter/explorer.md',
+    file: 'platform/infocenter/explorer.md',
   },
   {
     slug: 'guides',
@@ -166,7 +166,7 @@ export const docsConfig: DocPage[] = [
     description: 'Platform guides and tutorials',
     category: 'Platform',
     order: 5,
-    file: 'infocenter/guides.md',
+    file: 'platform/infocenter/guides.md',
   },
   {
     slug: 'intelligence-center',
@@ -174,7 +174,7 @@ export const docsConfig: DocPage[] = [
     description: 'Advanced analytics tools',
     category: 'Platform',
     order: 6,
-    file: 'infocenter/IntelligenceCenter.md',
+    file: 'platform/infocenter/IntelligenceCenter.md',
   },
 
   // EcoLoop
@@ -226,7 +226,7 @@ export const docsConfig: DocPage[] = [
     description: 'Join the kas.me community',
     category: 'Community',
     order: 1,
-    file: 'community.md',
+    file: 'community/community.md',
   },
   {
     slug: 'faq',
@@ -234,7 +234,7 @@ export const docsConfig: DocPage[] = [
     description: 'Frequently asked questions',
     category: 'Community',
     order: 2,
-    file: 'hub/faq.md',
+    file: 'community/hub/faq.md',
   },
   {
     slug: 'story',
@@ -242,7 +242,7 @@ export const docsConfig: DocPage[] = [
     description: 'The story behind kas.me',
     category: 'Community',
     order: 3,
-    file: 'hub/story.md',
+    file: 'community/hub/story.md',
   },
   {
     slug: 'audits',
@@ -250,7 +250,7 @@ export const docsConfig: DocPage[] = [
     description: 'Security audits and transparency',
     category: 'Community',
     order: 4,
-    file: 'hub/audits.md',
+    file: 'community/hub/audits.md',
   },
 
   // Development
@@ -260,7 +260,7 @@ export const docsConfig: DocPage[] = [
     description: 'Developer resources and API',
     category: 'Development',
     order: 1,
-    file: 'dev.md',
+    file: 'development/dev.md',
   },
   {
     slug: 'devtalk-1',
@@ -268,7 +268,7 @@ export const docsConfig: DocPage[] = [
     description: 'First developer talk',
     category: 'Development',
     order: 2,
-    file: 'devtalks/devtalk1.md',
+    file: 'development/devtalks/devtalk1.md',
   },
   {
     slug: 'devtalk-2',
@@ -276,7 +276,7 @@ export const docsConfig: DocPage[] = [
     description: 'Second developer talk',
     category: 'Development',
     order: 3,
-    file: 'devtalks/devtalk2.md',
+    file: 'development/devtalks/devtalk2.md',
   },
 ]
 
