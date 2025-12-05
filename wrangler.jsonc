@@ -1,0 +1,12 @@
+{
+  "name": "cyber-pump",
+  "type": "service-worker",
+  "compatibility_date": "2025-12-05",
+  "compatibility_flags": ["nodejs_compat"],
+  
+  // Serve static assets from the dist directory
+  "assets": {
+    "directory": "./dist"
+  }
+
+}
