@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { PageHeader } from '@/components/PageHeader'
+import { DevBanner } from '@/components/DevBanner'
 import { Footer } from '@/components/Footer'
 
 const blogPosts = [
@@ -95,6 +96,7 @@ export function BlogPage() {
           { label: 'Docs', href: '/docs' },
         ]}
       />
+      <DevBanner />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Page Header */}

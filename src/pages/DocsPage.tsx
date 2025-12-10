@@ -4,6 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/PageHeader'
+import { DevBanner } from '@/components/DevBanner'
 import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 import { getDocsNavigation, getDocBySlug, getCategories, getDocsByCategory } from '@/lib/docs'
 import { useMarkdownContent } from '@/lib/useMarkdown'
@@ -342,6 +343,7 @@ export function DocsPage() {
           // { label: 'Launch kas.me', href: 'https://kas.me', external: true },
         ]}
       />
+      <DevBanner />
 
       <div className="flex">
         {/* Sidebar */}
