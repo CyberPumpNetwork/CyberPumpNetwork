@@ -118,13 +118,10 @@ export function Navbar() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" asChild>
+            <Button variant="ghost" className='bg-accent text-background font-semibold' asChild>
               <Link to="/docs">
                 Docs
               </Link>
-            </Button>
-            <Button className="bg-accent hover:bg-accent/90 text-background font-semibold">
-              Launch App
             </Button>
           </div>
 
@@ -188,9 +185,6 @@ export function Navbar() {
                     <Link to="/docs" onClick={() => setIsMenuOpen(false)}>
                       Read Whitepaper
                     </Link>
-                  </Button>
-                  <Button className="bg-accent hover:bg-accent/90 text-background font-semibold">
-                    Launch App
                   </Button>
                 </div>
               </div>

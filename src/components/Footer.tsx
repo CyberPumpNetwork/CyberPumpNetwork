@@ -8,7 +8,7 @@ const footerLinks = {
     { name: 'Features', href: '/#about' },
     { name: 'Tokenomics', href: '/#tokenomics' },
     { name: 'Roadmap', href: '/#roadmap' },
-    { name: 'Launch kas.me', href: 'https://kas.me', external: true },
+    { name: 'kas.me', href: 'https://kas.me', external: true },
   ],
   Resources: [
     { name: 'Whitepaper', href: 'https://drive.google.com/file/d/1zMFJSHH6YH8BvDm03LdZDzP3K99bNjZK/view?usp=sharing', external: true },

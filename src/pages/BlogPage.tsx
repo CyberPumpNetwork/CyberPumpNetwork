@@ -93,7 +93,6 @@ export function BlogPage() {
         logoText="CyberPump"
         navItems={[
           { label: 'Docs', href: '/docs' },
-          { label: 'Launch App', href: '#' },
         ]}
       />
 

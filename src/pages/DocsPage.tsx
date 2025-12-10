@@ -339,7 +339,7 @@ export function DocsPage() {
         sidebarContent={<DocsSidebar className="h-full px-4" />}
         navItems={[
           { label: 'Back to Home', href: '/' },
-          { label: 'Launch kas.me', href: 'https://kas.me', external: true },
+          // { label: 'Launch kas.me', href: 'https://kas.me', external: true },
         ]}
       />
 

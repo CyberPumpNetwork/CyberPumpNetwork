@@ -46,8 +46,8 @@ export function Hero() {
             className="bg-accent hover:bg-accent/90 text-background font-semibold px-8 py-6 text-lg rounded-xl shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 transition-all duration-300"
             asChild
           >
-            <a href="https://kas.me" target="_blank" rel="noopener noreferrer">
-              Discover kas.me
+            <a href="/docs" target="_blank" rel="noopener noreferrer">
+              Open the Docs
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"

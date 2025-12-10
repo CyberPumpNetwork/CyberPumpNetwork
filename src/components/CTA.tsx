@@ -49,7 +49,7 @@ export function CTA() {
             asChild
           >
             <a href="https://kas.me" target="_blank" rel="noopener noreferrer">
-              Launch kas.me
+              Back to the top
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"
