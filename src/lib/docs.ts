@@ -21,7 +21,7 @@ export const docsConfig: DocPage[] = [
     file: 'getting-started/index.md',
   },
   {
-    slug: 'basics',
+    slug: 'getting-started/basics',
     title: 'Kaspa Basics',
     description: 'Learn the fundamentals of Kaspa',
     category: 'Getting Started',
@@ -29,7 +29,7 @@ export const docsConfig: DocPage[] = [
     file: 'basics/basics.md',
   },
   {
-    slug: 'kasme-info',
+    slug: 'getting-started/kasme-info',
     title: 'About kas.me',
     description: 'Information about the kas.me platform',
     category: 'Getting Started',
@@ -37,7 +37,7 @@ export const docsConfig: DocPage[] = [
     file: 'getting-started/kasme-info.md',
   },
   {
-    slug: 'getting-started',
+    slug: 'getting-started/guides',
     title: 'Getting Started Guide',
     description: 'How to get started with kas.me',
     category: 'Getting Started',
@@ -55,7 +55,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/tokenomics.md',
   },
   {
-    slug: 'det-tokenomics',
+    slug: 'tokenomics/det-tokenomics',
     title: 'Detailed Tokenomics',
     description: 'In-depth $CYPU token details',
     category: 'Tokenomics',
@@ -63,7 +63,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/det_tokenomics.md',
   },
   {
-    slug: 'token-supply',
+    slug: 'tokenomics/det-token/token-supply',
     title: 'Token Supply',
     description: 'Supply mechanics and distribution',
     category: 'Tokenomics',
@@ -71,7 +71,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/det_token/tokensupply.md',
   },
   {
-    slug: 'wallets',
+    slug: 'tokenomics/det-token/wallets',
     title: 'Wallet Overview',
     description: 'Official wallet addresses',
     category: 'Tokenomics',
@@ -79,7 +79,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/det_token/wallets.md',
   },
   {
-    slug: 'liquidity-pools',
+    slug: 'tokenomics/det-token/liquidity-pools',
     title: 'Liquidity Pools',
     description: 'DEX pools and liquidity',
     category: 'Tokenomics',
@@ -87,7 +87,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/det_token/liquiditypools.md',
   },
   {
-    slug: 'staking',
+    slug: 'tokenomics/det-token/staking',
     title: 'Staking',
     description: 'Staking $CYPU tokens',
     category: 'Tokenomics',
@@ -95,7 +95,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/det_token/staking.md',
   },
   {
-    slug: 'vesting',
+    slug: 'tokenomics/det-token/vesting',
     title: 'Vesting',
     description: 'Token vesting schedules',
     category: 'Tokenomics',
@@ -103,7 +103,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/det_token/vesting.md',
   },
   {
-    slug: 'peg',
+    slug: 'tokenomics/det-token/peg',
     title: 'PEG System',
     description: '$CYPU ↔ CYPUV peg mechanism',
     category: 'Tokenomics',
@@ -111,7 +111,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/det_token/peg.md',
   },
   {
-    slug: 'lock',
+    slug: 'tokenomics/det-token/lock',
     title: 'Token Locks',
     description: 'Lock mechanisms and vaults',
     category: 'Tokenomics',
@@ -119,7 +119,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/det_token/lock.md',
   },
   {
-    slug: 'mint',
+    slug: 'tokenomics/publicmarket/mint',
     title: 'Minting',
     description: 'How to mint $CYPU',
     category: 'Tokenomics',
@@ -129,7 +129,7 @@ export const docsConfig: DocPage[] = [
 
   // Platform
   {
-    slug: 'features',
+    slug: 'platform/infocenter/features',
     title: 'Platform Features',
     description: 'Explore kas.me features',
     category: 'Platform',
@@ -137,7 +137,7 @@ export const docsConfig: DocPage[] = [
     file: 'platform/infocenter/features.md',
   },
   {
-    slug: 'det-features',
+    slug: 'platform/infocenter/features/det-features',
     title: 'Detailed Features',
     description: 'In-depth feature breakdown',
     category: 'Platform',
@@ -145,7 +145,7 @@ export const docsConfig: DocPage[] = [
     file: 'platform/infocenter/features/det_features.md',
   },
   {
-    slug: 'free-features',
+    slug: 'platform/infocenter/features/free-features',
     title: 'Free Features',
     description: 'Features available for free',
     category: 'Platform',
@@ -153,7 +153,7 @@ export const docsConfig: DocPage[] = [
     file: 'platform/infocenter/features/free_features.md',
   },
   {
-    slug: 'explorer',
+    slug: 'platform/infocenter/explorer',
     title: 'Explorer',
     description: 'Kaspa blockchain explorer',
     category: 'Platform',
@@ -161,7 +161,7 @@ export const docsConfig: DocPage[] = [
     file: 'platform/infocenter/explorer.md',
   },
   {
-    slug: 'guides',
+    slug: 'platform/infocenter/guides',
     title: 'Guides',
     description: 'Platform guides and tutorials',
     category: 'Platform',
@@ -169,7 +169,7 @@ export const docsConfig: DocPage[] = [
     file: 'platform/infocenter/guides.md',
   },
   {
-    slug: 'intelligence-center',
+    slug: 'platform/infocenter/intelligence-center',
     title: 'Intelligence Center',
     description: 'Advanced analytics tools',
     category: 'Platform',
@@ -179,7 +179,7 @@ export const docsConfig: DocPage[] = [
 
   // EcoLoop
   {
-    slug: 'ecoloop',
+    slug: 'tokenomics/ecoloop',
     title: 'EcoLoop',
     description: 'The IT CyberSpace ecosystem loop',
     category: 'EcoLoop',
@@ -187,7 +187,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/ecoloop_itcs.md',
   },
   {
-    slug: 'ecoloop-firm',
+    slug: 'tokenomics/titcs/firm',
     title: 'The IT CyberSpace',
     description: 'About the company',
     category: 'EcoLoop',
@@ -195,7 +195,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/titcs/firm.md',
   },
   {
-    slug: 'ecoloop-network',
+    slug: 'tokenomics/titcs/network',
     title: 'Network',
     description: 'CyberPump Network details',
     category: 'EcoLoop',
@@ -203,7 +203,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/titcs/network.md',
   },
   {
-    slug: 'ecoloop-onchain',
+    slug: 'tokenomics/titcs/onchain',
     title: 'On-Chain',
     description: 'On-chain mechanics',
     category: 'EcoLoop',
@@ -211,7 +211,7 @@ export const docsConfig: DocPage[] = [
     file: 'tokenomics/titcs/onchain.md',
   },
   {
-    slug: 'ecoloop-partners',
+    slug: 'tokenomics/titcs/partners',
     title: 'Partners',
     description: 'Partner ecosystem',
     category: 'EcoLoop',
@@ -229,7 +229,7 @@ export const docsConfig: DocPage[] = [
     file: 'community/community.md',
   },
   {
-    slug: 'faq',
+    slug: 'community/hub/faq',
     title: 'FAQ',
     description: 'Frequently asked questions',
     category: 'Community',
@@ -237,7 +237,7 @@ export const docsConfig: DocPage[] = [
     file: 'community/hub/faq.md',
   },
   {
-    slug: 'story',
+    slug: 'community/hub/story',
     title: 'Our Story',
     description: 'The story behind kas.me',
     category: 'Community',
@@ -245,7 +245,7 @@ export const docsConfig: DocPage[] = [
     file: 'community/hub/story.md',
   },
   {
-    slug: 'audits',
+    slug: 'community/hub/audits',
     title: 'Audits',
     description: 'Security audits and transparency',
     category: 'Community',
@@ -255,7 +255,7 @@ export const docsConfig: DocPage[] = [
 
   // Development
   {
-    slug: 'dev',
+    slug: 'development',
     title: 'Development',
     description: 'Developer resources and API',
     category: 'Development',
@@ -263,7 +263,7 @@ export const docsConfig: DocPage[] = [
     file: 'development/dev.md',
   },
   {
-    slug: 'devtalk-1',
+    slug: 'development/devtalks/devtalk-1',
     title: 'DevTalk #1',
     description: 'First developer talk',
     category: 'Development',
@@ -271,7 +271,7 @@ export const docsConfig: DocPage[] = [
     file: 'development/devtalks/devtalk1.md',
   },
   {
-    slug: 'devtalk-2',
+    slug: 'development/devtalks/devtalk-2',
     title: 'DevTalk #2',
     description: 'Second developer talk',
     category: 'Development',

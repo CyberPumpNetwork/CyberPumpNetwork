@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
+import { PageHeader } from '@/components/PageHeader'
 import { Footer } from '@/components/Footer'
 
 const blogPosts = [
@@ -89,28 +89,13 @@ export function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
-        <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center">
-              <span className="text-xl font-bold text-background">CP</span>
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-accent to-accent/70 bg-clip-text text-transparent">
-              CyperPump
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/docs">Docs</Link>
-            </Button>
-            <Button className="bg-accent hover:bg-accent/90 text-background">
-              Launch App
-            </Button>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        logoText="CyberPump"
+        navItems={[
+          { label: 'Docs', href: '/docs' },
+          { label: 'Launch App', href: '#' },
+        ]}
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Page Header */}

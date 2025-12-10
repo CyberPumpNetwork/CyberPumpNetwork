@@ -1,10 +1,9 @@
-import { useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { PageHeader } from '@/components/PageHeader'
 import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 import { getDocsNavigation, getDocBySlug, getCategories, getDocsByCategory } from '@/lib/docs'
 import { useMarkdownContent } from '@/lib/useMarkdown'
@@ -329,50 +328,25 @@ function MarkdownDocPage({ slug }: { slug: string }) {
 }
 
 export function DocsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
   const { '*': slug } = useParams()
   const isHomePage = !slug || slug === ''
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Navigation */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
-        <div className="flex h-14 items-center px-4 lg:px-6">
-          <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0">
-              <DocsSidebar className="h-full px-4" />
-            </SheetContent>
-          </Sheet>
-
-          <div className="flex items-center gap-4 ml-auto">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to Home
-              </Link>
-            </Button>
-            <Button size="sm" className="bg-accent hover:bg-accent/90 text-background" asChild>
-              <a href="https://kas.me" target="_blank" rel="noopener noreferrer">
-                Launch kas.me
-              </a>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        showLogo={false}
+        showSidebar={true}
+        sidebarContent={<DocsSidebar className="h-full px-4" />}
+        navItems={[
+          { label: 'Back to Home', href: '/' },
+          { label: 'Launch kas.me', href: 'https://kas.me', external: true },
+        ]}
+      />
 
       <div className="flex">
         {/* Sidebar */}
         <aside className="hidden lg:block w-64 shrink-0 border-r border-border/50">
-          <DocsSidebar className="sticky top-14 h-[calc(100vh-3.5rem)] pl-6" />
+          <DocsSidebar className="sticky top-16 h-[calc(100vh-4rem)] pl-6" />
         </aside>
 
         {/* Main Content */}
