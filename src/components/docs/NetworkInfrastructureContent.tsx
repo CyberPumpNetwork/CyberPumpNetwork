@@ -1,4 +1,5 @@
 import { Callout } from '@/components/docs/Callout'
+import { NetworkInfrastructureMap } from './NetworkInfrastructureMap'
 import { Server, Network, Cpu, Database, Zap, Globe, Shield, Settings } from 'lucide-react'
 
 export function NetworkInfrastructureContent() {
@@ -11,6 +12,15 @@ export function NetworkInfrastructureContent() {
           The technical foundation of kas.me - from mining rigs to distributed Worker nodes. Decentralized architecture with configurable regional compliance.
         </p>
       </div>
+
+      {/* Interactive Infrastructure Map */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold">Infrastructure Overview</h2>
+        <p className="text-muted-foreground">
+          Drag nodes to explore the architecture. Animated lines show active data flows between Godfather nodes and Worker clusters.
+        </p>
+        <NetworkInfrastructureMap />
+      </section>
 
       {/* The Real Architecture */}
       <section className="space-y-4">
