@@ -8,6 +8,8 @@ import {
   useEdgesState,
   Handle,
   Position,
+  getSmoothStepPath,
+  type EdgeProps,
 } from '@xyflow/react'
 import type { Node, Edge } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
@@ -52,6 +54,7 @@ interface Connection {
   animated?: boolean;
   sourceHandle?: 'top' | 'right' | 'bottom' | 'left';
   targetHandle?: 'top' | 'right' | 'bottom' | 'left';
+  offset?: number; // Visual offset in pixels for overlapping edges
 }
 
 // === DATA DEFINITION (Single Source of Truth) ===
@@ -78,17 +81,15 @@ const MILESTONES: Milestone[] = [
   { id: 'training-complete', year: 2023, quarter: 2, branch: 'career', label: 'Training Complete' },
   { id: 'software-coach', year: 2023, quarter: 3, branch: 'career', label: 'Software Coach' },
   { id: 'health-it', year: 2024, quarter: 1, branch: 'career', label: 'Health IT Dev' },
-  { id: 'business-plan', year: 2024, quarter: 4, branch: 'career', label: 'Business Plan' },
+  { id: 'business-plan', year: 2024, quarter: 3, branch: 'career', label: 'Business Plan' },
   { id: 'it-cyberspace', year: 2025, quarter: 1, branch: 'career', label: 'The IT CyberSpace' },
   { id: 'self-employ-prep', year: 2025, quarter: 2, branch: 'career', label: 'Prep Independence' },
   { id: 'q3-goal', year: 2026, quarter: 3, branch: 'career', label: 'Full Independence', type: 'future' },
-  { id: 'it-cyberspace-future', year: 2027, quarter: 1, branch: 'career', label: 'The IT CyberSpace v2', type: 'future' },
   { id: 'it-cyberspace-future', year: 2027, quarter: 1, branch: 'career', label: 'The IT CyberSpace v2', type: 'future' },
 
   // === CRYPTO BRANCH (DASHED GREEN - FINANCIAL EXPLORATION) ===
   { id: 'curiosity-money', year: 2019, quarter: 1, branch: 'crypto', label: 'Money Curiosity' },
   { id: 'crypto-discovered', year: 2019, quarter: 2, branch: 'crypto', label: 'Found Crypto' },
-  { id: 'mining-attempts', year: 2019, quarter: 4, branch: 'crypto', label: 'Mining Failed' },
   { id: 'money-lost', year: 2020, quarter: 1, branch: 'crypto', label: 'Money Lost' },
   { id: 'kaspa-heard', year: 2022, quarter: 2, branch: 'crypto', label: 'Kaspa = Scam?' },
   { id: 'perp-trading', year: 2023, quarter: 3, branch: 'crypto', label: 'Tried Trading' },
@@ -97,27 +98,33 @@ const MILESTONES: Milestone[] = [
   { id: 'first-kaspa-buy', year: 2025, quarter: 1, branch: 'crypto', label: 'First KAS Buy' },
   { id: 'tokenomics-design', year: 2025, quarter: 2, branch: 'crypto', label: 'Tokenomics Design' },
   { id: 'token-launch', year: 2025, quarter: 4, branch: 'crypto', label: 'Token Launch' },
+  { id: 'compliance-framework', year: 2026, quarter: 3, branch: 'crypto', label: 'Compliance Framework', type: 'future' },
+  { id: 'crypto-audits', year: 2027, quarter: 1, branch: 'crypto', label: 'Crypto Audits', type: 'future' },
 
   // === LEARNING BRANCH (DASHED YELLOW - INTELLECTUAL GROWTH) ===
+  { id: 'start-mining', year: 2019, quarter: 3, branch: 'learning', label: 'Start Mining' },
+  { id: 'mining-attempts', year: 2019, quarter: 4, branch: 'learning', label: 'Mining Failed' },
   { id: 'learn-crypto', year: 2021, quarter: 1, branch: 'learning', label: 'Study Crypto' },
-  { id: 'learn-economics', year: 2021, quarter: 3, branch: 'learning', label: 'Study Economics' },
+  { id: 'learn-economics', year: 2021, quarter: 2, branch: 'learning', label: 'Study Economics' },
   { id: 'btc-maxi', year: 2022, quarter: 1, branch: 'learning', label: 'BTC Maximalist' },
-  { id: 'learn-markets', year: 2022, quarter: 4, branch: 'learning', label: 'Study Markets' },
+  { id: 'learn-markets', year: 2022, quarter: 3, branch: 'learning', label: 'Study Markets' },
   { id: 'frustrated-pause', year: 2023, quarter: 2, branch: 'learning', label: 'Frustrated' },
   { id: 'goosebumps', year: 2024, quarter: 3, branch: 'learning', label: 'Goosebumps!' },
   { id: 'btc-goodbye', year: 2024, quarter: 4, branch: 'learning', label: 'Bye BTC Maxi' },
   { id: 'deep-understanding', year: 2025, quarter: 1, branch: 'learning', label: 'Deep Knowledge' },
   { id: 'hft-research', year: 2025, quarter: 2, branch: 'learning', label: 'HFT Research' },
   { id: 'system-architecture', year: 2025, quarter: 4, branch: 'learning', label: 'Architecture' },
+  { id: 'regulatory', year: 2026, quarter: 3, branch: 'learning', label: 'Regulatory', type: 'future' },
 
   // === DEV BRANCH (DASHED BLUE - DEVELOPMENT WORK) ===
+  { id: 'backend-learn', year: 2017, quarter: 2, branch: 'dev', label: 'Java Backend' },
+  { id: 'fw-plugin-dev', year: 2022, quarter: 3, branch: 'dev', label: 'FW Plugin Dev' },
   { id: 'gta', year: 2023, quarter: 2, branch: 'dev', label: 'GTA Server' },
   { id: 'qbcore', year: 2023, quarter: 4, branch: 'dev', label: 'QBCore Framework' },
   { id: 'rust-learning', year: 2024, quarter: 4, branch: 'dev', label: 'Rust Learning' },
 
   // === BUILDING BRANCH (DASHED PURPLE - TECHNICAL PROJECTS & PRODUCTS) ===
   { id: 'minecraft', year: 2012, quarter: 2, branch: 'building', label: 'Minecraft Servers' },
-  { id: 'backend-learn', year: 2017, quarter: 2, branch: 'building', label: 'Java Backend' },
   { id: 'freakyworld', year: 2022, quarter: 1, branch: 'building', label: 'FreakyWorld' },
   { id: 'freakyworld-end', year: 2024, quarter: 3, branch: 'building', label: 'FW Shutdown (50 Players)' },
   { id: 'platform-idea', year: 2025, quarter: 1, branch: 'building', label: 'kas.me Concept' },
@@ -158,8 +165,7 @@ const CONNECTIONS: Connection[] = [
   // === CRYPTO BRANCH (FROM MAIN TIMELINE DOWNWARD, THEN HORIZONTAL) ===
   { from: 'age19', to: 'curiosity-money', sourceHandle: 'bottom', targetHandle: 'top' }, // Age 19 → Crypto starts
   { from: 'curiosity-money', to: 'crypto-discovered', sourceHandle: 'right', targetHandle: 'left' },
-  { from: 'crypto-discovered', to: 'mining-attempts', sourceHandle: 'right', targetHandle: 'left' },
-  { from: 'mining-attempts', to: 'money-lost', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'crypto-discovered', to: 'money-lost', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'money-lost', to: 'kaspa-heard', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'kaspa-heard', to: 'perp-trading', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'perp-trading', to: 'money-burned', sourceHandle: 'right', targetHandle: 'left' },
@@ -167,9 +173,11 @@ const CONNECTIONS: Connection[] = [
   { from: 'kaspa-rediscovered', to: 'first-kaspa-buy', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'first-kaspa-buy', to: 'tokenomics-design', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'tokenomics-design', to: 'token-launch', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'token-launch', to: 'compliance-framework', sourceHandle: 'right', targetHandle: 'left', animated: true },
 
   // === LEARNING BRANCH (FROM CAREER DOWNWARD, THEN HORIZONTAL) ===
   { from: 'bank-training', to: 'learn-crypto', sourceHandle: 'bottom', targetHandle: 'top' }, // From Career → Learning starts
+  { from: 'start-mining', to: 'mining-attempts', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'learn-crypto', to: 'learn-economics', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'learn-economics', to: 'btc-maxi', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'btc-maxi', to: 'learn-markets', sourceHandle: 'right', targetHandle: 'left' },
@@ -181,15 +189,21 @@ const CONNECTIONS: Connection[] = [
   { from: 'hft-research', to: 'system-architecture', sourceHandle: 'right', targetHandle: 'left' },
 
   // === DEV BRANCH (FROM CAREER DOWNWARD, THEN HORIZONTAL) ===
+  { from: 'age17', to: 'backend-learn', sourceHandle: 'bottom', targetHandle: 'top' }, // Main → Dev (Age 17)
+  { from: 'minecraft', to: 'backend-learn', sourceHandle: 'top', targetHandle: 'bottom' }, // Building → Dev
+  { from: 'backend-learn', to: 'fw-plugin-dev', sourceHandle: 'right', targetHandle: 'left' }, // Backend → FW Plugin
   { from: 'training-complete', to: 'gta', sourceHandle: 'bottom', targetHandle: 'top' }, // From Career → Dev starts
+  { from: 'freakyworld', to: 'fw-plugin-dev', sourceHandle: 'top', targetHandle: 'bottom' }, // Building → Dev (UP!)
+  { from: 'learn-economics', to: 'fw-plugin-dev', sourceHandle: 'bottom', targetHandle: 'top', offset: -20 }, // Learning → Dev
+  { from: 'learn-markets', to: 'fw-plugin-dev', sourceHandle: 'bottom', targetHandle: 'top', offset: 20 }, // Learning → Dev
+  { from: 'fw-plugin-dev', to: 'gta', sourceHandle: 'right', targetHandle: 'left' }, // FW Plugin Dev → GTA
   { from: 'gta', to: 'qbcore', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'qbcore', to: 'rust-learning', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'software-coach', to: 'qbcore', sourceHandle: 'bottom', targetHandle: 'top' }, // Career → Dev connection
 
   // === BUILDING BRANCH (FROM MAIN TIMELINE DOWNWARD, THEN HORIZONTAL) ===
   { from: 'age13', to: 'minecraft', sourceHandle: 'bottom', targetHandle: 'top' }, // Age 13 → Building starts
-  { from: 'minecraft', to: 'backend-learn', sourceHandle: 'right', targetHandle: 'left' },
-  { from: 'backend-learn', to: 'freakyworld', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'minecraft', to: 'freakyworld', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'freakyworld', to: 'freakyworld-end', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'freakyworld-end', to: 'platform-idea', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'platform-idea', to: 'devtalk-1', sourceHandle: 'right', targetHandle: 'left' },
@@ -199,7 +213,9 @@ const CONNECTIONS: Connection[] = [
 
   // === CROSS-BRANCH CONNECTIONS (LOGICAL RELATIONSHIPS) ===
   // Crypto → Learning: Discoveries trigger learning
-  { from: 'crypto-discovered', to: 'learn-crypto', sourceHandle: 'top', targetHandle: 'bottom' },
+  { from: 'crypto-discovered', to: 'start-mining', sourceHandle: 'top', targetHandle: 'bottom' },
+  { from: 'mining-attempts', to: 'money-lost', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'money-lost', to: 'learn-crypto', sourceHandle: 'top', targetHandle: 'bottom' },
   { from: 'money-burned', to: 'frustrated-pause', sourceHandle: 'top', targetHandle: 'bottom' },
   
   // Learning → Crypto: Knowledge influences decisions
@@ -214,26 +230,33 @@ const CONNECTIONS: Connection[] = [
   { from: 'training-complete', to: 'perp-trading', sourceHandle: 'bottom', targetHandle: 'top' },
   
   // Crypto/Learning → Dev: Kaspa interest leads to Rust
-  { from: 'kaspa-rediscovered', to: 'rust-learning', sourceHandle: 'bottom', targetHandle: 'top' },
-  { from: 'hft-research', to: 'rust-learning', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'kaspa-rediscovered', to: 'rust-learning', sourceHandle: 'bottom', targetHandle: 'top', offset: -15 },
+  { from: 'hft-research', to: 'rust-learning', sourceHandle: 'bottom', targetHandle: 'top', offset: 15 },
   
   // Building → Career: FW shutdown leads to business focus
   { from: 'freakyworld-end', to: 'business-plan', sourceHandle: 'top', targetHandle: 'bottom' },
   
   // Multiple branches → Building kas.me platform: 4 pillars converge
-  { from: 'deep-understanding', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top' },
-  { from: 'rust-learning', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top' },
-  { from: 'it-cyberspace', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top' },
-  { from: 'tokenomics-design', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'deep-understanding', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top', offset: -30 },
+  { from: 'rust-learning', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top', offset: -10 },
+  { from: 'it-cyberspace', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top', offset: 10 },
+  { from: 'tokenomics-design', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top', offset: 30 },
   { from: 'token-launch', to: 'devtalk-1', sourceHandle: 'bottom', targetHandle: 'top' },
   
   // Main → Building: Current state
-  { from: 'age17', to: 'backend-learn', sourceHandle: 'bottom', targetHandle: 'top' },
   { from: 'age22', to: 'freakyworld', sourceHandle: 'bottom', targetHandle: 'top' },
-  { from: 'age26', to: 'current-dev', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'age26', to: 'current-dev', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
   
   // Career → Building: Future convergence
   { from: 'it-cyberspace-future', to: 'building-kasme', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
+  
+  // Future convergence → Regulatory & Audits
+  { from: 'token-launch', to: 'regulatory', sourceHandle: 'right', targetHandle: 'left', animated: true, offset: 30 },
+  { from: 'system-architecture', to: 'regulatory', sourceHandle: 'right', targetHandle: 'left', animated: true, offset: 30 },
+  { from: 'current-dev', to: 'regulatory', sourceHandle: 'top', targetHandle: 'bottom', animated: true, offset: -20 },
+  { from: 'q3-goal', to: 'regulatory', sourceHandle: 'bottom', targetHandle: 'top', animated: true, offset: 20 },
+  { from: 'regulatory', to: 'compliance-framework', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
+  { from: 'compliance-framework', to: 'crypto-audits', sourceHandle: 'right', targetHandle: 'left', animated: true },
 ];
 
 // === FRAMEWORK: POSITION CALCULATOR ===
@@ -242,6 +265,45 @@ function calculatePosition(milestone: Milestone) {
   const x = yearOffset * GRID.YEAR_WIDTH + (milestone.quarter - 1) * GRID.QUARTER_WIDTH;
   const y = BRANCHES[milestone.branch].y;
   return { x, y };
+}
+
+// === CUSTOM EDGE COMPONENT WITH OFFSET SUPPORT ===
+function OffsetEdge({ 
+  id, 
+  sourceX, 
+  sourceY, 
+  targetX, 
+  targetY, 
+  sourcePosition, 
+  targetPosition, 
+  style = {}, 
+  markerEnd, 
+  data,
+}: EdgeProps) {
+  const offset = (data?.offset as number) || 0;
+  
+  // Apply vertical offset to both source and target points
+  const offsetSourceY = sourceY + offset;
+  const offsetTargetY = targetY + offset;
+  
+  const [edgePath] = getSmoothStepPath({
+    sourceX,
+    sourceY: offsetSourceY,
+    sourcePosition,
+    targetX,
+    targetY: offsetTargetY,
+    targetPosition,
+  });
+
+  return (
+    <path
+      id={id}
+      style={style}
+      className="react-flow__edge-path"
+      d={edgePath}
+      markerEnd={markerEnd}
+    />
+  );
 }
 
 // === FRAMEWORK: EDGE STYLE GENERATOR ===
@@ -313,9 +375,10 @@ function generateEdges(connections: Connection[], milestones: Milestone[]): Edge
     id: `e-${connection.from}-${connection.to}`,
     source: connection.from,
     target: connection.to,    sourceHandle: connection.sourceHandle,
-    targetHandle: connection.targetHandle,    type: 'smoothstep',
+    targetHandle: connection.targetHandle,    type: connection.offset ? 'offsetEdge' : 'smoothstep',
     animated: connection.animated || false,
     style: getEdgeStyle(connection, milestones),
+    data: connection.offset ? { offset: connection.offset } : undefined,
   }));
 }
 
@@ -325,12 +388,21 @@ function MilestoneNode({ data }: { data: any }) {
   
   return (
     <div className={`rounded-lg border-2 ${branchConfig.bgClass} backdrop-blur-sm px-3 py-2 shadow-md min-w-[120px] max-w-[180px]`}>
+      {/* Dual handles: each position can be both source and target */}
       <Handle type="target" position={Position.Top} id="top" className="w-2 h-2" />
+      <Handle type="source" position={Position.Top} id="top" className="w-2 h-2" style={{ opacity: 0 }} />
+      
       <Handle type="target" position={Position.Left} id="left" className="w-2 h-2" />
+      <Handle type="source" position={Position.Left} id="left" className="w-2 h-2" style={{ opacity: 0 }} />
+      
       <div className="text-xs font-medium text-muted-foreground mb-1">{data.year}</div>
       <div className="text-sm font-semibold">{data.label}</div>
-      <Handle type="source" position={Position.Right} id="right" className="w-2 h-2" />
-      <Handle type="source" position={Position.Bottom} id="bottom" className="w-2 h-2" />
+      
+      <Handle type="target" position={Position.Right} id="right" className="w-2 h-2" />
+      <Handle type="source" position={Position.Right} id="right" className="w-2 h-2" style={{ opacity: 0 }} />
+      
+      <Handle type="target" position={Position.Bottom} id="bottom" className="w-2 h-2" />
+      <Handle type="source" position={Position.Bottom} id="bottom" className="w-2 h-2" style={{ opacity: 0 }} />
     </div>
   );
 }
@@ -340,12 +412,21 @@ function FutureNode({ data }: { data: any }) {
   
   return (
     <div className={`rounded-lg border-2 border-dashed ${branchConfig.bgClass} backdrop-blur-sm px-3 py-2 shadow-md min-w-[120px] max-w-[180px] opacity-70`}>
+      {/* Dual handles: each position can be both source and target */}
       <Handle type="target" position={Position.Top} id="top" className="w-2 h-2" />
+      <Handle type="source" position={Position.Top} id="top" className="w-2 h-2" style={{ opacity: 0 }} />
+      
       <Handle type="target" position={Position.Left} id="left" className="w-2 h-2" />
+      <Handle type="source" position={Position.Left} id="left" className="w-2 h-2" style={{ opacity: 0 }} />
+      
       <div className="text-xs font-medium text-muted-foreground mb-1">{data.year}</div>
       <div className="text-sm font-semibold italic">{data.label}</div>
-      <Handle type="source" position={Position.Right} id="right" className="w-2 h-2" />
-      <Handle type="source" position={Position.Bottom} id="bottom" className="w-2 h-2" />
+      
+      <Handle type="target" position={Position.Right} id="right" className="w-2 h-2" />
+      <Handle type="source" position={Position.Right} id="right" className="w-2 h-2" style={{ opacity: 0 }} />
+      
+      <Handle type="target" position={Position.Bottom} id="bottom" className="w-2 h-2" />
+      <Handle type="source" position={Position.Bottom} id="bottom" className="w-2 h-2" style={{ opacity: 0 }} />
     </div>
   );
 }
@@ -364,6 +445,10 @@ export function StoryRoadmap() {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
 
+  const edgeTypes = {
+    offsetEdge: OffsetEdge,
+  };
+
   return (
     <div className="w-full h-[800px] bg-background rounded-lg border relative">
       <ReactFlow
@@ -372,6 +457,7 @@ export function StoryRoadmap() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
         minZoom={0.1}
         maxZoom={1.5}

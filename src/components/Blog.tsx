@@ -2,21 +2,33 @@ import { Link } from 'react-router-dom'
 import { Card, CardContent } from './ui/card'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
+import { Mic, Coins } from 'lucide-react'
 
+// Links to actual existing docs pages
 const resourcePosts = [
   {
-    title: 'First Ever Dev Talk',
+    title: 'Dev Talk #1: Origin Story',
     excerpt:
-      '72 days after token launch. The origin story - from first contact with blockchain in 2019, to understanding Kaspa, to the simple thought: give people the ability to understand and act.',
+      '72 days after token launch. From first contact with blockchain in 2019 to Kaspa - give people the ability to understand and act.',
     category: 'Dev Talk',
     link: '/docs/community/devtalks/devtalk-1',
+    icon: Mic,
   },
   {
-    title: 'Absurd Megalomania',
+    title: 'Dev Talk #2: Absurd Megalomania',
     excerpt:
-      'A declaration of freedom. The paradox of a website without traditional ownership - just code, nodes, and a system that includes you. Designed to survive me.',
+      'A declaration of freedom. The paradox of a website without traditional ownership - just code, nodes, and a system designed to survive me.',
     category: 'Dev Talk',
     link: '/docs/community/devtalks/devtalk-2',
+    icon: Mic,
+  },
+  {
+    title: '$CYPU Token & Ecosystem',
+    excerpt:
+      'Overview of the KRC-20 token powering kas.me. Fair launch, transparent distribution, and the economic model.',
+    category: 'Tokenomics',
+    link: '/docs/tokenomics',
+    icon: Coins,
   },
 ]
 
@@ -43,78 +55,66 @@ export function Blog() {
 
         {/* Blog Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {resourcePosts.map((post, index) => (
-            <Card
-              key={index}
-              className="group overflow-hidden hover:border-accent/40 transition-all duration-300 hover:-translate-y-1"
-            >
-              {/* Image */}
-              <div className="aspect-video overflow-hidden bg-accent/10">
-                <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">
-                  <svg
-                    className="w-12 h-12 text-accent/40"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-                    />
-                  </svg>
-                </div>
-              </div>
+          {resourcePosts.map((post, index) => {
+            const Icon = post.icon
+            return (
+              <Link key={index} to={post.link}>
+                <Card className="group overflow-hidden hover:border-accent/40 transition-all duration-300 hover:-translate-y-1 h-full">
+                  {/* Image */}
+                  <div className="aspect-video overflow-hidden bg-accent/10">
+                    <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">
+                      <Icon className="w-12 h-12 text-accent/50 group-hover:text-accent group-hover:scale-110 transition-all" />
+                    </div>
+                  </div>
 
-              {/* Content */}
-              <CardContent className="p-6">
-                {/* Meta */}
-                <div className="flex items-center gap-3 mb-4">
-                  <Badge variant="secondary" className="bg-accent/10 text-accent">
-                    {post.category}
-                  </Badge>
-                </div>
+                  {/* Content */}
+                  <CardContent className="p-6">
+                    {/* Meta */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <Badge variant="secondary" className="bg-accent/10 text-accent">
+                        {post.category}
+                      </Badge>
+                    </div>
 
-                {/* Title */}
-                <h3 className="text-xl font-semibold mb-3 group-hover:text-accent transition-colors duration-300">
-                  {post.title}
-                </h3>
+                    {/* Title */}
+                    <h3 className="text-xl font-semibold mb-3 group-hover:text-accent transition-colors duration-300">
+                      {post.title}
+                    </h3>
 
-                {/* Excerpt */}
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  {post.excerpt}
-                </p>
+                    {/* Excerpt */}
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                      {post.excerpt}
+                    </p>
 
-                {/* Read More */}
-                <Button variant="ghost" className="text-accent p-0 h-auto hover:bg-transparent hover:text-accent/80" asChild>
-                  <Link to={post.link}>
-                    Read Dev Talk
-                    <svg
-                      className="w-4 h-4 ml-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+                    {/* Read More */}
+                    <span className="text-accent text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                      Read More
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </span>
+                  </CardContent>
+                </Card>
+              </Link>
+            )
+          })}
         </div>
 
         {/* View All Button */}
         <div className="text-center mt-12">
           <Button variant="outline" size="lg" asChild className="border-accent/30 text-accent hover:bg-accent/10">
-            <Link to="/docs/community/devtalks">
-              Browse All Dev Talks
+            <Link to="/blog">
+              Browse All Resources
               <svg
                 className="w-4 h-4 ml-2"
                 fill="none"
