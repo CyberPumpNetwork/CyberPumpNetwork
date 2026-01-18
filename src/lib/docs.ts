@@ -226,7 +226,7 @@ export const docsConfig: DocPage[] = [
     description: 'Join the kas.me community',
     category: 'Community',
     order: 1,
-    file: 'community/community.md',
+    file: '', // Uses React component CommunityContent instead of markdown
   },
   {
     slug: 'community/hub/faq',
@@ -242,7 +242,7 @@ export const docsConfig: DocPage[] = [
     description: 'The story behind kas.me',
     category: 'Community',
     order: 3,
-    file: 'community/hub/story.md',
+    file: '', // Uses React component StoryContent instead of markdown
   },
   {
     slug: 'community/hub/audits',

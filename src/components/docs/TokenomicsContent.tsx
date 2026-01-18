@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { ResourceCard } from './ResourceCard'
 import { Callout } from './Callout'
 import { StatsGrid } from './StatsGrid'
@@ -245,10 +246,18 @@ export function TokenomicsContent() {
           </div>
         </div>
 
-        <Callout type="tip" title="Earning CYPUV">
+        <Callout type="warning" title="Acquiring $CYPUV">
+          <p className="text-sm mb-2">
+            <strong>$CYPUV is freely available via the Bonding Curve on KaspaCom L2.</strong> User-purchased tokens are fully liquid - no locks, no restrictions.
+          </p>
           <p className="text-sm">
-            CYPUV is earned through platform participation and contributions to the ecosystem.
-            Distribution is based on actual value added, not speculative holding. Think: Proof of Work for governance rights.
+            Only firm-acquired tokens are locked (Tangem hardware + 4-year smart contract).{' '}
+            <Link
+              to="/docs/tokenomics/det-token/lock#firm-cypuv-lock"
+              className="text-accent font-semibold hover:underline"
+            >
+              See lock details →
+            </Link>
           </p>
         </Callout>
       </div>

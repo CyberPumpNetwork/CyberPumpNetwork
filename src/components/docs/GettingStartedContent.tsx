@@ -448,7 +448,7 @@ export function GettingStartedContent() {
           </a>
           <span className="hidden sm:inline text-muted-foreground">•</span>
           <a
-            href="https://github.com/H34R7L3s/CyberPump"
+            href="https://github.com/CyberPumpNetwork"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-accent hover:gap-3 transition-all"

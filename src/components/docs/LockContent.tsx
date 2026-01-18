@@ -2,6 +2,7 @@ import { ResourceCard } from './ResourceCard'
 import { Callout } from './Callout'
 import { StatsGrid } from './StatsGrid'
 import { TOKENOMICS } from '@/lib/tokenomics-data'
+import { useScrollAndHighlight } from '@/hooks/useScrollAndHighlight'
 import {
   Lock,
   Shield,
@@ -17,8 +18,17 @@ import {
 } from 'lucide-react'
 
 export function LockContent() {
+  const { highlightedId, getAnimationClasses, getAnimationStyles } = useScrollAndHighlight({
+    rotations: 2,
+    rotationDuration: 3000,
+    glowDuration: 2000
+  })
+
   return (
     <div className="space-y-12">
+      {/* Keyframe animations */}
+      <style>{getAnimationStyles()}</style>
+
       {/* Development Status Banner */}
       <Callout type="info" title="Current Lock Status">
         This page explains which tokens are locked and which aren't. IMPORTANT: Only firm-owned tokens are locked. Users can freely trade $CYPUV on DEX - no user locks. The firm's dev wallet purchases are locked 4 years via KaspaCom smart contract.
@@ -343,7 +353,10 @@ export function LockContent() {
       </section>
 
       {/* $CYPUV Governance - Physically Locked */}
-      <section className="space-y-6">
+      <section
+        id="firm-cypuv-lock"
+        className={`space-y-6 rounded-xl p-6 -mx-6 transition-all duration-500 ${getAnimationClasses('firm-cypuv-lock')}`}
+      >
         <h2 className="text-3xl font-bold">{TOKENOMICS.CYPUV.ticker} Governance (Physically Locked)</h2>
 
         <Callout type="warning" title="Firm $CYPUV Locked (NOT User Tokens)">

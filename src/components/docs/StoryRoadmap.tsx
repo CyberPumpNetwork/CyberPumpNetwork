@@ -1,0 +1,408 @@
+import { useState, useCallback } from 'react'
+import {
+  ReactFlow,
+  Controls,
+  Background,
+  BackgroundVariant,
+  useNodesState,
+  useEdgesState,
+  Handle,
+  Position,
+} from '@xyflow/react'
+import type { Node, Edge } from '@xyflow/react'
+import '@xyflow/react/dist/style.css'
+
+// ============================================================================
+// PROFESSIONAL GRID-BASED FRAMEWORK FOR TIMELINE VISUALIZATION
+// ============================================================================
+
+// === GRID CONFIGURATION ===
+const GRID = {
+  YEAR_WIDTH: 750,        // Width per year column (maximum clarity)
+  QUARTER_WIDTH: 187.5,   // Width per quarter (750/4)
+  BRANCH_HEIGHT: 130,     // Vertical spacing between branches (increased)
+  START_YEAR: 2006,       // Timeline starts at school (compact early life)
+};
+
+const BRANCHES = {
+  main: { y: 0, color: 'hsl(var(--accent))', solid: true, label: 'Life', bgClass: 'bg-accent/10 border-accent' },
+  career: { y: 130, color: 'rgb(236 72 153)', solid: true, label: 'Career', bgClass: 'bg-pink-500/10 border-pink-500' },
+  learning: { y: 260, color: 'rgb(234 179 8)', solid: false, label: 'Learning', bgClass: 'bg-yellow-500/10 border-yellow-500' },
+  crypto: { y: 390, color: 'rgb(34 197 94)', solid: false, label: 'Crypto', bgClass: 'bg-green-500/10 border-green-500' },
+  dev: { y: 520, color: 'rgb(59 130 246)', solid: false, label: 'Dev', bgClass: 'bg-blue-500/10 border-blue-500' },
+  building: { y: 650, color: 'rgb(168 85 247)', solid: false, label: 'Building', bgClass: 'bg-purple-500/10 border-purple-500' },
+} as const;
+
+type BranchType = keyof typeof BRANCHES;
+
+// === DATA STRUCTURES ===
+interface Milestone {
+  id: string;
+  year: number;
+  quarter: 1 | 2 | 3 | 4; // Q1-Q4 for precise positioning within year
+  branch: BranchType;
+  label: string;
+  type?: 'milestone' | 'future';
+  offset?: number; // Optional horizontal offset in pixels for overlapping nodes
+}
+
+interface Connection {
+  from: string;
+  to: string;
+  animated?: boolean;
+  sourceHandle?: 'top' | 'right' | 'bottom' | 'left';
+  targetHandle?: 'top' | 'right' | 'bottom' | 'left';
+}
+
+// === DATA DEFINITION (Single Source of Truth) ===
+const MILESTONES: Milestone[] = [
+  // === LIFE TIMELINE (MAIN BRANCH - CONTINUOUS BACKBONE) ===
+  { id: 'school', year: 2006, quarter: 1, branch: 'main', label: 'School Start' },
+  { id: 'age13', year: 2012, quarter: 1, branch: 'main', label: 'Age 13' },
+  { id: 'age17', year: 2017, quarter: 1, branch: 'main', label: 'Age 17' },
+  { id: 'age19', year: 2019, quarter: 1, branch: 'main', label: 'Age 19' },
+  { id: 'age20', year: 2020, quarter: 1, branch: 'main', label: 'Age 20' },
+  { id: 'age21', year: 2021, quarter: 1, branch: 'main', label: 'Age 21' },
+  { id: 'age22', year: 2022, quarter: 1, branch: 'main', label: 'Age 22' },
+  { id: 'age23', year: 2023, quarter: 1, branch: 'main', label: 'Age 23' },
+  { id: 'age24', year: 2024, quarter: 1, branch: 'main', label: 'Age 24' },
+  { id: 'age25', year: 2025, quarter: 1, branch: 'main', label: 'Age 25' },
+  { id: 'age26', year: 2026, quarter: 1, branch: 'main', label: 'Age 26 (Now)' },
+  { id: 'future', year: 2027, quarter: 1, branch: 'main', label: 'Future', type: 'future' },
+
+  // === CAREER BRANCH (SOLID PINK - PROFESSIONAL DEVELOPMENT) ===
+  { id: 'dropped-school', year: 2020, quarter: 2, branch: 'career', label: 'School Dropout' },
+  { id: 'bank-training', year: 2020, quarter: 4, branch: 'career', label: 'IT Training Start' },
+  { id: 'training-year1', year: 2021, quarter: 2, branch: 'career', label: 'Year 1 Complete' },
+  { id: 'training-year2', year: 2022, quarter: 2, branch: 'career', label: 'Year 2 Complete' },
+  { id: 'training-complete', year: 2023, quarter: 2, branch: 'career', label: 'Training Complete' },
+  { id: 'software-coach', year: 2023, quarter: 3, branch: 'career', label: 'Software Coach' },
+  { id: 'health-it', year: 2024, quarter: 1, branch: 'career', label: 'Health IT Dev' },
+  { id: 'business-plan', year: 2024, quarter: 4, branch: 'career', label: 'Business Plan' },
+  { id: 'it-cyberspace', year: 2025, quarter: 1, branch: 'career', label: 'The IT CyberSpace' },
+  { id: 'self-employ-prep', year: 2025, quarter: 2, branch: 'career', label: 'Prep Independence' },
+  { id: 'q3-goal', year: 2026, quarter: 3, branch: 'career', label: 'Full Independence', type: 'future' },
+  { id: 'it-cyberspace-future', year: 2027, quarter: 1, branch: 'career', label: 'The IT CyberSpace v2', type: 'future' },
+  { id: 'it-cyberspace-future', year: 2027, quarter: 1, branch: 'career', label: 'The IT CyberSpace v2', type: 'future' },
+
+  // === CRYPTO BRANCH (DASHED GREEN - FINANCIAL EXPLORATION) ===
+  { id: 'curiosity-money', year: 2019, quarter: 1, branch: 'crypto', label: 'Money Curiosity' },
+  { id: 'crypto-discovered', year: 2019, quarter: 2, branch: 'crypto', label: 'Found Crypto' },
+  { id: 'mining-attempts', year: 2019, quarter: 4, branch: 'crypto', label: 'Mining Failed' },
+  { id: 'money-lost', year: 2020, quarter: 1, branch: 'crypto', label: 'Money Lost' },
+  { id: 'kaspa-heard', year: 2022, quarter: 2, branch: 'crypto', label: 'Kaspa = Scam?' },
+  { id: 'perp-trading', year: 2023, quarter: 3, branch: 'crypto', label: 'Tried Trading' },
+  { id: 'money-burned', year: 2023, quarter: 4, branch: 'crypto', label: 'Burned Again' },
+  { id: 'kaspa-rediscovered', year: 2024, quarter: 2, branch: 'crypto', label: 'Kaspa Revisited' },
+  { id: 'first-kaspa-buy', year: 2025, quarter: 1, branch: 'crypto', label: 'First KAS Buy' },
+  { id: 'tokenomics-design', year: 2025, quarter: 2, branch: 'crypto', label: 'Tokenomics Design' },
+  { id: 'token-launch', year: 2025, quarter: 4, branch: 'crypto', label: 'Token Launch' },
+
+  // === LEARNING BRANCH (DASHED YELLOW - INTELLECTUAL GROWTH) ===
+  { id: 'learn-crypto', year: 2021, quarter: 1, branch: 'learning', label: 'Study Crypto' },
+  { id: 'learn-economics', year: 2021, quarter: 3, branch: 'learning', label: 'Study Economics' },
+  { id: 'btc-maxi', year: 2022, quarter: 1, branch: 'learning', label: 'BTC Maximalist' },
+  { id: 'learn-markets', year: 2022, quarter: 4, branch: 'learning', label: 'Study Markets' },
+  { id: 'frustrated-pause', year: 2023, quarter: 2, branch: 'learning', label: 'Frustrated' },
+  { id: 'goosebumps', year: 2024, quarter: 3, branch: 'learning', label: 'Goosebumps!' },
+  { id: 'btc-goodbye', year: 2024, quarter: 4, branch: 'learning', label: 'Bye BTC Maxi' },
+  { id: 'deep-understanding', year: 2025, quarter: 1, branch: 'learning', label: 'Deep Knowledge' },
+  { id: 'hft-research', year: 2025, quarter: 2, branch: 'learning', label: 'HFT Research' },
+  { id: 'system-architecture', year: 2025, quarter: 4, branch: 'learning', label: 'Architecture' },
+
+  // === DEV BRANCH (DASHED BLUE - DEVELOPMENT WORK) ===
+  { id: 'gta', year: 2023, quarter: 2, branch: 'dev', label: 'GTA Server' },
+  { id: 'qbcore', year: 2023, quarter: 4, branch: 'dev', label: 'QBCore Framework' },
+  { id: 'rust-learning', year: 2024, quarter: 4, branch: 'dev', label: 'Rust Learning' },
+
+  // === BUILDING BRANCH (DASHED PURPLE - TECHNICAL PROJECTS & PRODUCTS) ===
+  { id: 'minecraft', year: 2012, quarter: 2, branch: 'building', label: 'Minecraft Servers' },
+  { id: 'backend-learn', year: 2017, quarter: 2, branch: 'building', label: 'Java Backend' },
+  { id: 'freakyworld', year: 2022, quarter: 1, branch: 'building', label: 'FreakyWorld' },
+  { id: 'freakyworld-end', year: 2024, quarter: 3, branch: 'building', label: 'FW Shutdown (50 Players)' },
+  { id: 'platform-idea', year: 2025, quarter: 1, branch: 'building', label: 'kas.me Concept' },
+  { id: 'devtalk-1', year: 2025, quarter: 4, branch: 'building', label: 'DevTalk #1 (Nov)' },
+  { id: 'devtalk-2', year: 2025, quarter: 4, branch: 'building', label: 'DevTalk #2 (Dez)' },
+  { id: 'current-dev', year: 2026, quarter: 2, branch: 'building', label: 'Active Dev' },
+  { id: 'building-kasme', year: 2027, quarter: 1, branch: 'building', label: 'Building kas.me', type: 'future' },
+];
+
+const CONNECTIONS: Connection[] = [
+  // === LIFE TIMELINE (HORIZONTAL TREE TRUNK - ALL AGES CONNECTED RIGHT→LEFT) ===
+  { from: 'school', to: 'age13', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age13', to: 'age17', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age17', to: 'age19', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age19', to: 'age20', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age20', to: 'age21', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age21', to: 'age22', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age22', to: 'age23', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age23', to: 'age24', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age24', to: 'age25', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age25', to: 'age26', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'age26', to: 'future', sourceHandle: 'right', targetHandle: 'left', animated: true },
+
+  // === CAREER BRANCH (FROM MAIN TIMELINE DOWNWARD, THEN HORIZONTAL) ===
+  { from: 'age20', to: 'dropped-school', sourceHandle: 'bottom', targetHandle: 'top' },  // Age 20 → Career starts
+  { from: 'dropped-school', to: 'bank-training', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'bank-training', to: 'training-year1', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'training-year1', to: 'training-year2', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'training-year2', to: 'training-complete', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'training-complete', to: 'software-coach', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'software-coach', to: 'health-it', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'health-it', to: 'business-plan', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'business-plan', to: 'it-cyberspace', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'it-cyberspace', to: 'self-employ-prep', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'self-employ-prep', to: 'q3-goal', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'q3-goal', to: 'it-cyberspace-future', sourceHandle: 'right', targetHandle: 'left', animated: true },
+
+  // === CRYPTO BRANCH (FROM MAIN TIMELINE DOWNWARD, THEN HORIZONTAL) ===
+  { from: 'age19', to: 'curiosity-money', sourceHandle: 'bottom', targetHandle: 'top' }, // Age 19 → Crypto starts
+  { from: 'curiosity-money', to: 'crypto-discovered', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'crypto-discovered', to: 'mining-attempts', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'mining-attempts', to: 'money-lost', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'money-lost', to: 'kaspa-heard', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'kaspa-heard', to: 'perp-trading', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'perp-trading', to: 'money-burned', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'money-burned', to: 'kaspa-rediscovered', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'kaspa-rediscovered', to: 'first-kaspa-buy', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'first-kaspa-buy', to: 'tokenomics-design', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'tokenomics-design', to: 'token-launch', sourceHandle: 'right', targetHandle: 'left' },
+
+  // === LEARNING BRANCH (FROM CAREER DOWNWARD, THEN HORIZONTAL) ===
+  { from: 'bank-training', to: 'learn-crypto', sourceHandle: 'bottom', targetHandle: 'top' }, // From Career → Learning starts
+  { from: 'learn-crypto', to: 'learn-economics', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'learn-economics', to: 'btc-maxi', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'btc-maxi', to: 'learn-markets', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'learn-markets', to: 'frustrated-pause', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'frustrated-pause', to: 'goosebumps', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'goosebumps', to: 'btc-goodbye', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'btc-goodbye', to: 'deep-understanding', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'deep-understanding', to: 'hft-research', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'hft-research', to: 'system-architecture', sourceHandle: 'right', targetHandle: 'left' },
+
+  // === DEV BRANCH (FROM CAREER DOWNWARD, THEN HORIZONTAL) ===
+  { from: 'training-complete', to: 'gta', sourceHandle: 'bottom', targetHandle: 'top' }, // From Career → Dev starts
+  { from: 'gta', to: 'qbcore', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'qbcore', to: 'rust-learning', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'software-coach', to: 'qbcore', sourceHandle: 'bottom', targetHandle: 'top' }, // Career → Dev connection
+
+  // === BUILDING BRANCH (FROM MAIN TIMELINE DOWNWARD, THEN HORIZONTAL) ===
+  { from: 'age13', to: 'minecraft', sourceHandle: 'bottom', targetHandle: 'top' }, // Age 13 → Building starts
+  { from: 'minecraft', to: 'backend-learn', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'backend-learn', to: 'freakyworld', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'freakyworld', to: 'freakyworld-end', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'freakyworld-end', to: 'platform-idea', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'platform-idea', to: 'devtalk-1', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'devtalk-1', to: 'devtalk-2', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'devtalk-2', to: 'current-dev', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'current-dev', to: 'building-kasme', sourceHandle: 'right', targetHandle: 'left', animated: true },
+
+  // === CROSS-BRANCH CONNECTIONS (LOGICAL RELATIONSHIPS) ===
+  // Crypto → Learning: Discoveries trigger learning
+  { from: 'crypto-discovered', to: 'learn-crypto', sourceHandle: 'top', targetHandle: 'bottom' },
+  { from: 'money-burned', to: 'frustrated-pause', sourceHandle: 'top', targetHandle: 'bottom' },
+  
+  // Learning → Crypto: Knowledge influences decisions
+  { from: 'btc-maxi', to: 'kaspa-heard', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'frustrated-pause', to: 'kaspa-rediscovered', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'kaspa-rediscovered', to: 'goosebumps', sourceHandle: 'top', targetHandle: 'bottom' },
+  { from: 'goosebumps', to: 'first-kaspa-buy', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'first-kaspa-buy', to: 'btc-goodbye', sourceHandle: 'top', targetHandle: 'bottom' },
+  { from: 'deep-understanding', to: 'tokenomics-design', sourceHandle: 'bottom', targetHandle: 'top' },
+  
+  // Career → Crypto: Income enables trading
+  { from: 'training-complete', to: 'perp-trading', sourceHandle: 'bottom', targetHandle: 'top' },
+  
+  // Crypto/Learning → Dev: Kaspa interest leads to Rust
+  { from: 'kaspa-rediscovered', to: 'rust-learning', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'hft-research', to: 'rust-learning', sourceHandle: 'bottom', targetHandle: 'top' },
+  
+  // Building → Career: FW shutdown leads to business focus
+  { from: 'freakyworld-end', to: 'business-plan', sourceHandle: 'top', targetHandle: 'bottom' },
+  
+  // Multiple branches → Building kas.me platform: 4 pillars converge
+  { from: 'deep-understanding', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'rust-learning', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'it-cyberspace', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'tokenomics-design', to: 'platform-idea', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'token-launch', to: 'devtalk-1', sourceHandle: 'bottom', targetHandle: 'top' },
+  
+  // Main → Building: Current state
+  { from: 'age17', to: 'backend-learn', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'age22', to: 'freakyworld', sourceHandle: 'bottom', targetHandle: 'top' },
+  { from: 'age26', to: 'current-dev', sourceHandle: 'bottom', targetHandle: 'top' },
+  
+  // Career → Building: Future convergence
+  { from: 'it-cyberspace-future', to: 'building-kasme', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
+];
+
+// === FRAMEWORK: POSITION CALCULATOR ===
+function calculatePosition(milestone: Milestone) {
+  const yearOffset = milestone.year - GRID.START_YEAR;
+  const x = yearOffset * GRID.YEAR_WIDTH + (milestone.quarter - 1) * GRID.QUARTER_WIDTH;
+  const y = BRANCHES[milestone.branch].y;
+  return { x, y };
+}
+
+// === FRAMEWORK: EDGE STYLE GENERATOR ===
+function getEdgeStyle(connection: Connection, milestones: Milestone[]) {
+  const sourceNode = milestones.find(m => m.id === connection.from);
+  const targetNode = milestones.find(m => m.id === connection.to);
+  
+  if (!sourceNode || !targetNode) return {
+    stroke: '#888',
+    strokeWidth: 2,
+  };
+  
+  // Use target branch color for styling (except main branch connections)
+  const branch = targetNode.branch === 'main' ? sourceNode.branch : targetNode.branch;
+  const config = BRANCHES[branch];
+  
+  return {
+    stroke: config.color,
+    strokeWidth: config.solid ? 2.5 : 2,
+    strokeDasharray: config.solid ? undefined : '5,5',
+  };
+}
+
+// === FRAMEWORK: NODE GENERATOR WITH COLLISION DETECTION ===
+function generateNodes(milestones: Milestone[]): Node[] {
+  const NODE_WIDTH = 180; // max-w-[180px]
+  const NODE_SPACING = 25; // gap between overlapping nodes (increased)
+  
+  // Group milestones by position key (year + quarter + branch)
+  const positionGroups = new Map<string, Milestone[]>();
+  
+  milestones.forEach(milestone => {
+    const key = `${milestone.year}-${milestone.quarter}-${milestone.branch}`;
+    if (!positionGroups.has(key)) {
+      positionGroups.set(key, []);
+    }
+    positionGroups.get(key)!.push(milestone);
+  });
+  
+  return milestones.map(milestone => {
+    const key = `${milestone.year}-${milestone.quarter}-${milestone.branch}`;
+    const group = positionGroups.get(key)!;
+    const indexInGroup = group.indexOf(milestone);
+    
+    // Calculate base position
+    const basePosition = calculatePosition(milestone);
+    
+    // Add horizontal offset for overlapping nodes
+    if (group.length > 1 && indexInGroup > 0) {
+      basePosition.x += indexInGroup * (NODE_WIDTH + NODE_SPACING);
+    }
+    
+    return {
+      id: milestone.id,
+      type: milestone.type === 'future' ? 'future' : 'milestone',
+      position: basePosition,
+      data: {
+        year: milestone.year.toString(),
+        label: milestone.label,
+        branch: milestone.branch,
+      },
+    };
+  });
+}
+
+// === FRAMEWORK: EDGE GENERATOR ===
+function generateEdges(connections: Connection[], milestones: Milestone[]): Edge[] {
+  return connections.map(connection => ({
+    id: `e-${connection.from}-${connection.to}`,
+    source: connection.from,
+    target: connection.to,    sourceHandle: connection.sourceHandle,
+    targetHandle: connection.targetHandle,    type: 'smoothstep',
+    animated: connection.animated || false,
+    style: getEdgeStyle(connection, milestones),
+  }));
+}
+
+// === CUSTOM NODE COMPONENTS ===
+function MilestoneNode({ data }: { data: any }) {
+  const branchConfig = BRANCHES[data.branch as BranchType];
+  
+  return (
+    <div className={`rounded-lg border-2 ${branchConfig.bgClass} backdrop-blur-sm px-3 py-2 shadow-md min-w-[120px] max-w-[180px]`}>
+      <Handle type="target" position={Position.Top} id="top" className="w-2 h-2" />
+      <Handle type="target" position={Position.Left} id="left" className="w-2 h-2" />
+      <div className="text-xs font-medium text-muted-foreground mb-1">{data.year}</div>
+      <div className="text-sm font-semibold">{data.label}</div>
+      <Handle type="source" position={Position.Right} id="right" className="w-2 h-2" />
+      <Handle type="source" position={Position.Bottom} id="bottom" className="w-2 h-2" />
+    </div>
+  );
+}
+
+function FutureNode({ data }: { data: any }) {
+  const branchConfig = BRANCHES[data.branch as BranchType];
+  
+  return (
+    <div className={`rounded-lg border-2 border-dashed ${branchConfig.bgClass} backdrop-blur-sm px-3 py-2 shadow-md min-w-[120px] max-w-[180px] opacity-70`}>
+      <Handle type="target" position={Position.Top} id="top" className="w-2 h-2" />
+      <Handle type="target" position={Position.Left} id="left" className="w-2 h-2" />
+      <div className="text-xs font-medium text-muted-foreground mb-1">{data.year}</div>
+      <div className="text-sm font-semibold italic">{data.label}</div>
+      <Handle type="source" position={Position.Right} id="right" className="w-2 h-2" />
+      <Handle type="source" position={Position.Bottom} id="bottom" className="w-2 h-2" />
+    </div>
+  );
+}
+
+const nodeTypes = {
+  milestone: MilestoneNode,
+  future: FutureNode,
+};
+
+// === MAIN COMPONENT ===
+export function StoryRoadmap() {
+  // Generate nodes and edges from data
+  const initialNodes = generateNodes(MILESTONES);
+  const initialEdges = generateEdges(CONNECTIONS, MILESTONES);
+
+  const [nodes, , onNodesChange] = useNodesState(initialNodes);
+  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+
+  return (
+    <div className="w-full h-[800px] bg-background rounded-lg border relative">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        nodeTypes={nodeTypes}
+        fitView
+        minZoom={0.1}
+        maxZoom={1.5}
+        defaultViewport={{ x: 0, y: 200, zoom: 0.6 }}
+        defaultEdgeOptions={{
+          type: 'smoothstep',
+          style: { strokeWidth: 2 },
+        }}
+      >
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+        <Controls />
+      </ReactFlow>
+      
+      {/* Legend */}
+      <div className="absolute bottom-4 left-4 bg-background/95 backdrop-blur-sm rounded-lg border p-4 shadow-lg">
+        <div className="text-sm font-semibold mb-2">Branch Legend</div>
+        <div className="space-y-1 text-xs">
+          {Object.entries(BRANCHES).map(([key, config]) => (
+            <div key={key} className="flex items-center gap-2">
+              <div
+                className="w-8 h-0.5"
+                style={{
+                  backgroundColor: config.color,
+                  borderStyle: config.solid ? 'solid' : 'dashed',
+                }}
+              />
+              <span>{config.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

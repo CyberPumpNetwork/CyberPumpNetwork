@@ -3,33 +3,20 @@ import { Card, CardContent } from './ui/card'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 
-const blogPosts = [
+const resourcePosts = [
   {
-    title: 'Introducing kas.me: Your Kaspa Ecosystem Hub',
+    title: 'First Ever Dev Talk',
     excerpt:
-      'Discover how kas.me by The IT CyberSpace is building the ultimate analytics and tracking platform for the Kaspa blockchain ecosystem.',
-    date: 'Jan 10, 2025',
-    readTime: '5 min read',
-    category: 'Announcements',
-    slug: 'introducing-kasme',
+      '72 days after token launch. The origin story - from first contact with blockchain in 2019, to understanding Kaspa, to the simple thought: give people the ability to understand and act.',
+    category: 'Dev Talk',
+    link: '/docs/community/devtalks/devtalk-1',
   },
   {
-    title: 'Understanding $CYPU Tokenomics',
+    title: 'Absurd Megalomania',
     excerpt:
-      'A comprehensive guide to the $CYPU token on the KRC-20 standard - minting mechanics, distribution, and the innovative 1:1 $KAS ratio.',
-    date: 'Jan 8, 2025',
-    readTime: '8 min read',
-    category: 'Education',
-    slug: 'cypu-tokenomics',
-  },
-  {
-    title: 'EcoLoop: The Future of Token Creation',
-    excerpt:
-      'Learn about EcoLoop - our planned feature for streamlined token creation within the Kaspa ecosystem, making blockchain accessible to everyone.',
-    date: 'Jan 5, 2025',
-    readTime: '6 min read',
-    category: 'Features',
-    slug: 'ecoloop-token-creation',
+      'A declaration of freedom. The paradox of a website without traditional ownership - just code, nodes, and a system that includes you. Designed to survive me.',
+    category: 'Dev Talk',
+    link: '/docs/community/devtalks/devtalk-2',
   },
 ]
 
@@ -40,23 +27,23 @@ export function Blog() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-accent/10 text-accent hover:bg-accent/20 uppercase tracking-wider">
-            Latest Updates
+            Dev Talks
           </Badge>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6">
-            From Our{' '}
+            From the{' '}
             <span className="bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
-              Blog
+              Lead Dev's Desk
             </span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Stay updated with the latest news, insights, and developments from
-            kas.me and The IT CyberSpace team.
+            Transparent updates, technical deep-dives, and honest progress reports.
+            No marketing fluff - just real development insights.
           </p>
         </div>
 
         {/* Blog Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogPosts.map((post, index) => (
+          {resourcePosts.map((post, index) => (
             <Card
               key={index}
               className="group overflow-hidden hover:border-accent/40 transition-all duration-300 hover:-translate-y-1"
@@ -87,7 +74,6 @@ export function Blog() {
                   <Badge variant="secondary" className="bg-accent/10 text-accent">
                     {post.category}
                   </Badge>
-                  <span className="text-sm text-muted-foreground">{post.date}</span>
                 </div>
 
                 {/* Title */}
@@ -102,8 +88,8 @@ export function Blog() {
 
                 {/* Read More */}
                 <Button variant="ghost" className="text-accent p-0 h-auto hover:bg-transparent hover:text-accent/80" asChild>
-                  <Link to={`/blog/${post.slug}`}>
-                    Read More
+                  <Link to={post.link}>
+                    Read Dev Talk
                     <svg
                       className="w-4 h-4 ml-2"
                       fill="none"
@@ -127,8 +113,8 @@ export function Blog() {
         {/* View All Button */}
         <div className="text-center mt-12">
           <Button variant="outline" size="lg" asChild className="border-accent/30 text-accent hover:bg-accent/10">
-            <Link to="/blog">
-              View All Articles
+            <Link to="/docs/community/devtalks">
+              Browse All Dev Talks
               <svg
                 className="w-4 h-4 ml-2"
                 fill="none"

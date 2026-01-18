@@ -32,7 +32,9 @@ import { BasicsContent } from '@/components/docs/BasicsContent'
 import { GettingStartedContent } from '@/components/docs/GettingStartedContent'
 import { KasMeInfoContent } from '@/components/docs/KasMeInfoContent'
 import { AuditsContent } from '@/components/docs/AuditsContent'
+import { CommunityContent } from '@/components/docs/CommunityContent'
 import { DevelopmentContent } from '@/components/docs/DevelopmentContent'
+import { StoryContent } from '@/components/docs/StoryContent'
 import { getDocBySlug, getCategories, getDocsByCategory } from '@/lib/docs'
 import { useMarkdownContent } from '@/lib/useMarkdown'
 import {
@@ -261,12 +263,12 @@ function DocsHomePage() {
                 Explore our open-source code, contribute, and track development progress.
               </p>
               <a
-                href="https://github.com/H34R7L3s/CyberPump"
+                href="https://github.com/CyberPumpNetwork"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-accent hover:gap-3 transition-all font-medium"
               >
-                H34R7L3s/CyberPump
+                CyberPumpNetwork
                 <ExternalLink className="w-4 h-4" />
               </a>
             </CardContent>
@@ -306,6 +308,8 @@ function MarkdownDocPage({ slug }: { slug: string }) {
     slug === 'getting-started/basics' ||
     slug === 'getting-started/guides' ||
     slug === 'getting-started/kasme-info' ||
+    slug === 'community' ||
+    slug === 'community/hub/story' ||
     slug === 'community/hub/audits' ||
     slug === 'development'
 
@@ -412,6 +416,10 @@ function MarkdownDocPage({ slug }: { slug: string }) {
             <GettingStartedContent />
           ) : slug === 'getting-started/kasme-info' ? (
             <KasMeInfoContent />
+          ) : slug === 'community' ? (
+            <CommunityContent />
+          ) : slug === 'community/hub/story' ? (
+            <StoryContent />
           ) : slug === 'community/hub/audits' ? (
             <AuditsContent />
           ) : slug === 'development' ? (
@@ -434,7 +442,7 @@ function MarkdownDocPage({ slug }: { slug: string }) {
             </Link>
             {!hasCustomComponent && (
               <a
-                href={`https://github.com/H34R7L3s/CyberPump/edit/main/src/docs/${doc?.file || ''}`}
+                href={`https://github.com/CyberPumpNetwork/edit/main/src/docs/${doc?.file || ''}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent transition-colors group"
@@ -483,7 +491,13 @@ export function DocsPage() {
 
         {/* Main Content Area */}
         <main className="flex-1 min-w-0">
-          <div className={isHomePage ? "max-w-6xl mx-auto px-8 py-16" : "max-w-5xl mx-auto px-8 py-12"}>
+          <div className={
+            isHomePage
+              ? "max-w-6xl mx-auto px-8 py-16"
+              : slug === 'community/hub/story'
+                ? "max-w-full px-6 py-12"
+                : "max-w-5xl mx-auto px-8 py-12"
+          }>
             {isHomePage ? (
               <DocsHomePage />
             ) : (

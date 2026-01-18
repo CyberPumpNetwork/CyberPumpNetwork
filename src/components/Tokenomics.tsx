@@ -1,119 +1,220 @@
-import { Card, CardContent } from './ui/card'
+import { Link } from 'react-router-dom'
 import { Badge } from './ui/badge'
-
-const tokenDistribution = [
-  { name: 'Unminted (Future)', percentage: 80, color: 'bg-accent' },
-  { name: 'ICO / Public Sale', percentage: 7, color: 'bg-accent/80' },
-  { name: 'Vault Locked', percentage: 5.5, color: 'bg-accent/60' },
-  { name: 'Firm Wallet', percentage: 5.5, color: 'bg-accent/40' },
-  { name: 'Burned', percentage: 2, color: 'bg-accent/20' },
-]
-
-const tokenDetails = [
-  { label: 'Token Name', value: 'CyberPump' },
-  { label: 'Symbol', value: '$CYPU' },
-  { label: 'Total Supply', value: '1,000,000,000' },
-  { label: 'Token Standard', value: 'KRC-20' },
-  { label: 'Network', value: 'Kaspa (BlockDAG)' },
-  { label: 'Minting Ratio', value: '1 $KAS = 1 $CYPU' },
-]
 
 export function Tokenomics() {
   return (
     <section id="tokenomics" className="py-24 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-accent/10 text-accent hover:bg-accent/20 uppercase tracking-wider">
             Token Economics
           </Badge>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6">
-            Transparent{' '}
+            $CYPU{' '}
             <span className="bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
               Tokenomics
             </span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Built on a foundation of fairness and sustainability. Every token has
-            a purpose, every allocation is strategic.
+            1 Billion max supply. 80% unminted. Full transparency on every wallet.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Distribution Chart */}
-          <div className="relative">
-            <div className="aspect-square max-w-md mx-auto relative">
-              {/* Circular Chart Visualization */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-64 h-64 rounded-full border-8 border-accent/20 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-conic from-accent via-accent/60 to-accent/20 rounded-full" 
-                       style={{ background: `conic-gradient(#40E0D0 0% 40%, #40E0D0cc 40% 65%, #40E0D099 65% 80%, #40E0D066 80% 90%, #40E0D033 90% 100%)` }} />
-                  <div className="absolute inset-4 bg-background rounded-full flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-accent">1B</div>
-                      <div className="text-sm text-muted-foreground">Total Supply</div>
-                    </div>
-                  </div>
-                </div>
+        {/* Main Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          <div className="text-center p-6 rounded-xl border border-border/50 bg-card/30">
+            <div className="text-3xl md:text-4xl font-bold text-accent mb-1">1B</div>
+            <div className="text-sm text-muted-foreground">Max Supply</div>
+          </div>
+          <div className="text-center p-6 rounded-xl border border-border/50 bg-card/30">
+            <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">800M</div>
+            <div className="text-sm text-muted-foreground">Unminted</div>
+          </div>
+          <div className="text-center p-6 rounded-xl border border-border/50 bg-card/30">
+            <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">200M</div>
+            <div className="text-sm text-muted-foreground">Initial Supply</div>
+          </div>
+          <div className="text-center p-6 rounded-xl border border-accent/30 bg-accent/5">
+            <div className="text-3xl md:text-4xl font-bold text-accent mb-1">1:1</div>
+            <div className="text-sm text-muted-foreground">$KAS Mint Ratio</div>
+          </div>
+        </div>
+
+        {/* Initial 200M Breakdown */}
+        <div className="rounded-2xl border border-border/50 bg-card/20 p-8 mb-8">
+          <h3 className="text-xl font-bold mb-6 text-center">Initial 200M Distribution</h3>
+
+          <div className="grid md:grid-cols-4 gap-6">
+            {/* Tangem Locked */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-accent" />
+                <span className="font-semibold">Tangem Locked</span>
               </div>
+              <div className="text-3xl font-bold">~109M</div>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <div>Vault: 54.55M</div>
+                <div>Firm: 54.55M</div>
+                <div>Dev Ops: ~0.9M</div>
+              </div>
+              <div className="text-xs text-accent">Hardware immovable</div>
             </div>
 
-            {/* Legend */}
-            <div className="mt-8 space-y-3">
-              {tokenDistribution.map((item) => (
-                <div key={item.name} className="flex items-center justify-between p-3 rounded-lg bg-card/50 border border-border/50">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-4 h-4 rounded-full ${item.color}`} />
-                    <span className="font-medium">{item.name}</span>
-                  </div>
-                  <span className="text-accent font-bold">{item.percentage}%</span>
-                </div>
-              ))}
+            {/* L1 Sale Orders */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-accent" />
+                <span className="font-semibold">L1 Sale Orders</span>
+              </div>
+              <div className="text-3xl font-bold">50M</div>
+              <div className="text-sm text-muted-foreground">
+                Locked in KaspaCom marketplace until purchased
+              </div>
+              <div className="text-xs text-accent">Locked until sold</div>
+            </div>
+
+            {/* Dev Wallet */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-orange-500" />
+                <span className="font-semibold text-orange-500">Dev Wallet</span>
+              </div>
+              <div className="text-3xl font-bold text-orange-500">20M</div>
+              <div className="text-sm text-muted-foreground">
+                Reserved for BaFin-compliant Private Sale
+              </div>
+              <div className="text-xs text-orange-500">MOVABLE - only dump risk</div>
+            </div>
+
+            {/* Burned */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <span className="font-semibold">Burned</span>
+              </div>
+              <div className="text-3xl font-bold">20M</div>
+              <div className="text-sm text-muted-foreground">
+                Permanently removed from circulation
+              </div>
+              <div className="text-xs text-red-500">Gone forever</div>
             </div>
           </div>
 
-          {/* Token Details */}
-          <div className="space-y-6">
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold mb-6">Token Details</h3>
-                <div className="space-y-4">
-                  {tokenDetails.map((detail) => (
-                    <div
-                      key={detail.label}
-                      className="flex justify-between items-center py-3 border-b border-border/50 last:border-0"
-                    >
-                      <span className="text-muted-foreground">{detail.label}</span>
-                      <span className="font-semibold">{detail.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          {/* Summary Line */}
+          <div className="mt-8 pt-6 border-t border-border/50 flex flex-wrap items-center justify-center gap-6 text-sm">
+            <div>
+              <span className="text-muted-foreground">Total Locked:</span>
+              <span className="font-bold ml-2">159M</span>
+            </div>
+            <div className="text-muted-foreground">|</div>
+            <div>
+              <span className="text-muted-foreground">Movable:</span>
+              <span className="font-bold text-orange-500 ml-2">20M</span>
+            </div>
+            <div className="text-muted-foreground">|</div>
+            <div>
+              <span className="text-muted-foreground">Burned:</span>
+              <span className="font-bold ml-2">20M</span>
+            </div>
+          </div>
+        </div>
 
-            {/* Tax Structure */}
-            <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
-              <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-4">Transaction Tax</h3>
-              <p className="text-muted-foreground mb-6">
-                A small 3% tax on transactions funds the ecosystem:
-              </p>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 rounded-xl bg-background/50">
-                  <div className="text-2xl font-bold text-accent">1%</div>
-                  <div className="text-sm text-muted-foreground">Burn</div>
-                </div>
-                <div className="text-center p-4 rounded-xl bg-background/50">
-                  <div className="text-2xl font-bold text-accent">1%</div>
-                  <div className="text-sm text-muted-foreground">Holders</div>
-                </div>
-                <div className="text-center p-4 rounded-xl bg-background/50">
-                  <div className="text-2xl font-bold text-accent">1%</div>
-                  <div className="text-sm text-muted-foreground">Treasury</div>
-                </div>
+        {/* Token Info + CTA */}
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          {/* Token Details */}
+          <div className="rounded-xl border border-border/50 bg-card/30 p-6">
+            <h4 className="font-semibold mb-4">Token Details</h4>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Name</span>
+                <span className="font-medium">CyberPump ($CYPU)</span>
               </div>
-              </CardContent>
-            </Card>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Standard</span>
+                <span className="font-medium">KRC-20</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Network</span>
+                <span className="font-medium">Kaspa</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Mint Price</span>
+                <span className="font-medium">1 $KAS = 1 $CYPU</span>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="rounded-xl border border-accent/30 bg-accent/5 p-6 flex flex-col justify-center">
+            <h4 className="font-semibold mb-2">Full Transparency</h4>
+            <p className="text-sm text-muted-foreground mb-4">
+              Every wallet address is public. Verify holdings on-chain anytime.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                to="/docs/tokenomics/det-token/wallets"
+                className="text-sm font-medium text-accent hover:underline"
+              >
+                View All Wallets →
+              </Link>
+              <Link
+                to="/docs/tokenomics/det-token/token-supply"
+                className="text-sm font-medium text-accent hover:underline"
+              >
+                Token Supply Details →
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* CYPUV Section */}
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/5 p-8">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <h3 className="text-2xl font-bold text-red-500">$CYPUV</h3>
+            <Badge className="bg-red-500/20 text-red-500 border-red-500/30">Governance Token</Badge>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {/* Bonding Curve Progress */}
+            <div className="text-center space-y-2">
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">Bonding Curve</div>
+              <div className="text-3xl font-bold text-red-500">26%</div>
+              <div className="w-full h-1.5 bg-red-500/20 rounded-full overflow-hidden">
+                <div className="h-full bg-red-500 rounded-full" style={{ width: '26%' }} />
+              </div>
+              <div className="text-xs text-muted-foreground">Complete</div>
+            </div>
+
+            {/* Developer Lock */}
+            <div className="text-center space-y-2">
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">Dev Lock</div>
+              <div className="text-xl font-bold text-red-500">1695d</div>
+              <div className="text-xs text-muted-foreground">Curve: 25.99%</div>
+            </div>
+
+            {/* Curve Rest */}
+            <div className="text-center space-y-2">
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">Curve</div>
+              <div className="text-3xl font-bold text-foreground">59.52%</div>
+              <div className="text-xs text-muted-foreground">Remaining</div>
+            </div>
+
+            {/* Supply */}
+            <div className="text-center space-y-2">
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">Supply</div>
+              <div className="text-3xl font-bold text-foreground">54.55M</div>
+              <div className="text-xs text-muted-foreground">1:1 $CYPU Vault</div>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-red-500/20 text-center">
+            <Link
+              to="/docs/tokenomics/det-token/cypuv"
+              className="text-sm font-medium text-red-500 hover:underline"
+            >
+              Learn about $CYPUV Governance →
+            </Link>
           </div>
         </div>
       </div>

@@ -216,7 +216,7 @@ export function DevelopmentContent() {
 
           <Callout type="info" title="Want Updates?">
             <p className="text-sm">
-              Follow development progress on <a href="https://x.com/kas_me_" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-semibold">X/Twitter @kas_me_</a> for announcements about API beta releases and developer documentation.
+              Follow development progress on <a href="https://x.com/TheITCyberSpace" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-semibold">X/Twitter @TheITCyberSpace</a> for announcements about API beta releases and developer documentation.
             </p>
           </Callout>
         </div>

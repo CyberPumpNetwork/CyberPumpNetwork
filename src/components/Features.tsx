@@ -77,8 +77,8 @@ export function Features() {
             </span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            CyperPump combines innovative technology with sustainable tokenomics
-            to create a truly revolutionary DeFi experience.
+            kas.me combines real-time Kaspa analytics with sustainable tokenomics -
+            built by The IT CyberSpace, a German IT startup.
           </p>
         </div>
 

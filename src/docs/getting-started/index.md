@@ -79,7 +79,7 @@ permalink: /
 <div class="footer-links" style="text-align: center; margin-top: 2em; padding: 1.5em; background: rgba(0,0,0,0.3); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
   <a href="https://kas.me" style="background: #40E0D0; color: #000; padding: 0.8em 1.5em; margin: 0 0.5em; text-decoration: none; border-radius: 25px; font-weight: bold; transition: all 0.3s;">Discover kas.me</a>
   <a href="https://x.com/TheITCyberSpace" style="background: #40E0D0; color: #000; padding: 0.8em 1.5em; margin: 0 0.5em; text-decoration: none; border-radius: 25px; font-weight: bold; transition: all 0.3s;">Follow us on X</a>
-  <a href="https://github.com/H34R7L3s/CyberPump" style="background: #40E0D0; color: #000; padding: 0.8em 1.5em; margin: 0 0.5em; text-decoration: none; border-radius: 25px; font-weight: bold; transition: all 0.3s;">Dive into the Repo</a>
+  <a href="https://github.com/CyberPumpNetwork" style="background: #40E0D0; color: #000; padding: 0.8em 1.5em; margin: 0 0.5em; text-decoration: none; border-radius: 25px; font-weight: bold; transition: all 0.3s;">Dive into the Repo</a>
 </div>
 
 <style>

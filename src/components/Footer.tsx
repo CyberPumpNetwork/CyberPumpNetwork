@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
-import { Input } from './ui/input'
 import { Separator } from './ui/separator'
 
 const footerLinks = {
@@ -8,22 +7,21 @@ const footerLinks = {
     { name: 'Features', href: '/#about' },
     { name: 'Tokenomics', href: '/#tokenomics' },
     { name: 'Roadmap', href: '/#roadmap' },
-    { name: 'kas.me', href: 'https://kas.me', external: true },
+    { name: 'Development', href: '/docs/development' },
   ],
   Resources: [
-    { name: 'Whitepaper', href: 'https://drive.google.com/file/d/1zMFJSHH6YH8BvDm03LdZDzP3K99bNjZK/view?usp=sharing', external: true },
     { name: 'Documentation', href: '/docs' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'FAQ', href: '/docs#faq' },
+    { name: 'EcoLoop', href: '/docs/tokenomics/ecoloop' },
+    { name: 'Audits & Compliance', href: '/docs/community/hub/audits' },
+    { name: 'Whitepaper', href: 'https://drive.google.com/file/d/1zMFJSHH6YH8BvDm03LdZDzP3K99bNjZK/view?usp=sharing', external: true },
   ],
   Community: [
-    { name: 'X (Twitter)', href: 'https://x.com/TheITCyberSpace', external: true },
-    { name: 'GitHub', href: 'https://github.com/H34R7L3s/CyberPump', external: true },
+    { name: '@TheITCyberSpace', href: 'https://x.com/TheITCyberSpace', external: true },
   ],
   Token: [
-    { name: '$CYPU Token', href: '/#tokenomics' },
-    { name: 'Token Distribution', href: '/docs/tokenomics' },
-    { name: 'Wallet Info', href: '/docs/wallets' },
+    { name: 'Token Supply', href: '/docs/tokenomics/det-token/token-supply' },
+    { name: 'Wallets & Locks', href: '/docs/tokenomics/det-token/lock' },
+    { name: 'How to Mint', href: '/docs/tokenomics/publicmarket/mint' },
   ],
 }
 
@@ -47,15 +45,12 @@ export function Footer() {
             <p className="text-xs text-muted-foreground/70 mb-6">
               A project by The IT CyberSpace 🇩🇪
             </p>
-            {/* Newsletter */}
+            {/* CTA */}
             <div className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1"
-              />
-              <Button className="bg-accent hover:bg-accent/90 text-background">
-                Subscribe
+              <Button className="bg-accent hover:bg-accent/90 text-background" asChild>
+                <a href="https://x.com/TheITCyberSpace" target="_blank" rel="noopener noreferrer">
+                  Follow Updates on X
+                </a>
               </Button>
             </div>
           </div>
@@ -114,24 +109,14 @@ export function Footer() {
               rel="noopener noreferrer"
               className="text-sm text-muted-foreground hover:text-accent transition-colors duration-200"
             >
-              X (Twitter)
+              @TheITCyberSpace
             </a>
-            <a
-              href="https://github.com/H34R7L3s/CyberPump"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/docs"
               className="text-sm text-muted-foreground hover:text-accent transition-colors duration-200"
             >
-              GitHub
-            </a>
-            <a
-              href="https://kas.me"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-accent transition-colors duration-200"
-            >
-              kas.me
-            </a>
+              Documentation
+            </Link>
           </div>
         </div>
       </div>

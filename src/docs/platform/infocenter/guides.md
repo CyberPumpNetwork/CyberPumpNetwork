@@ -131,5 +131,5 @@ permalink: /kasme/guides/
 <div class="footer-links">
   <a href="https://kas.me">Discover kas.me</a>
   <a href="https://x.com/TheITCyberSpace">Follow us on X</a>
-  <a href="https://github.com/H34R7L3s/CyberPump">Dive into the Repo</a>
+  <a href="https://github.com/CyberPumpNetwork">Dive into the Repo</a>
 </div>

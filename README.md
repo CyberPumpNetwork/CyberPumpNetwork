@@ -197,7 +197,7 @@ Private - The IT CyberSpace
 
 - **Website:** [kas.me](https://kas.me)
 - **X/Twitter:** [@TheITCyberSpace](https://x.com/TheITCyberSpace)
-- **GitHub:** [H34R7L3s/CyberPump](https://github.com/H34R7L3s/CyberPump)
+- **GitHub:** [CyberPumpNetwork](https://github.com/CyberPumpNetwork)
 
 ---
 
