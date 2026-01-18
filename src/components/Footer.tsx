@@ -4,9 +4,9 @@ import { Separator } from './ui/separator'
 
 const footerLinks = {
   Platform: [
-    { name: 'Features', href: '/#about' },
-    { name: 'Tokenomics', href: '/#tokenomics' },
-    { name: 'Roadmap', href: '/#roadmap' },
+    { name: 'Features', href: '/', scrollTo: 'about' },
+    { name: 'Tokenomics', href: '/', scrollTo: 'tokenomics' },
+    { name: 'Roadmap', href: '/', scrollTo: 'roadmap' },
     { name: 'Development', href: '/docs/development' },
   ],
   Resources: [
@@ -74,6 +74,21 @@ export function Footer() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                       </a>
+                    ) : 'scrollTo' in link && link.scrollTo ? (
+                      <Link
+                        to={link.href}
+                        onClick={(e) => {
+                          if (window.location.pathname === '/') {
+                            e.preventDefault();
+                            const element = document.getElementById(link.scrollTo as string);
+                            element?.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                        state={{ scrollTo: link.scrollTo }}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                      >
+                        {link.name}
+                      </Link>
                     ) : link.href.startsWith('/') || link.href.startsWith('#') ? (
                       <Link
                         to={link.href}

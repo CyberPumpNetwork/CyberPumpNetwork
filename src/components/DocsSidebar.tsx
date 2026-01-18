@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ScrollArea } from './ui/scroll-area'
 import { ChevronDown, ChevronRight, ExternalLink } from 'lucide-react'
@@ -22,14 +22,16 @@ interface DocsSidebarProps {
 export function DocsSidebar({ className }: DocsSidebarProps) {
   const location = useLocation()
   const currentPath = location.pathname
-  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
-
-  const toggleSection = (title: string) => {
-    setCollapsedSections(prev => ({
-      ...prev,
-      [title]: !prev[title]
-    }))
-  }
+  
+  // Initialize with all sections collapsed
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>(() => {
+    const initialState: Record<string, boolean> = {}
+    docsNavigation.forEach(section => {
+      initialState[section.title] = true // Start collapsed
+    })
+    initialState['External Resources'] = true
+    return initialState
+  })
 
   // Check if section has active item
   const isSectionActive = (section: typeof docsNavigation[0]) => {
@@ -39,16 +41,35 @@ export function DocsSidebar({ className }: DocsSidebarProps) {
     )
   }
 
+  // Auto-expand section with active item on route change
+  useEffect(() => {
+    const activeSection = docsNavigation.find(section => isSectionActive(section))
+    if (activeSection) {
+      setCollapsedSections(prev => ({
+        ...prev,
+        [activeSection.title]: false // Expand active section
+      }))
+    }
+  }, [currentPath])
+
+  const toggleSection = (title: string) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [title]: !prev[title]
+    }))
+  }
+
   return (
-    <ScrollArea className={className}>
-      <div className="py-6 pr-6">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 mb-8 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <span className="text-sm font-bold text-background">KM</span>
-          </div>
-          <span className="font-bold group-hover:text-accent transition-colors">kas.me</span>
-        </Link>
+    <div className={cn("flex flex-col", className)}>
+      <ScrollArea className="flex-1 overflow-auto">
+        <div className="py-6 pr-6">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 mb-8 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="text-sm font-bold text-background">KM</span>
+            </div>
+            <span className="font-bold group-hover:text-accent transition-colors">kas.me</span>
+          </Link>
 
         {/* Navigation Sections */}
         <div className="space-y-4">
@@ -135,6 +156,7 @@ export function DocsSidebar({ className }: DocsSidebarProps) {
           </div>
         </div>
       </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   )
 }
