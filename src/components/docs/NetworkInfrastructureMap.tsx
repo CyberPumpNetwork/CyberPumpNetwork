@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   ReactFlow,
   Controls,
@@ -12,7 +13,7 @@ import {
 } from '@xyflow/react'
 import type { Node, Edge } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { Server, Cpu, Zap, Network, Globe, Database, Users, Workflow, Sun, Leaf, Activity } from 'lucide-react'
+import { Server, Cpu, Zap, Network, Globe, Database, Users, Workflow, Sun, Leaf, Activity, ChevronDown, ChevronUp } from 'lucide-react'
 
 // ============================================================================
 // NETWORK INFRASTRUCTURE VISUALIZATION
@@ -278,6 +279,7 @@ export function NetworkInfrastructureMap() {
 
   const [nodes, , onNodesChange] = useNodesState(initialNodes)
   const [edges, , onEdgesChange] = useEdgesState(initialEdges)
+  const [legendOpen, setLegendOpen] = useState(false)
 
   return (
     <div className="w-full h-[700px] bg-background rounded-lg border relative">
@@ -315,62 +317,82 @@ export function NetworkInfrastructureMap() {
         <Controls />
       </ReactFlow>
 
-      {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-background/95 backdrop-blur-sm rounded-lg border p-4 shadow-lg">
-        <div className="text-sm font-semibold mb-3">Legend</div>
+      {/* Legend - Collapsible */}
+      <div className="absolute bottom-4 left-4 bg-background/95 backdrop-blur-sm rounded-lg border shadow-lg overflow-hidden">
+        {/* Header - Always visible */}
+        <button
+          onClick={() => setLegendOpen(!legendOpen)}
+          className="w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors"
+        >
+          <span className="text-sm font-semibold">Legend</span>
+          {legendOpen ? (
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          ) : (
+            <ChevronUp className="w-4 h-4 text-muted-foreground" />
+          )}
+        </button>
 
-        {/* Layers */}
-        <div className="space-y-1.5 text-xs mb-3">
-          <div className="font-medium text-muted-foreground mb-1">Layers</div>
-          {Object.entries(LAYERS).reverse().map(([key, config]) => (
-            <div key={key} className="flex items-center gap-2">
-              <div
-                className="w-3 h-3 rounded border"
-                style={{ backgroundColor: config.color + '20', borderColor: config.color }}
-              />
-              <span>{config.label}</span>
+        {/* Collapsible Content */}
+        <div
+          className={`transition-all duration-300 ease-in-out ${
+            legendOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'
+          } overflow-hidden`}
+        >
+          <div className="px-4 pb-4 space-y-3">
+            {/* Layers */}
+            <div className="space-y-1.5 text-xs">
+              <div className="font-medium text-muted-foreground mb-1">Layers</div>
+              {Object.entries(LAYERS).reverse().map(([key, config]) => (
+                <div key={key} className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded border"
+                    style={{ backgroundColor: config.color + '20', borderColor: config.color }}
+                  />
+                  <span>{config.label}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Connection Types */}
-        <div className="space-y-1.5 text-xs mb-3">
-          <div className="font-medium text-muted-foreground mb-1">Connections</div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-0.5 bg-blue-500" />
-            <span>Data Flow</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-0.5 bg-yellow-500" style={{ backgroundImage: 'repeating-linear-gradient(90deg, rgb(234 179 8), rgb(234 179 8) 8px, transparent 8px, transparent 12px)' }} />
-            <span>Energy Flow</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-0.5 bg-green-500" style={{ backgroundImage: 'repeating-linear-gradient(90deg, rgb(34 197 94), rgb(34 197 94) 5px, transparent 5px, transparent 10px)' }} />
-            <span>Revenue Flow</span>
-          </div>
-        </div>
+            {/* Connection Types */}
+            <div className="space-y-1.5 text-xs">
+              <div className="font-medium text-muted-foreground mb-1">Connections</div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-0.5 bg-blue-500" />
+                <span>Data Flow</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-0.5 bg-yellow-500" style={{ backgroundImage: 'repeating-linear-gradient(90deg, rgb(234 179 8), rgb(234 179 8) 8px, transparent 8px, transparent 12px)' }} />
+                <span>Energy Flow</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-0.5 bg-green-500" style={{ backgroundImage: 'repeating-linear-gradient(90deg, rgb(34 197 94), rgb(34 197 94) 5px, transparent 5px, transparent 10px)' }} />
+                <span>Revenue Flow</span>
+              </div>
+            </div>
 
-        {/* Status */}
-        <div className="space-y-1.5 text-xs">
-          <div className="font-medium text-muted-foreground mb-1">Status</div>
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-            <span>Live</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-            <span>Testing</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ animation: 'testingActive 1.5s ease-in-out infinite', backgroundColor: 'rgb(234 179 8)' }}
-            />
-            <span>Testing (Active)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-gray-500" />
-            <span>Planned</span>
+            {/* Status */}
+            <div className="space-y-1.5 text-xs">
+              <div className="font-medium text-muted-foreground mb-1">Status</div>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                <span>Live</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+                <span>Testing</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ animation: 'testingActive 1.5s ease-in-out infinite', backgroundColor: 'rgb(234 179 8)' }}
+                />
+                <span>Testing (Active)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-500" />
+                <span>Planned</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
