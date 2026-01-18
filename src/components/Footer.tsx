@@ -33,8 +33,8 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center">
-                <span className="text-xl font-bold text-background">KM</span>
+              <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center overflow-hidden ml-1">
+                <img src="/logo.png" alt="kas.me" className="w-[112%] h-[112%] object-cover" />
               </div>
               <span className="text-xl font-bold">kas.me</span>
             </div>

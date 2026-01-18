@@ -65,14 +65,14 @@ export function DocsSidebar({ className }: DocsSidebarProps) {
         <div className="py-6 pr-6">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 mb-8 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span className="text-sm font-bold text-background">KM</span>
+            <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center group-hover:scale-110 transition-transform overflow-hidden ml-1">
+              <img src="/logo.png" alt="kas.me" className="w-[112%] h-[112%] object-cover" />
             </div>
             <span className="font-bold group-hover:text-accent transition-colors">kas.me</span>
           </Link>
 
-        {/* Navigation Sections */}
-        <div className="space-y-4">
+          {/* Navigation Sections */}
+          <div className="space-y-4">
           {docsNavigation.map((section) => {
             const isCollapsed = collapsedSections[section.title]
             const isActive = isSectionActive(section)
