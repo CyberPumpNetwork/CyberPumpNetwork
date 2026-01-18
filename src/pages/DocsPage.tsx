@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -470,23 +471,54 @@ function MarkdownDocPage({ slug }: { slug: string }) {
 export function DocsPage() {
   const { '*': slug } = useParams()
   const isHomePage = !slug || slug === ''
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+    
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
     <div className="min-h-screen bg-background">
-      <PageHeader
-        showLogo={false}
-        showSidebar={true}
-        sidebarContent={<DocsSidebar className="h-full px-4" />}
-        navItems={[
-          { label: 'Back to Home', href: '/' },
-        ]}
-      />
-      <DevBanner />
+      {/* Gelber Banner - immer ganz oben */}
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <DevBanner />
+      </div>
+      
+      {/* Header - fährt komplett nach rechts raus beim Scrollen */}
+      <div className={`fixed top-12 left-0 right-0 z-40 transition-transform duration-500 ease-in-out ${isScrolled ? 'translate-x-full' : 'translate-x-0'}`}>
+        <PageHeader
+          showLogo={false}
+          showSidebar={true}
+          sidebarContent={<DocsSidebar className="h-full px-4" />}
+          navItems={[
+            { label: 'Back to Home', href: '/' },
+          ]}
+        />
+      </div>
+      
+      {/* Back to Home Button - erscheint rechts beim Scrollen ohne Balken */}
+      <div className={`fixed top-14 right-4 z-50 transition-opacity duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <Button 
+          variant="ghost" 
+          asChild 
+          className="bg-background/80 backdrop-blur-sm border border-accent/30 shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:border-accent/50 transition-all"
+          style={{
+            boxShadow: '0 0 20px rgba(20, 184, 166, 0.15), 0 0 40px rgba(168, 85, 247, 0.1)'
+          }}
+        >
+          <Link to="/">Back to Home</Link>
+        </Button>
+      </div>
 
-      <div className="flex">
+      <div className="flex" style={{ marginTop: '64px' }}>
         {/* Left Sidebar */}
         <aside className="hidden lg:block w-72 shrink-0 border-r border-border/50">
-          <DocsSidebar className="sticky top-16 h-[calc(100vh-4rem)] pl-8 pr-4" />
+          <DocsSidebar className="sticky top-28 h-[calc(100vh-7rem)] pl-8 pr-4" />
         </aside>
 
         {/* Main Content Area */}
