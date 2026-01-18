@@ -1,7 +1,40 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge } from './ui/badge'
 
+// Dev Lock Enddatum: 10. September 2030, 10:45 UTC (1695d 12h 28m ab 18.01.2026 22:17 UTC)
+const DEV_LOCK_END_DATE = new Date('2030-09-10T10:45:00Z').getTime()
+
+function useCountdown(targetDate: number) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = Date.now()
+      const difference = targetDate - now
+
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / (1000 * 60)) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        })
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+      }
+    }
+
+    calculateTimeLeft()
+    const interval = setInterval(calculateTimeLeft, 1000)
+    return () => clearInterval(interval)
+  }, [targetDate])
+
+  return timeLeft
+}
+
 export function Tokenomics() {
+  const countdown = useCountdown(DEV_LOCK_END_DATE)
   return (
     <section id="tokenomics" className="py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -189,7 +222,12 @@ export function Tokenomics() {
             {/* Developer Lock */}
             <div className="text-center space-y-2">
               <div className="text-xs text-muted-foreground uppercase tracking-wide">Dev Lock</div>
-              <div className="text-xl font-bold text-red-500">1695d</div>
+              <div className="space-y-1">
+                <div className="text-sm text-muted-foreground">Unlocks in:</div>
+                <div className="text-xl font-bold text-red-500 tabular-nums">
+                  {countdown.days}d {countdown.hours}h {countdown.minutes}m
+                </div>
+              </div>
               <div className="text-xs text-muted-foreground">Curve: 25.99%</div>
             </div>
 

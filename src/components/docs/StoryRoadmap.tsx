@@ -27,7 +27,7 @@ const GRID = {
 };
 
 const BRANCHES = {
-  main: { y: 0, color: 'hsl(var(--accent))', solid: true, label: 'Life', bgClass: 'bg-accent/10 border-accent' },
+  main: { y: 0, color: 'rgb(20, 184, 166)', solid: true, label: 'Life', bgClass: 'bg-accent/10 border-accent' },
   career: { y: 130, color: 'rgb(236 72 153)', solid: true, label: 'Career', bgClass: 'bg-pink-500/10 border-pink-500' },
   learning: { y: 260, color: 'rgb(234 179 8)', solid: false, label: 'Learning', bgClass: 'bg-yellow-500/10 border-yellow-500' },
   crypto: { y: 390, color: 'rgb(34 197 94)', solid: false, label: 'Crypto', bgClass: 'bg-green-500/10 border-green-500' },
@@ -320,9 +320,12 @@ function getEdgeStyle(connection: Connection, milestones: Milestone[]) {
   const branch = targetNode.branch === 'main' ? sourceNode.branch : targetNode.branch;
   const config = BRANCHES[branch];
   
+  // Make main timeline thicker for better visibility
+  const strokeWidth = branch === 'main' ? 3.5 : (config.solid ? 2.5 : 2);
+  
   return {
     stroke: config.color,
-    strokeWidth: config.solid ? 2.5 : 2,
+    strokeWidth,
     strokeDasharray: config.solid ? undefined : '5,5',
   };
 }
@@ -450,7 +453,7 @@ export function StoryRoadmap() {
   };
 
   return (
-    <div className="w-full h-[800px] bg-background rounded-lg border relative">
+    <div className="w-full h-[600px] bg-background rounded-lg border relative">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -458,10 +461,9 @@ export function StoryRoadmap() {
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        fitView
         minZoom={0.1}
         maxZoom={1.5}
-        defaultViewport={{ x: 0, y: 200, zoom: 0.6 }}
+        defaultViewport={{ x: -4200, y: 250, zoom: 1.0 }}
         defaultEdgeOptions={{
           type: 'smoothstep',
           style: { strokeWidth: 2 },
