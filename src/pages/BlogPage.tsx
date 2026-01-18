@@ -63,9 +63,9 @@ const blogPosts = [
     featured: false,
   },
   {
-    title: 'Cross-Chain Bridging: Coming Soon',
+    title: 'Cross-Chain Bridging: Research Phase',
     excerpt:
-      'A sneak peek at our upcoming cross-chain bridge that will connect CyperPump across multiple blockchain networks.',
+      'A look at our cross-chain bridge design that aims to connect CyperPump across multiple blockchain networks.',
     date: 'Nov 8, 2025',
     readTime: '4 min read',
     category: 'Development',

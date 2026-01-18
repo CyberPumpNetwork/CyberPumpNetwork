@@ -189,7 +189,7 @@ permalink: /kasme/features/
   <div class="info-grid sub-grid">
     <div class="accordion-card">
       <div class="accordion-content">
-        <p style="text-align: center; padding: 2em; color: var(--text-secondary);"> Coming Soon 
+        <p style="text-align: center; padding: 2em; color: var(--text-secondary);"> In Development 
 Elite features for high holders are secret.</p>
       </div>
     </div>

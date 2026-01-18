@@ -1,37 +1,80 @@
+# Token & Ecosystem
+
+The **$CYPU** token is the heart of the kas.me ecosystem. Built on Kaspa as a KRC-20 token, it embodies fair-launch principles, transparent distribution, and sustainable growth.
+
 ---
-layout: single
-permalink: /Token/
+
+## Overview
+
+kas.me isn't just another platform with a token attached. The entire ecosystem is designed around **cohesion** – a system whose survival depends on the interconnectedness of its users.
+
+The token serves multiple purposes:
+- **Platform Access** – Premium features and advanced analytics
+- **Governance** – Community-driven decision making
+- **Rewards** – Incentivize participation and contributions
+- **Utility** – Powers the CyberPumpNetwork infrastructure
+
 ---
 
-<h2>Token & Ecosystem</h2>
+## Core Resources
 
-<div class="info-grid">
-  <div class="resource-card">
-    <i class="fas fa-file-pdf"></i>
-    <h3><a href="https://drive.google.com/file/d/15VvRoxo2g-s6Q1FiX-BYvyxYhJTAGjBs/view" target="_blank" rel="noopener"> Whitepaper and General Info</a></h3>
-    <p>The foundational document outlining kas.me's vision, architecture, and role in the Kaspa ecosystem. Dive into the technical blueprint for our platform.</p>
-    <p>🏦 📜 Work in Progress 📜 🏦</p>  
-</div>
-  <div class="resource-card">
-    <i class="fas fa-coins"></i>
-    <h3><a href="/kasme/det_tokenomics">Token Supply / Liquidity Pools and more</a></h3>
-    <p>Detailed breakdown of $CYPU tokenomics, supply mechanics, and distribution. Understand how kas.me's token integrates with Kaspa's fair-launch model for sustainable growth.</p>
-  </div>
-  <div class="resource-card">
-    <i class="fas fa-robot"></i>
-    <h3><a href="/kasme/ecoloop/onchain">Mint System / Automatic Bot</a></h3>
-    <p>Learn about our automated minting system and bot features for seamless token generation and management. Designed for sustainable growth within the <a style="color: var(--accent-turkis); border-bottom: 1px solid var(--accent-turkis);">CyberPumpNetwork</a> </p>
-  </div>
-  <div class="resource-card">
-    <i class="fas fa-recycle"></i>
-    <h3><a href="/kasme/ecoloop">Ecosystem Loop</a></h3>
-    <p>Understand the interconnected loop of kas.me's ecosystem: From token utility to community governance and Kaspa integration. See how it creates value for users and developers.</p>
-  </div>
-    <div class="resource-card">
-        <i class="fas fa-wallet"></i>
-        <h3><a href="/Token/wallet-overview">Wallet Overview</a></h3>
-        <p>All wallets belonging to The IT CyberSpace (Dev Wallet, Vault Wallet, Dev Fund Wallet, etc.) are displayed here transparently for full accountability and trust in our operations.</p>
-      </div>
+### 📜 Whitepaper
 
+The foundational document outlining kas.me's vision, architecture, and role in the Kaspa ecosystem. Dive into the technical blueprint for our platform.
 
-</div>
+[View Whitepaper](https://drive.google.com/file/d/15VvRoxo2g-s6Q1FiX-BYvyxYhJTAGjBs/view) (Work in Progress 🏦)
+
+### 📊 Detailed Tokenomics
+
+Complete breakdown of $CYPU token supply, distribution mechanics, liquidity pools, staking, vesting schedules, and more.
+
+[Explore Detailed Tokenomics](/docs/tokenomics/det-tokenomics)
+
+### 🤖 Mint System & Automated Bot
+
+Learn about our automated minting system and bot features for seamless token generation and management. Designed for sustainable growth within the **CyberPumpNetwork**.
+
+[Learn About Minting](/docs/tokenomics/publicmarket/mint)
+
+### 🔄 Ecosystem Loop
+
+Understand the interconnected loop of kas.me's ecosystem: From token utility to community governance and Kaspa integration. See how it creates value for users and developers.
+
+[Understand EcoLoop](/docs/tokenomics/ecoloop)
+
+### 💼 Wallet Overview
+
+All wallets belonging to The IT CyberSpace (Dev Wallet, Vault Wallet, Dev Fund Wallet, etc.) are displayed here transparently for full accountability and trust in our operations.
+
+[View All Wallets](/docs/tokenomics/det-token/wallets)
+
+---
+
+## Key Principles
+
+### Fair Launch
+No pre-mine, no insider allocations. $CYPU follows Kaspa's fair-launch philosophy.
+
+### Transparency
+All wallets, transactions, and mechanisms are publicly verifiable on-chain.
+
+### Sustainability
+Token economics designed for long-term viability, not pump-and-dump schemes.
+
+### Community-Driven
+Governance and development decisions involve the community from day one.
+
+---
+
+## Quick Links
+
+- [Token Supply & Distribution](/docs/tokenomics/det-token/token-supply)
+- [Liquidity Pools](/docs/tokenomics/det-token/liquidity-pools)
+- [Staking Mechanism](/docs/tokenomics/det-token/staking)
+- [Vesting Schedules](/docs/tokenomics/det-token/vesting)
+- [PEG System](/docs/tokenomics/det-token/peg)
+- [Token Locks](/docs/tokenomics/det-token/lock)
+
+---
+
+**The token is not the goal. It's the means to achieve the vision.**

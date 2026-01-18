@@ -25,7 +25,7 @@ const blogPosts = [
   {
     title: 'EcoLoop: The Future of Token Creation',
     excerpt:
-      'Learn about EcoLoop - our upcoming feature for streamlined token creation within the Kaspa ecosystem, making blockchain accessible to everyone.',
+      'Learn about EcoLoop - our planned feature for streamlined token creation within the Kaspa ecosystem, making blockchain accessible to everyone.',
     date: 'Jan 5, 2025',
     readTime: '6 min read',
     category: 'Features',

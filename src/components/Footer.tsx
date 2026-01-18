@@ -105,7 +105,7 @@ export function Footer() {
         <Separator className="my-8" />
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2025 kas.me by The IT CyberSpace. All rights reserved.
+            © 2026 kas.me by The IT CyberSpace. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a

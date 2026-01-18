@@ -1,251 +1,273 @@
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/PageHeader'
 import { DevBanner } from '@/components/DevBanner'
 import { MarkdownRenderer } from '@/components/MarkdownRenderer'
-import { getDocsNavigation, getDocBySlug, getCategories, getDocsByCategory } from '@/lib/docs'
+import { DocsSidebar } from '@/components/DocsSidebar'
+import { DocsSearch } from '@/components/DocsSearch'
+import { TableOfContents } from '@/components/TableOfContents'
+import { TokenomicsContent } from '@/components/docs/TokenomicsContent'
+import { DetTokenomicsContent } from '@/components/docs/DetTokenomicsContent'
+import { TokenSupplyContent } from '@/components/docs/TokenSupplyContent'
+import { WalletsContent } from '@/components/docs/WalletsContent'
+import { LiquidityPoolsContent } from '@/components/docs/LiquidityPoolsContent'
+import { StakingContent } from '@/components/docs/StakingContent'
+import { VestingContent } from '@/components/docs/VestingContent'
+import { PegContent } from '@/components/docs/PegContent'
+import { LockContent } from '@/components/docs/LockContent'
+import { MintContent } from '@/components/docs/MintContent'
+import { FeaturesContent } from '@/components/docs/FeaturesContent'
+import { DetailedFeaturesContent } from '@/components/docs/DetailedFeaturesContent'
+import { FreeFeaturesContent } from '@/components/docs/FreeFeaturesContent'
+import { ExplorerContent } from '@/components/docs/ExplorerContent'
+import { GuidesContent } from '@/components/docs/GuidesContent'
+import { IntelligenceCenterContent } from '@/components/docs/IntelligenceCenterContent'
+import { EcoLoopContent } from '@/components/docs/EcoLoopContent'
+import { TheFirmContent } from '@/components/docs/TheFirmContent'
+import { NetworkInfrastructureContent } from '@/components/docs/NetworkInfrastructureContent'
+import { OnChainInnovationContent } from '@/components/docs/OnChainInnovationContent'
+import { BasicsContent } from '@/components/docs/BasicsContent'
+import { GettingStartedContent } from '@/components/docs/GettingStartedContent'
+import { KasMeInfoContent } from '@/components/docs/KasMeInfoContent'
+import { AuditsContent } from '@/components/docs/AuditsContent'
+import { DevelopmentContent } from '@/components/docs/DevelopmentContent'
+import { getDocBySlug, getCategories, getDocsByCategory } from '@/lib/docs'
 import { useMarkdownContent } from '@/lib/useMarkdown'
-
-const docsNavigation = getDocsNavigation()
-
-// Add external resources to navigation
-const externalResources = [
-  { 
-    title: 'Whitepaper', 
-    href: 'https://drive.google.com/file/d/1zMFJSHH6YH8BvDm03LdZDzP3K99bNjZK/view?usp=sharing', 
-    external: true 
-  },
-]
-
-function DocsSidebar({ className }: { className?: string }) {
-  const location = useLocation()
-  const currentPath = location.pathname
-
-  return (
-    <ScrollArea className={className}>
-      <div className="py-6 pr-6">
-        <Link to="/" className="flex items-center gap-2 mb-8">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center">
-            <span className="text-sm font-bold text-background">KM</span>
-          </div>
-          <span className="font-bold">kas.me</span>
-        </Link>
-
-        <div className="space-y-6">
-          {docsNavigation.map((section) => (
-            <div key={section.title}>
-              <h4 className="font-semibold text-sm mb-2 text-foreground">{section.title}</h4>
-              <div className="space-y-1">
-                {section.items.map((item) => {
-                  const isActive = currentPath === item.href || 
-                    (item.href === '/docs' && currentPath === '/docs/')
-                  return (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      className={`block text-sm py-1.5 px-3 rounded-md transition-colors ${
-                        isActive
-                          ? 'bg-accent/10 text-accent font-medium'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                      }`}
-                    >
-                      {item.title}
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-          
-          {/* External Resources */}
-          <div>
-            <h4 className="font-semibold text-sm mb-2 text-foreground">External Resources</h4>
-            <div className="space-y-1">
-              {externalResources.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-sm py-1.5 px-3 rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"
-                >
-                  {item.title}
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </ScrollArea>
-  )
-}
+import {
+  BookOpen,
+  Zap,
+  Coins,
+  FileText,
+  MessageSquare,
+  Sparkles,
+  ArrowRight,
+  Code2,
+  ExternalLink
+} from 'lucide-react'
 
 function DocsHomePage() {
   const categories = getCategories()
   const docsByCategory = getDocsByCategory()
 
+  const quickStartCards = [
+    {
+      icon: Zap,
+      title: 'Launch kas.me',
+      description: 'Access the platform to track your Kaspa portfolio and explore features.',
+      href: 'https://kas.me',
+      external: true,
+      gradient: 'from-accent/20 to-accent/5'
+    },
+    {
+      icon: Coins,
+      title: '$CYPU Tokenomics',
+      description: 'Learn about the KRC-20 token powering kas.me ecosystem.',
+      href: '/docs/tokenomics',
+      external: false,
+      gradient: 'from-blue-500/20 to-blue-500/5'
+    },
+    {
+      icon: FileText,
+      title: 'Platform Features',
+      description: 'Explore all kas.me platform features and capabilities.',
+      href: '/docs/platform/infocenter/features',
+      external: false,
+      gradient: 'from-purple-500/20 to-purple-500/5'
+    },
+  ]
+
+  const categoryIcons: Record<string, any> = {
+    'Getting Started': BookOpen,
+    'Tokenomics': Coins,
+    'Platform': Zap,
+    'EcoLoop': Sparkles,
+    'Community': MessageSquare,
+    'Behind the Scenes': MessageSquare,
+    'Development': Code2,
+  }
+
   return (
-    <div className="space-y-12">
-      {/* Hero Section */}
-      <div>
-        <Badge className="mb-4 bg-accent/10 text-accent hover:bg-accent/20">
-          Documentation
-        </Badge>
-        <h1 className="text-4xl font-bold mb-4">Welcome to kas.me Docs</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl">
-          Your Kaspa Ecosystem Hub by The IT CyberSpace 🇩🇪. Explore our comprehensive 
-          documentation to learn about kas.me, $CYPU token, and the Kaspa ecosystem.
-        </p>
+    <div className="space-y-16">
+      {/* Hero Section with Gradient */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-purple-500/10 rounded-3xl blur-3xl -z-10" />
+        <div className="relative space-y-6 py-8">
+          <Badge className="bg-gradient-to-r from-accent/20 to-blue-500/20 text-accent border-accent/30 backdrop-blur-sm">
+            <Sparkles className="w-3 h-3 mr-1" />
+            Documentation
+          </Badge>
+          <div>
+            <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-br from-foreground via-foreground to-accent bg-clip-text text-transparent">
+              kas.me Docs
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed">
+              Your comprehensive guide to the Kaspa Ecosystem Hub.
+              <span className="text-foreground font-medium"> Explore tokenomics, platform features, and the philosophy</span> behind kas.me by The IT CyberSpace 🇩🇪
+            </p>
+          </div>
+
+          {/* Search Bar with Glass Effect */}
+          <div className="max-w-2xl pt-4">
+            <DocsSearch />
+          </div>
+        </div>
       </div>
 
-      {/* Quick Links */}
+      {/* Quick Start Cards */}
       <div>
-        <h2 className="text-2xl font-bold mb-6">Quick Links</h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          <Card className="group hover:border-accent/40 transition-colors">
-            <CardHeader>
-              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-2 group-hover:bg-accent/20 transition-colors">
-                <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <CardTitle className="text-lg">Launch kas.me</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-2">
-                Access the platform to track your Kaspa portfolio.
-              </p>
-              <a href="https://kas.me" target="_blank" rel="noopener noreferrer" className="text-accent text-sm">
-                Go to kas.me →
-              </a>
-            </CardContent>
-          </Card>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-1 h-8 bg-gradient-to-b from-accent to-accent/30 rounded-full" />
+          <h2 className="text-3xl font-bold">Quick Start</h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {quickStartCards.map((card, index) => {
+            const Icon = card.icon
+            const CardWrapper = card.external ? 'a' : Link
+            const wrapperProps = card.external
+              ? { href: card.href, target: '_blank', rel: 'noopener noreferrer' }
+              : { to: card.href }
 
-          <Link to="/docs/tokenomics">
-            <Card className="group hover:border-accent/40 transition-colors h-full">
-              <CardHeader>
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-2 group-hover:bg-accent/20 transition-colors">
-                  <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <CardTitle className="text-lg">$CYPU Tokenomics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Learn about the KRC-20 token powering kas.me.
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
+            return (
+              <CardWrapper key={index} {...wrapperProps as any}>
+                <Card className="group relative overflow-hidden border-border/50 hover:border-accent/50 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5 h-full bg-card/50 backdrop-blur-sm">
+                  {/* Gradient Background on Hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
 
-          <Link to="/docs/features">
-            <Card className="group hover:border-accent/40 transition-colors h-full">
-              <CardHeader>
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-2 group-hover:bg-accent/20 transition-colors">
-                  <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <CardTitle className="text-lg">Platform Features</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Explore all kas.me platform features.
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
+                  <CardHeader className="relative">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                      <Icon className="w-6 h-6 text-accent" />
+                    </div>
+                    <CardTitle className="text-xl group-hover:text-accent transition-colors">
+                      {card.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                      {card.description}
+                    </p>
+                    <div className="flex items-center gap-2 text-accent font-medium text-sm group-hover:gap-3 transition-all">
+                      Learn more
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardWrapper>
+            )
+          })}
         </div>
       </div>
 
       {/* Browse by Category */}
       <div>
-        <h2 className="text-2xl font-bold mb-6">Browse Documentation</h2>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-1 h-8 bg-gradient-to-b from-accent to-accent/30 rounded-full" />
+          <h2 className="text-3xl font-bold">Browse Documentation</h2>
+        </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((category) => (
-            <Card key={category} className="hover:border-accent/40 transition-colors">
-              <CardHeader>
-                <CardTitle className="text-lg">{category}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {docsByCategory[category]?.slice(0, 5).map((doc) => (
-                    <li key={doc.slug}>
-                      <Link
-                        to={doc.slug === 'index' ? '/docs' : `/docs/${doc.slug}`}
-                        className="text-sm text-muted-foreground hover:text-accent transition-colors"
-                      >
-                        {doc.title}
-                      </Link>
-                    </li>
-                  ))}
-                  {(docsByCategory[category]?.length || 0) > 5 && (
-                    <li className="text-sm text-accent">
-                      +{(docsByCategory[category]?.length || 0) - 5} more...
-                    </li>
-                  )}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
+          {categories.map((category) => {
+            const Icon = categoryIcons[category] || FileText
+            const docs = docsByCategory[category] || []
+
+            return (
+              <Card
+                key={category}
+                className="group border-border/50 hover:border-accent/50 transition-all duration-300 bg-card/50 backdrop-blur-sm hover:shadow-lg hover:shadow-accent/5"
+              >
+                <CardHeader>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Icon className="w-5 h-5 text-accent" />
+                    </div>
+                    <CardTitle className="text-xl group-hover:text-accent transition-colors">
+                      {category}
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {docs.slice(0, 5).map((doc) => (
+                      <li key={doc.slug}>
+                        <Link
+                          to={doc.slug === 'index' ? '/docs' : `/docs/${doc.slug}`}
+                          className="group/link flex items-start gap-2 text-sm text-muted-foreground hover:text-accent transition-colors"
+                        >
+                          <ArrowRight className="w-4 h-4 mt-0.5 opacity-0 -ml-6 group-hover/link:opacity-100 group-hover/link:ml-0 transition-all" />
+                          <span className="group-hover/link:translate-x-1 transition-transform">
+                            {doc.title}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                    {docs.length > 5 && (
+                      <li className="text-sm text-accent font-medium pt-2">
+                        +{docs.length - 5} more articles...
+                      </li>
+                    )}
+                  </ul>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
       </div>
 
-      {/* Community Links */}
+      {/* Community & Resources */}
       <div>
-        <h2 className="text-2xl font-bold mb-6">Community & Links</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <Card>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-1 h-8 bg-gradient-to-b from-accent to-accent/30 rounded-full" />
+          <h2 className="text-3xl font-bold">Community & Resources</h2>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-6">
+          <Card className="group border-border/50 hover:border-accent/50 transition-all duration-300 bg-card/50 backdrop-blur-sm hover:shadow-lg hover:shadow-accent/5">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <svg className="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-                Follow on X
+              <CardTitle className="text-xl flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <svg className="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </div>
+                <span className="group-hover:text-accent transition-colors">Follow on X</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Get the latest updates and community discussions.
+              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                Get the latest updates, announcements, and join community discussions.
               </p>
-              <a 
-                href="https://x.com/TheITCyberSpace" 
-                target="_blank" 
+              <a
+                href="https://x.com/TheITCyberSpace"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-accent hover:underline"
+                className="inline-flex items-center gap-2 text-accent hover:gap-3 transition-all font-medium"
               >
                 @TheITCyberSpace
+                <ExternalLink className="w-4 h-4" />
               </a>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="group border-border/50 hover:border-accent/50 transition-all duration-300 bg-card/50 backdrop-blur-sm hover:shadow-lg hover:shadow-accent/5">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <svg className="w-5 h-5 text-accent" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                </svg>
-                GitHub Repository
+              <CardTitle className="text-xl flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Code2 className="w-5 h-5 text-accent" />
+                </div>
+                <span className="group-hover:text-accent transition-colors">GitHub</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Explore our open-source code and contribute.
+              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                Explore our open-source code, contribute, and track development progress.
               </p>
-              <a 
-                href="https://github.com/H34R7L3s/CyberPump" 
-                target="_blank" 
+              <a
+                href="https://github.com/H34R7L3s/CyberPump"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-accent hover:underline"
+                className="inline-flex items-center gap-2 text-accent hover:gap-3 transition-all font-medium"
               >
                 H34R7L3s/CyberPump
+                <ExternalLink className="w-4 h-4" />
               </a>
             </CardContent>
           </Card>
@@ -259,71 +281,180 @@ function MarkdownDocPage({ slug }: { slug: string }) {
   const { content, loading, error } = useMarkdownContent(slug)
   const doc = getDocBySlug(slug || 'index')
 
-  if (loading) {
+  // Check if this page has a custom component
+  const hasCustomComponent =
+    slug === 'tokenomics' ||
+    slug === 'tokenomics/det-tokenomics' ||
+    slug === 'tokenomics/det-token/token-supply' ||
+    slug === 'tokenomics/det-token/wallets' ||
+    slug === 'tokenomics/det-token/liquidity-pools' ||
+    slug === 'tokenomics/det-token/staking' ||
+    slug === 'tokenomics/det-token/vesting' ||
+    slug === 'tokenomics/det-token/peg' ||
+    slug === 'tokenomics/det-token/lock' ||
+    slug === 'tokenomics/publicmarket/mint' ||
+    slug === 'platform/infocenter/features' ||
+    slug === 'platform/infocenter/features/det-features' ||
+    slug === 'platform/infocenter/features/free-features' ||
+    slug === 'platform/infocenter/explorer' ||
+    slug === 'platform/infocenter/guides' ||
+    slug === 'platform/infocenter/intelligence-center' ||
+    slug === 'tokenomics/ecoloop' ||
+    slug === 'tokenomics/titcs/firm' ||
+    slug === 'tokenomics/titcs/network' ||
+    slug === 'tokenomics/titcs/onchain' ||
+    slug === 'getting-started/basics' ||
+    slug === 'getting-started/guides' ||
+    slug === 'getting-started/kasme-info' ||
+    slug === 'community/hub/audits' ||
+    slug === 'development'
+
+  if (loading && !hasCustomComponent) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+        <div className="relative">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+          <div className="absolute inset-0 rounded-full border-2 border-accent/20"></div>
+        </div>
       </div>
     )
   }
 
-  if (error || !content) {
+  if (error || (!content && !hasCustomComponent)) {
     return (
       <div className="text-center py-20">
+        <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
+          <FileText className="w-8 h-8 text-accent" />
+        </div>
         <h2 className="text-2xl font-bold mb-4">Document Not Found</h2>
-        <p className="text-muted-foreground mb-6">
+        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
           {error || 'The requested documentation page could not be found.'}
         </p>
         <Link to="/docs">
-          <Button variant="outline">← Back to Docs</Button>
+          <Button variant="outline" className="group">
+            ← Back to Docs
+            <ArrowRight className="w-4 h-4 ml-2 rotate-180 group-hover:-translate-x-1 transition-transform" />
+          </Button>
         </Link>
       </div>
     )
   }
 
   return (
-    <div>
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <Link to="/docs" className="hover:text-accent">Docs</Link>
-        <span>/</span>
+    <div className="flex gap-12">
+      {/* Main Content */}
+      <div className="flex-1 min-w-0">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
+          <Link to="/docs" className="hover:text-accent transition-colors font-medium">Docs</Link>
+          <span>/</span>
+          {doc?.category && (
+            <>
+              <span className="text-foreground/60">{doc.category}</span>
+              <span>/</span>
+            </>
+          )}
+          <span className="text-foreground font-medium">{doc?.title || slug}</span>
+        </nav>
+
+        {/* Category Badge */}
         {doc?.category && (
-          <>
-            <span>{doc.category}</span>
-            <span>/</span>
-          </>
+          <Badge className="mb-6 bg-gradient-to-r from-accent/20 to-blue-500/20 text-accent border-accent/30 backdrop-blur-sm">
+            {doc.category}
+          </Badge>
         )}
-        <span className="text-foreground">{doc?.title || slug}</span>
-      </div>
 
-      {/* Category Badge */}
-      {doc?.category && (
-        <Badge className="mb-4 bg-accent/10 text-accent hover:bg-accent/20">
-          {doc.category}
-        </Badge>
-      )}
+        {/* Article Container - Custom Component or Markdown */}
+        <article className="max-w-none">
+          {slug === 'tokenomics' ? (
+            <TokenomicsContent />
+          ) : slug === 'tokenomics/det-tokenomics' ? (
+            <DetTokenomicsContent />
+          ) : slug === 'tokenomics/det-token/token-supply' ? (
+            <TokenSupplyContent />
+          ) : slug === 'tokenomics/det-token/wallets' ? (
+            <WalletsContent />
+          ) : slug === 'tokenomics/det-token/liquidity-pools' ? (
+            <LiquidityPoolsContent />
+          ) : slug === 'tokenomics/det-token/staking' ? (
+            <StakingContent />
+          ) : slug === 'tokenomics/det-token/vesting' ? (
+            <VestingContent />
+          ) : slug === 'tokenomics/det-token/peg' ? (
+            <PegContent />
+          ) : slug === 'tokenomics/det-token/lock' ? (
+            <LockContent />
+          ) : slug === 'tokenomics/publicmarket/mint' ? (
+            <MintContent />
+          ) : slug === 'platform/infocenter/features' ? (
+            <FeaturesContent />
+          ) : slug === 'platform/infocenter/features/det-features' ? (
+            <DetailedFeaturesContent />
+          ) : slug === 'platform/infocenter/features/free-features' ? (
+            <FreeFeaturesContent />
+          ) : slug === 'platform/infocenter/explorer' ? (
+            <ExplorerContent />
+          ) : slug === 'platform/infocenter/guides' ? (
+            <GuidesContent />
+          ) : slug === 'platform/infocenter/intelligence-center' ? (
+            <IntelligenceCenterContent />
+          ) : slug === 'tokenomics/ecoloop' ? (
+            <EcoLoopContent />
+          ) : slug === 'tokenomics/titcs/firm' ? (
+            <TheFirmContent />
+          ) : slug === 'tokenomics/titcs/network' ? (
+            <NetworkInfrastructureContent />
+          ) : slug === 'tokenomics/titcs/onchain' ? (
+            <OnChainInnovationContent />
+          ) : slug === 'getting-started/basics' ? (
+            <BasicsContent />
+          ) : slug === 'getting-started/guides' ? (
+            <GettingStartedContent />
+          ) : slug === 'getting-started/kasme-info' ? (
+            <KasMeInfoContent />
+          ) : slug === 'community/hub/audits' ? (
+            <AuditsContent />
+          ) : slug === 'development' ? (
+            <DevelopmentContent />
+          ) : (
+            <div className="prose prose-lg dark:prose-invert">
+              <MarkdownRenderer content={content} />
+            </div>
+          )}
+        </article>
 
-      {/* Markdown Content */}
-      <MarkdownRenderer content={content} />
-
-      {/* Navigation Footer */}
-      <div className="mt-12 pt-6 border-t border-border">
-        <div className="flex justify-between items-center">
-          <Link to="/docs">
-            <Button variant="ghost" className="text-muted-foreground hover:text-accent">
-              ← Back to Docs
-            </Button>
-          </Link>
-          <a 
-            href={`https://github.com/H34R7L3s/CyberPump/edit/main/src/docs/${doc?.file || ''}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-muted-foreground hover:text-accent"
-          >
-            Edit this page on GitHub →
-          </a>
+        {/* Navigation Footer */}
+        <div className="mt-16 pt-8 border-t border-border/50">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <Link to="/docs">
+              <Button variant="ghost" className="group text-muted-foreground hover:text-accent -ml-4">
+                <ArrowRight className="w-4 h-4 mr-2 rotate-180 group-hover:-translate-x-1 transition-transform" />
+                Back to Docs
+              </Button>
+            </Link>
+            {!hasCustomComponent && (
+              <a
+                href={`https://github.com/H34R7L3s/CyberPump/edit/main/src/docs/${doc?.file || ''}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent transition-colors group"
+              >
+                Edit this page on GitHub
+                <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </a>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Right Sidebar - Table of Contents */}
+      {!hasCustomComponent && (
+        <aside className="hidden xl:block w-64 shrink-0">
+          <div className="sticky top-24">
+            <TableOfContents content={content} />
+          </div>
+        </aside>
+      )}
     </div>
   )
 }
@@ -340,20 +471,19 @@ export function DocsPage() {
         sidebarContent={<DocsSidebar className="h-full px-4" />}
         navItems={[
           { label: 'Back to Home', href: '/' },
-          // { label: 'Launch kas.me', href: 'https://kas.me', external: true },
         ]}
       />
       <DevBanner />
 
       <div className="flex">
-        {/* Sidebar */}
-        <aside className="hidden lg:block w-64 shrink-0 border-r border-border/50">
-          <DocsSidebar className="sticky top-16 h-[calc(100vh-4rem)] pl-6" />
+        {/* Left Sidebar */}
+        <aside className="hidden lg:block w-72 shrink-0 border-r border-border/50">
+          <DocsSidebar className="sticky top-16 h-[calc(100vh-4rem)] pl-8 pr-4" />
         </aside>
 
-        {/* Main Content */}
+        {/* Main Content Area */}
         <main className="flex-1 min-w-0">
-          <div className="max-w-4xl mx-auto px-6 py-12">
+          <div className={isHomePage ? "max-w-6xl mx-auto px-8 py-16" : "max-w-5xl mx-auto px-8 py-12"}>
             {isHomePage ? (
               <DocsHomePage />
             ) : (

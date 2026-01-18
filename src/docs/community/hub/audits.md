@@ -85,7 +85,7 @@ permalink: /basics/audits/
     <i class="fas fa-check-circle" style="color: var(--accent-green);"></i>
     <h3>Everything Will Be Audited</h3>
     <p>Smart contracts, finances, operations - all get third-party audits when ready.</p>
-    <p>Timeline: Post-ICO growth enables it. BaFin/MiCA first milestone.</p>
+    <p>Audits will be conducted as the project scales and resources allow. BaFin/MiCA compliance is a priority.</p>
     <p>This page becomes your hub: Proofs, reports, updates posted here.</p>
   </div>
 
@@ -93,7 +93,7 @@ permalink: /basics/audits/
     <i class="fas fa-egg" style="color: var(--cat-beginner);"></i>
     <h3>Easter Eggs & The Bigger Picture</h3>
     <p>Project in "birth phase" - you're witnessing it live. Hints & reveals build excitement.</p>
-    <p>Why this way? Personal story in an upcoming <a style="color: var(--accent-turkis); border-bottom: 1px solid; font-weight: bold;"> Dev Talk.</a> (soon)</p>
+    <p>Why this way? Personal story in a <a style="color: var(--accent-turkis); border-bottom: 1px solid; font-weight: bold;"> Dev Talk.</a></p>
     <p>Goal: From basics to audited powerhouse - with you along the ride.</p>
   </div>
 </div>

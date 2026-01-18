@@ -108,11 +108,11 @@ permalink: /kasme/det_tokenomics/pools/
     <li><strong>Risks:</strong> Impermanent loss, smart contract risk</li>
   </ul>
   <p style="color: var(--text-secondary);">
-    <strong>WIP:</strong> Full step-by-step LP guide coming soon in Dev Talk #3.
+    <strong>WIP:</strong> Full step-by-step LP guide planned for a future Dev Talk.
   </p>
   <p style="text-align: center; margin-top: 1.5em;">
     <a style="color: var(--accent-turkis); border-bottom: 1px solid; font-weight: bold;">
-      Watch Dev Talk (Coming Soon) 
+      Watch Dev Talk (Planned)
     </a>
   </p>
 </div>

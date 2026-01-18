@@ -20,7 +20,7 @@ export function Hero() {
         {/* Badge */}
         <Badge className="mb-8 px-4 py-2 bg-accent/10 text-accent border-accent/20 hover:bg-accent/20">
           <span className="w-2 h-2 bg-accent rounded-full animate-pulse mr-2" />
-          Built on Kaspa's BlockDAG Technology
+          Built on Kaspa Technology
         </Badge>
 
         {/* Main Heading */}

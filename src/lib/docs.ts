@@ -34,7 +34,7 @@ export const docsConfig: DocPage[] = [
     description: 'Information about the kas.me platform',
     category: 'Getting Started',
     order: 3,
-    file: 'getting-started/kasme-info.md',
+    file: '', // Uses React component KasMeInfoContent instead of markdown
   },
   {
     slug: 'getting-started/guides',
@@ -42,7 +42,7 @@ export const docsConfig: DocPage[] = [
     description: 'How to get started with kas.me',
     category: 'Getting Started',
     order: 4,
-    file: 'platform/infocenter/guides/getting-started.md',
+    file: '', // Uses React component GettingStartedContent instead of markdown
   },
 
   // Tokenomics
@@ -134,15 +134,15 @@ export const docsConfig: DocPage[] = [
     description: 'Explore kas.me features',
     category: 'Platform',
     order: 1,
-    file: 'platform/infocenter/features.md',
+    file: '', // Uses React component FeaturesContent instead of markdown
   },
   {
     slug: 'platform/infocenter/features/det-features',
     title: 'Detailed Features',
-    description: 'In-depth feature breakdown',
+    description: 'Tool comparison: TradingView, Glassnode, Bloomberg vs kas.me',
     category: 'Platform',
     order: 2,
-    file: 'platform/infocenter/features/det_features.md',
+    file: '', // Uses React component DetailedFeaturesContent instead of markdown
   },
   {
     slug: 'platform/infocenter/features/free-features',
@@ -150,7 +150,7 @@ export const docsConfig: DocPage[] = [
     description: 'Features available for free',
     category: 'Platform',
     order: 3,
-    file: 'platform/infocenter/features/free_features.md',
+    file: '', // Uses React component FreeFeaturesContent instead of markdown
   },
   {
     slug: 'platform/infocenter/explorer',
@@ -158,7 +158,7 @@ export const docsConfig: DocPage[] = [
     description: 'Kaspa blockchain explorer',
     category: 'Platform',
     order: 4,
-    file: 'platform/infocenter/explorer.md',
+    file: '', // Uses React component ExplorerContent instead of markdown
   },
   {
     slug: 'platform/infocenter/guides',
@@ -166,7 +166,7 @@ export const docsConfig: DocPage[] = [
     description: 'Platform guides and tutorials',
     category: 'Platform',
     order: 5,
-    file: 'platform/infocenter/guides.md',
+    file: '', // Uses React component GuidesContent instead of markdown
   },
   {
     slug: 'platform/infocenter/intelligence-center',
@@ -174,7 +174,7 @@ export const docsConfig: DocPage[] = [
     description: 'Advanced analytics tools',
     category: 'Platform',
     order: 6,
-    file: 'platform/infocenter/IntelligenceCenter.md',
+    file: '', // Uses React component IntelligenceCenterContent instead of markdown
   },
 
   // EcoLoop
@@ -184,31 +184,31 @@ export const docsConfig: DocPage[] = [
     description: 'The IT CyberSpace ecosystem loop',
     category: 'EcoLoop',
     order: 1,
-    file: 'tokenomics/ecoloop_itcs.md',
+    file: '', // Uses React component EcoLoopContent instead of markdown
   },
   {
     slug: 'tokenomics/titcs/firm',
-    title: 'The IT CyberSpace',
-    description: 'About the company',
+    title: 'The Firm',
+    description: 'From one-person operation to structured entity - manifestation in progress',
     category: 'EcoLoop',
     order: 2,
-    file: 'tokenomics/titcs/firm.md',
+    file: '', // Uses React component TheFirmContent instead of markdown
   },
   {
     slug: 'tokenomics/titcs/network',
-    title: 'Network',
-    description: 'CyberPump Network details',
+    title: 'Network Infrastructure',
+    description: 'Decentralized architecture with distributed compliance - Godfather/Worker mesh',
     category: 'EcoLoop',
     order: 3,
-    file: 'tokenomics/titcs/network.md',
+    file: '', // Uses React component NetworkInfrastructureContent instead of markdown
   },
   {
     slug: 'tokenomics/titcs/onchain',
-    title: 'On-Chain',
-    description: 'On-chain mechanics',
+    title: 'On-Chain Innovation',
+    description: 'PEG Bot, Mint System, HFT dynamics - experimental DeFi with real-world backing',
     category: 'EcoLoop',
     order: 4,
-    file: 'tokenomics/titcs/onchain.md',
+    file: '', // Uses React component OnChainInnovationContent instead of markdown
   },
   {
     slug: 'tokenomics/titcs/partners',
@@ -246,37 +246,39 @@ export const docsConfig: DocPage[] = [
   },
   {
     slug: 'community/hub/audits',
-    title: 'Audits',
-    description: 'Security audits and transparency',
+    title: 'Audits & Regulatory Path',
+    description: 'Transparency from Day 1 - audit roadmap and regulatory compliance',
     category: 'Community',
     order: 4,
-    file: 'community/hub/audits.md',
+    file: '', // Uses React component AuditsContent instead of markdown
   },
 
   // Development
   {
     slug: 'development',
-    title: 'Development',
-    description: 'Developer resources and API',
+    title: 'Development & API',
+    description: 'Developer resources and API documentation (in development)',
     category: 'Development',
     order: 1,
-    file: 'development/dev.md',
+    file: '', // Uses React component DevelopmentContent instead of markdown
+  },
+
+  // Dev Talks - Behind the Scenes
+  {
+    slug: 'community/devtalks/devtalk-1',
+    title: 'Dev Talk #1: First Ever Dev Talk',
+    description: '72 Days After Token Launch - The origin story',
+    category: 'Behind the Scenes',
+    order: 1,
+    file: 'community/devtalks/devtalk1.md',
   },
   {
-    slug: 'development/devtalks/devtalk-1',
-    title: 'DevTalk #1',
-    description: 'First developer talk',
-    category: 'Development',
+    slug: 'community/devtalks/devtalk-2',
+    title: 'Dev Talk #2: Absurd Megalomania',
+    description: 'Personal reflections on building something different',
+    category: 'Behind the Scenes',
     order: 2,
-    file: 'development/devtalks/devtalk1.md',
-  },
-  {
-    slug: 'development/devtalks/devtalk-2',
-    title: 'DevTalk #2',
-    description: 'Second developer talk',
-    category: 'Development',
-    order: 3,
-    file: 'development/devtalks/devtalk2.md',
+    file: 'community/devtalks/devtalk2.md',
   },
 ]
 
@@ -288,6 +290,7 @@ export function getCategories(): string[] {
     'Platform',
     'EcoLoop',
     'Community',
+    'Behind the Scenes',
     'Development',
   ]
   return categoryOrder
