@@ -44,7 +44,7 @@ interface InfraNode {
   label: string
   sublabel?: string
   icon: 'server' | 'cpu' | 'zap' | 'network' | 'globe' | 'database' | 'users' | 'workflow' | 'sun' | 'leaf' | 'activity'
-  status?: 'live' | 'testing' | 'planned'
+  status?: 'live' | 'testing' | 'testing-active' | 'planned'
 }
 
 interface InfraConnection {
@@ -70,19 +70,19 @@ const INFRA_NODES: InfraNode[] = [
 
   // === LAYER 3: WORKER MESH ===
   { id: 'worker-light', column: 0, layer: 'workers', label: 'Lightweight Workers', sublabel: 'VPS Mode', icon: 'network', status: 'testing' },
-  { id: 'worker-full', column: 2, layer: 'workers', label: 'Full Node Workers', sublabel: 'Colocation Mode', icon: 'server', status: 'testing' },
+  { id: 'worker-full', column: 2, layer: 'workers', label: 'Full Node Workers', sublabel: 'Colocation Mode', icon: 'server', status: 'testing-active' },
   { id: 'worker-hybrid', column: 4, layer: 'workers', label: 'Hybrid Workers', sublabel: 'BFT Mode', icon: 'workflow', status: 'planned' },
 
   // === LAYER 2: GODFATHER BACKBONE ===
   { id: 'godfather-primary', column: 0, layer: 'godfather', label: 'Primary Godfather', sublabel: 'Kaspa Archive Node', icon: 'server', status: 'live' },
-  { id: 'godfather-ml', column: 1.5, layer: 'godfather', label: 'ML Training Node', sublabel: 'GPU Accelerated', icon: 'activity', status: 'live' },
+  { id: 'godfather-ml', column: 1.5, layer: 'godfather', label: 'ML Training Node', sublabel: 'GPU Accelerated', icon: 'activity', status: 'testing-active' },
   { id: 'godfather-backup', column: 3, layer: 'godfather', label: 'Backup Godfather', sublabel: 'Failover Node', icon: 'server', status: 'planned' },
   { id: 'price-aggregator', column: 4.5, layer: 'godfather', label: 'Price Aggregator', sublabel: 'CEX API Polling', icon: 'activity', status: 'live' },
 
   // === LAYER 1: MINING & ENERGY ===
   { id: 'mining-rigs', column: 0, layer: 'mining', label: 'ASIC Mining Rigs', sublabel: 'KAS Revenue', icon: 'cpu', status: 'live' },
   { id: 'solar-panels', column: 2, layer: 'mining', label: 'Solar Installation', sublabel: 'Energy Generation', icon: 'sun', status: 'live' },
-  { id: 'greenhouse', column: 4, layer: 'mining', label: 'Greenhouse', sublabel: 'Heat Recovery', icon: 'leaf', status: 'live' },
+  { id: 'greenhouse', column: 4, layer: 'mining', label: 'Greenhouse', sublabel: 'Heat Recovery', icon: 'leaf', status: 'testing-active' },
 ]
 
 const INFRA_CONNECTIONS: InfraConnection[] = [
@@ -150,12 +150,6 @@ function NodeIcon({ icon, className }: { icon: InfraNode['icon']; className?: st
 function InfrastructureNode({ data }: { data: { label: string; sublabel?: string; icon: InfraNode['icon']; layer: LayerType; status?: string } }) {
   const layerConfig = LAYERS[data.layer]
 
-  const statusColor = data.status === 'live'
-    ? 'bg-green-500'
-    : data.status === 'testing'
-      ? 'bg-yellow-500'
-      : 'bg-gray-500'
-
   return (
     <div className={`rounded-lg border-2 ${layerConfig.bgClass} backdrop-blur-sm px-3 py-2 shadow-md min-w-[140px] max-w-[180px]`}>
       <Handle type="target" position={Position.Top} id="top" className="w-2 h-2" />
@@ -167,7 +161,22 @@ function InfrastructureNode({ data }: { data: { label: string; sublabel?: string
       <div className="flex items-center gap-2 mb-1">
         <NodeIcon icon={data.icon} className="w-4 h-4 text-muted-foreground" />
         {data.status && (
-          <div className={`w-2 h-2 rounded-full ${statusColor}`} title={data.status} />
+          <div
+            className={`w-2.5 h-2.5 rounded-full ${
+              data.status === 'live'
+                ? 'bg-green-500'
+                : data.status === 'testing'
+                  ? 'bg-yellow-500'
+                  : data.status === 'testing-active'
+                    ? '' // Animation handles the color
+                    : 'bg-gray-500'
+            }`}
+            title={data.status === 'testing-active' ? 'Testing (Active Development)' : data.status}
+            style={data.status === 'testing-active' ? {
+              animation: 'testingActive 1.5s ease-in-out infinite',
+              backgroundColor: 'rgb(234 179 8)', // Yellow base
+            } : undefined}
+          />
         )}
       </div>
       <div className="text-sm font-semibold leading-tight">{data.label}</div>
@@ -272,6 +281,19 @@ export function NetworkInfrastructureMap() {
 
   return (
     <div className="w-full h-[700px] bg-background rounded-lg border relative">
+      {/* CSS Animation for testing-active status: Yellow base with green flash */}
+      <style>{`
+        @keyframes testingActive {
+          0%, 70%, 100% {
+            background-color: rgb(234 179 8);
+            box-shadow: none;
+          }
+          35% {
+            background-color: rgb(34 197 94);
+            box-shadow: 0 0 6px 2px rgba(34, 197, 94, 0.6);
+          }
+        }
+      `}</style>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -332,15 +354,22 @@ export function NetworkInfrastructureMap() {
         <div className="space-y-1.5 text-xs">
           <div className="font-medium text-muted-foreground mb-1">Status</div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
             <span>Live</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-yellow-500" />
+            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
             <span>Testing</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-gray-500" />
+            <div
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ animation: 'testingActive 1.5s ease-in-out infinite', backgroundColor: 'rgb(234 179 8)' }}
+            />
+            <span>Testing (Active)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-gray-500" />
             <span>Planned</span>
           </div>
         </div>
