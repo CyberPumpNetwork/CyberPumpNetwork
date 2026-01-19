@@ -3,33 +3,20 @@ import { Button } from './ui/button'
 export function CTA() {
   return (
     <section className="py-24 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-accent/5 to-accent/10" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+      {/* Background - subtle turquoise energy gradient */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14b8a6]/[0.03] to-transparent" />
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-px h-32 bg-gradient-to-b from-transparent via-accent/30 to-transparent" />
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-px h-32 bg-gradient-to-b from-transparent via-accent/30 to-transparent" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Icon */}
-        <div className="w-20 h-20 rounded-2xl bg-accent/20 flex items-center justify-center mx-auto mb-8">
-          <svg
-            className="w-10 h-10 text-accent"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
-          </svg>
-        </div>
 
-        {/* Heading */}
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
+        {/* Heading - bolder with turquoise glow */}
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6">
           Ready to Explore the{' '}
-          <span className="bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
+          <span
+            className="bg-gradient-to-r from-accent via-[#2dd4bf] to-accent/70 bg-clip-text text-transparent"
+            style={{ textShadow: '0 0 60px rgba(20, 184, 166, 0.25)' }}
+          >
             Kaspa Ecosystem?
           </span>
         </h2>

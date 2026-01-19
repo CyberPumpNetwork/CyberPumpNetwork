@@ -41,9 +41,12 @@ export function Blog() {
           <Badge className="mb-4 bg-accent/10 text-accent hover:bg-accent/20 uppercase tracking-wider">
             Dev Talks
           </Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-4 mb-6">
             From the{' '}
-            <span className="bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
+            <span
+              className="bg-gradient-to-r from-accent via-[#2dd4bf] to-accent/70 bg-clip-text text-transparent"
+              style={{ textShadow: '0 0 50px rgba(20, 184, 166, 0.2)' }}
+            >
               Lead Dev's Desk
             </span>
           </h2>
@@ -53,36 +56,50 @@ export function Blog() {
           </p>
         </div>
 
-        {/* Blog Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Blog Grid - Asymmetric layout */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {resourcePosts.map((post, index) => {
             const Icon = post.icon
+            const isFeature = index === 0
             return (
-              <Link key={index} to={post.link}>
-                <Card className="group overflow-hidden hover:border-accent/40 transition-all duration-300 hover:-translate-y-1 h-full">
+              <Link
+                key={index}
+                to={post.link}
+                className={isFeature ? 'md:col-span-2 lg:col-span-2' : ''}
+              >
+                <Card
+                  className={`group overflow-hidden transition-all duration-300 h-full ${
+                    isFeature
+                      ? 'border-accent/40 hover:border-accent/60 bg-gradient-to-br from-accent/5 to-transparent hover:scale-[1.01]'
+                      : 'border-border/40 hover:border-accent/30 bg-card/30 hover:scale-[1.02]'
+                  }`}
+                  style={isFeature ? { boxShadow: '0 0 30px rgba(20, 184, 166, 0.1)' } : {}}
+                >
                   {/* Image */}
-                  <div className="aspect-video overflow-hidden bg-accent/10">
-                    <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">
-                      <Icon className="w-12 h-12 text-accent/50 group-hover:text-accent group-hover:scale-110 transition-all" />
+                  <div className={`overflow-hidden bg-accent/10 ${isFeature ? 'aspect-[21/9]' : 'aspect-video'}`}>
+                    <div className="w-full h-full bg-gradient-to-br from-accent/20 via-accent/10 to-accent/5 flex items-center justify-center relative">
+                      <Icon className={`text-accent/50 group-hover:text-accent group-hover:scale-110 transition-all duration-300 ${isFeature ? 'w-16 h-16' : 'w-12 h-12'}`} />
+                      {/* Turquoise overlay on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                   </div>
 
                   {/* Content */}
-                  <CardContent className="p-6">
+                  <CardContent className={isFeature ? 'p-8' : 'p-6'}>
                     {/* Meta */}
                     <div className="flex items-center gap-3 mb-4">
-                      <Badge variant="secondary" className="bg-accent/10 text-accent">
+                      <Badge variant="secondary" className="bg-accent/10 text-accent border border-accent/20">
                         {post.category}
                       </Badge>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl font-semibold mb-3 group-hover:text-accent transition-colors duration-300">
+                    <h3 className={`font-semibold mb-3 group-hover:text-accent transition-colors duration-300 ${isFeature ? 'text-2xl' : 'text-xl'}`}>
                       {post.title}
                     </h3>
 
                     {/* Excerpt */}
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                    <p className={`text-muted-foreground leading-relaxed mb-4 ${isFeature ? 'text-base' : 'text-sm'}`}>
                       {post.excerpt}
                     </p>
 

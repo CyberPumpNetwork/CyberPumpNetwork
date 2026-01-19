@@ -114,9 +114,24 @@ export function Footer() {
         {/* Bottom Bar */}
         <Separator className="my-8" />
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            © 2026 kas.me by The IT CyberSpace. All rights reserved.
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © 2026 kas.me by The IT CyberSpace. All rights reserved.
+            </p>
+            {/* Powered by Kaspa Badge */}
+            <a
+              href="https://kaspa.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/30 bg-accent/5 hover:bg-accent/10 hover:border-accent/50 transition-all duration-300"
+              style={{ boxShadow: '0 0 10px rgba(20, 184, 166, 0.1)' }}
+            >
+              <svg className="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-xs font-medium text-accent">Powered by Kaspa</span>
+            </a>
+          </div>
           <div className="flex items-center gap-6">
             <a
               href="https://x.com/TheITCyberSpace"

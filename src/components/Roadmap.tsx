@@ -55,8 +55,7 @@ const roadmapPhases = [
 export function Roadmap() {
   return (
     <section id="roadmap" className="py-24 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent" />
+      {/* Background - different from other sections */}
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -64,9 +63,12 @@ export function Roadmap() {
           <Badge className="mb-4 bg-accent/10 text-accent hover:bg-accent/20 uppercase tracking-wider">
             Our Journey
           </Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-4 mb-6">
             kas.me{' '}
-            <span className="bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
+            <span
+              className="bg-gradient-to-r from-accent via-[#2dd4bf] to-accent/70 bg-clip-text text-transparent"
+              style={{ textShadow: '0 0 50px rgba(20, 184, 166, 0.2)' }}
+            >
               Roadmap
             </span>
           </h2>
@@ -78,8 +80,11 @@ export function Roadmap() {
 
         {/* Roadmap Timeline */}
         <div className="relative">
-          {/* Connection Line */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-accent via-accent/50 to-accent/20 hidden lg:block" />
+          {/* Connection Line - turquoise with glow */}
+          <div
+            className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-accent via-accent/50 to-accent/20 hidden lg:block"
+            style={{ boxShadow: '0 0 15px rgba(20, 184, 166, 0.4), 0 0 30px rgba(20, 184, 166, 0.2)' }}
+          />
 
           <div className="space-y-12 lg:space-y-0">
             {roadmapPhases.map((phase, index) => (
@@ -89,16 +94,23 @@ export function Roadmap() {
                   index % 2 === 0 ? '' : 'lg:flex-row-reverse'
                 }`}
               >
-                {/* Timeline Node */}
+                {/* Timeline Node - with glow effect */}
                 <div className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center justify-center">
                   <div
-                    className={`w-12 h-12 rounded-full border-4 flex items-center justify-center z-10 ${
+                    className={`w-12 h-12 rounded-full border-4 flex items-center justify-center z-10 transition-all duration-300 ${
                       phase.status === 'completed'
                         ? 'bg-accent border-accent text-background'
                         : phase.status === 'active'
-                        ? 'bg-accent/20 border-accent text-accent animate-pulse'
-                        : 'bg-card border-border text-muted-foreground'
+                        ? 'bg-accent/20 border-accent text-accent'
+                        : 'bg-card border-border text-muted-foreground hover:border-accent/30'
                     }`}
+                    style={
+                      phase.status === 'completed'
+                        ? { boxShadow: '0 0 20px rgba(20, 184, 166, 0.5)' }
+                        : phase.status === 'active'
+                        ? { boxShadow: '0 0 25px rgba(20, 184, 166, 0.6), 0 0 50px rgba(20, 184, 166, 0.3)' }
+                        : {}
+                    }
                   >
                     {phase.status === 'completed' ? (
                       <svg
@@ -127,11 +139,18 @@ export function Roadmap() {
                   }`}
                 >
                   <Card
-                    className={`transition-all duration-300 hover:-translate-y-1 ${
+                    className={`transition-all duration-300 hover:scale-[1.02] ${
                       phase.status === 'active'
-                        ? 'bg-accent/10 border-accent/40 shadow-lg shadow-accent/10'
-                        : 'bg-card/50 border-border/50 hover:border-accent/30'
+                        ? 'bg-gradient-to-br from-accent/10 to-accent/5 border-accent/40'
+                        : phase.status === 'completed'
+                        ? 'bg-card/50 border-accent/30 hover:border-accent/50'
+                        : 'bg-card/30 border-border/40 hover:border-accent/20'
                     }`}
+                    style={
+                      phase.status === 'active'
+                        ? { boxShadow: '0 0 30px rgba(20, 184, 166, 0.2)' }
+                        : {}
+                    }
                   >
                     <CardContent className="p-8">
                     {/* Phase Badge */}

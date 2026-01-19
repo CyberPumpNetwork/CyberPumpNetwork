@@ -43,9 +43,12 @@ export function Tokenomics() {
           <Badge className="mb-4 bg-accent/10 text-accent hover:bg-accent/20 uppercase tracking-wider">
             Token Economics
           </Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-4 mb-6">
             $CYPU{' '}
-            <span className="bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
+            <span
+              className="bg-gradient-to-r from-accent via-[#2dd4bf] to-accent/70 bg-clip-text text-transparent"
+              style={{ textShadow: '0 0 50px rgba(20, 184, 166, 0.2)' }}
+            >
               Tokenomics
             </span>
           </h2>
@@ -54,28 +57,33 @@ export function Tokenomics() {
           </p>
         </div>
 
-        {/* Main Stats Row */}
+        {/* Main Stats Row - Asymmetric with featured card */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-          <div className="text-center p-6 rounded-xl border border-border/50 bg-card/30">
-            <div className="text-3xl md:text-4xl font-bold text-accent mb-1">1B</div>
+          {/* Featured Max Supply - taller with turquoise glow */}
+          <div
+            className="text-center p-6 md:p-8 rounded-xl border border-accent/40 bg-gradient-to-b from-accent/10 to-transparent md:row-span-2 flex flex-col justify-center"
+            style={{ boxShadow: '0 0 30px rgba(20, 184, 166, 0.15)' }}
+          >
+            <div className="text-4xl md:text-5xl font-bold text-accent mb-2">1B</div>
             <div className="text-sm text-muted-foreground">Max Supply</div>
+            <div className="text-xs text-accent/60 mt-2">Total Token Cap</div>
           </div>
-          <div className="text-center p-6 rounded-xl border border-border/50 bg-card/30">
+          <div className="text-center p-6 rounded-xl border border-border/50 bg-card/30 hover:border-accent/30 transition-colors">
             <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">800M</div>
             <div className="text-sm text-muted-foreground">Unminted</div>
           </div>
-          <div className="text-center p-6 rounded-xl border border-border/50 bg-card/30">
+          <div className="text-center p-6 rounded-xl border border-border/50 bg-card/30 hover:border-accent/30 transition-colors">
             <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">200M</div>
             <div className="text-sm text-muted-foreground">Initial Supply</div>
           </div>
-          <div className="text-center p-6 rounded-xl border border-accent/30 bg-accent/5">
+          <div className="text-center p-6 rounded-xl border border-accent/30 bg-accent/5 hover:bg-accent/10 transition-colors">
             <div className="text-3xl md:text-4xl font-bold text-accent mb-1">1:1</div>
             <div className="text-sm text-muted-foreground">$KAS Mint Ratio</div>
           </div>
         </div>
 
         {/* Initial 200M Breakdown */}
-        <div className="rounded-2xl border border-border/50 bg-card/20 p-8 mb-8">
+        <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-card/30 via-accent/5 to-card/30 p-8 mb-8">
           <h3 className="text-xl font-bold mb-6 text-center">Initial 200M Distribution</h3>
 
           <div className="grid md:grid-cols-4 gap-6">
@@ -219,12 +227,15 @@ export function Tokenomics() {
               <div className="text-xs text-muted-foreground">Complete</div>
             </div>
 
-            {/* Developer Lock */}
+            {/* Developer Lock - with turquoise glow */}
             <div className="text-center space-y-2">
               <div className="text-xs text-muted-foreground uppercase tracking-wide">Dev Lock</div>
-              <div className="space-y-1">
+              <div
+                className="space-y-1 p-3 rounded-lg border border-accent/30 bg-accent/5"
+                style={{ boxShadow: '0 0 20px rgba(20, 184, 166, 0.3), inset 0 0 10px rgba(20, 184, 166, 0.1)' }}
+              >
                 <div className="text-sm text-muted-foreground">Unlocks in:</div>
-                <div className="text-xl font-bold text-red-500 tabular-nums">
+                <div className="text-xl font-bold text-accent tabular-nums">
                   {countdown.days}d {countdown.hours}h {countdown.minutes}m
                 </div>
               </div>
