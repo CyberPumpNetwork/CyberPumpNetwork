@@ -1,29 +1,27 @@
 import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
-import { Input } from './ui/input'
 import { Separator } from './ui/separator'
 
 const footerLinks = {
   Platform: [
-    { name: 'Features', href: '/#about' },
-    { name: 'Tokenomics', href: '/#tokenomics' },
-    { name: 'Roadmap', href: '/#roadmap' },
-    { name: 'kas.me', href: 'https://kas.me', external: true },
+    { name: 'Features', href: '/', scrollTo: 'about' },
+    { name: 'Tokenomics', href: '/', scrollTo: 'tokenomics' },
+    { name: 'Roadmap', href: '/', scrollTo: 'roadmap' },
+    { name: 'Development', href: '/docs/development' },
   ],
   Resources: [
-    { name: 'Whitepaper', href: 'https://drive.google.com/file/d/1zMFJSHH6YH8BvDm03LdZDzP3K99bNjZK/view?usp=sharing', external: true },
     { name: 'Documentation', href: '/docs' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'FAQ', href: '/docs#faq' },
+    { name: 'EcoLoop', href: '/docs/tokenomics/ecoloop' },
+    { name: 'Audits & Compliance', href: '/docs/community/hub/audits' },
+    { name: 'Whitepaper', href: 'https://drive.google.com/file/d/1zMFJSHH6YH8BvDm03LdZDzP3K99bNjZK/view?usp=sharing', external: true },
   ],
   Community: [
-    { name: 'X (Twitter)', href: 'https://x.com/TheITCyberSpace', external: true },
-    { name: 'GitHub', href: 'https://github.com/H34R7L3s/CyberPump', external: true },
+    { name: '@TheITCyberSpace', href: 'https://x.com/TheITCyberSpace', external: true },
   ],
   Token: [
-    { name: '$CYPU Token', href: '/#tokenomics' },
-    { name: 'Token Distribution', href: '/docs/tokenomics' },
-    { name: 'Wallet Info', href: '/docs/wallets' },
+    { name: 'Token Supply', href: '/docs/tokenomics/det-token/token-supply' },
+    { name: 'Wallets & Locks', href: '/docs/tokenomics/det-token/lock' },
+    { name: 'How to Mint', href: '/docs/tokenomics/publicmarket/mint' },
   ],
 }
 
@@ -35,8 +33,8 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center">
-                <span className="text-xl font-bold text-background">KM</span>
+              <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center overflow-hidden ml-1">
+                <img src="/logo.png" alt="kas.me" className="w-[112%] h-[112%] object-cover" />
               </div>
               <span className="text-xl font-bold">kas.me</span>
             </div>
@@ -47,15 +45,12 @@ export function Footer() {
             <p className="text-xs text-muted-foreground/70 mb-6">
               A project by The IT CyberSpace 🇩🇪
             </p>
-            {/* Newsletter */}
+            {/* CTA */}
             <div className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1"
-              />
-              <Button className="bg-accent hover:bg-accent/90 text-background">
-                Subscribe
+              <Button className="bg-accent hover:bg-accent/90 text-background" asChild>
+                <a href="https://x.com/TheITCyberSpace" target="_blank" rel="noopener noreferrer">
+                  Follow Updates on X
+                </a>
               </Button>
             </div>
           </div>
@@ -79,6 +74,21 @@ export function Footer() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                       </a>
+                    ) : 'scrollTo' in link && link.scrollTo ? (
+                      <Link
+                        to={link.href}
+                        onClick={(e) => {
+                          if (window.location.pathname === '/') {
+                            e.preventDefault();
+                            const element = document.getElementById(link.scrollTo as string);
+                            element?.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                        state={{ scrollTo: link.scrollTo }}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                      >
+                        {link.name}
+                      </Link>
                     ) : link.href.startsWith('/') || link.href.startsWith('#') ? (
                       <Link
                         to={link.href}
@@ -104,9 +114,24 @@ export function Footer() {
         {/* Bottom Bar */}
         <Separator className="my-8" />
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            © 2025 kas.me by The IT CyberSpace. All rights reserved.
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © 2026 kas.me by The IT CyberSpace. All rights reserved.
+            </p>
+            {/* Powered by Kaspa Badge */}
+            <a
+              href="https://kaspa.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/30 bg-accent/5 hover:bg-accent/10 hover:border-accent/50 transition-all duration-300"
+              style={{ boxShadow: '0 0 10px rgba(20, 184, 166, 0.1)' }}
+            >
+              <svg className="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-xs font-medium text-accent">Powered by Kaspa</span>
+            </a>
+          </div>
           <div className="flex items-center gap-6">
             <a
               href="https://x.com/TheITCyberSpace"
@@ -114,24 +139,14 @@ export function Footer() {
               rel="noopener noreferrer"
               className="text-sm text-muted-foreground hover:text-accent transition-colors duration-200"
             >
-              X (Twitter)
+              @TheITCyberSpace
             </a>
-            <a
-              href="https://github.com/H34R7L3s/CyberPump"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/docs"
               className="text-sm text-muted-foreground hover:text-accent transition-colors duration-200"
             >
-              GitHub
-            </a>
-            <a
-              href="https://kas.me"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-accent transition-colors duration-200"
-            >
-              kas.me
-            </a>
+              Documentation
+            </Link>
           </div>
         </div>
       </div>

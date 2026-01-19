@@ -20,9 +20,16 @@ export function useMarkdownContent(slug: string) {
       try {
         // Get the doc config for this slug
         const doc = getDocBySlug(slug === '' ? 'index' : slug)
-        
+
         if (!doc) {
           setError('Document not found')
+          setLoading(false)
+          return
+        }
+
+        // If doc.file is empty, this page uses a React component instead of markdown
+        if (!doc.file || doc.file === '') {
+          setContent('')
           setLoading(false)
           return
         }

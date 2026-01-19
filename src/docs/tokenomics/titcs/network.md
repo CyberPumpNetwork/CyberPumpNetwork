@@ -7,11 +7,11 @@ ecochain_data:
     title: "ASIC Rigs"
     text: "High-performance ASIC mining rigs optimized for Kaspa. Integrated heat conversion system repurposes waste heat for residential heating and greenhouse cultivation, creating a sustainable energy loop that reduces operational costs and environmental impact."
   - id: "2"
-    title: "Node 1: Primary Public Node"
-    text: "Public Full Kaspa Archive UTXO Index Node serving as the main backbone for blockchain data access, validation, and archival. Ensures high availability and supports ecosystem queries with complete historical indexing."
+    title: "Node 1: Primary Godfather Node"
+    text: "Full Kaspa Archive Node with UTXO indexing - this IS a complete Kaspa blockchain validator, not just connected to one. Reads chain directly, validates all transactions, extracts analytics from blockchain state. Godfather nodes ARE Kaspa nodes with ML capabilities."
   - id: "3"
-    title: "Node 2: Backup Node"
-    text: "Redundant backup of Node 1 with optimized lower power consumption. Provides failover capabilities, maintaining data integrity and network resilience during maintenance or unexpected downtime."
+    title: "Node 2: ML Training Godfather"
+    text: "Full Kaspa Node running ML training mode. Validates blockchain + trains LSTM models for whale tracking, regime detection. Direct on-chain data feeds Intelligence Center. Every Godfather validates the chain independently."
   - id: "4"
     title: "Node 3: Price Aggregator"
     text: "Dedicated Kaspa Active Price Aggregator Node that collects, processes, and normalizes real-time price data from multiple exchanges and sources for accurate market insights."
@@ -54,16 +54,13 @@ ecochain_data:
 <section class="network-intro" style="margin: 4em 0; padding: 4em 2em; background: radial-gradient(circle at top, rgba(0,255,255,0.05), rgba(0,0,0,0.6)); border-radius: 20px; box-shadow: 0 0 40px rgba(0,0,0,0.4); text-align: center;">
   <h2 style="font-size: 2em; font-weight: 800; color: #fff; margin-bottom: 0.6em;">Building a Resilient Digital Backbone</h2>
   <p style="max-width: 900px; margin: 0 auto; color: #aaa; font-size: 1.1em; line-height: 1.8;">
-    <strong>The CyberPumpNetwork</strong> integrates high-performance mining hardware with advanced nodes and servers,
-    creating a seamless infrastructure for the <span style="color: var(--accent-turkis); font-weight: 600;">$Kaspa</span>  ecosystem.
-    From energy-efficient ASIC rigs to data centers,
-    our setup emphasizes sustainability, security, and scalability.
+    <strong>The CyberPumpNetwork</strong> integrates high-performance mining hardware with <strong>full Kaspa blockchain nodes</strong> - not just connected to nodes, but BEING the nodes that validate the chain.
+    <br><br>
+    <strong>Direct on-chain access is the innovation:</strong> Every Godfather node IS a Kaspa full node reading blockchain state directly. Worker nodes CAN BE full Kaspa nodes too (operator choice: lightweight vs full node mode). No intermediaries, no centralized APIs - pure blockchain validation infrastructure.
     <br><br>
     Each <span style="color: var(--accent-turkis); font-weight: 600;">Card</span> highlights a critical component:
-    nodes for data archival, servers for automation and aggregation,
-    all linked through anchor points for fluid data exchange.
-    This forms a <em>dynamic operational loop</em> - where mining powers data insights,
-    and analytics drive network optimizations.
+    Godfather nodes validating Kaspa blockchain + ML processing, Worker nodes (full or lightweight), servers for automation,
+    all linked through cryptographic validation. This forms a <em>decentralized validator mesh</em> - where anyone with colocation can run a full Kaspa node + Worker software, achieving maximum independence.
   </p>
 </section>
 

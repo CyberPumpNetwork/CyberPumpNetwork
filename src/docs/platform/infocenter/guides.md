@@ -60,7 +60,7 @@ permalink: /kasme/guides/
             <i class="fas fa-chevron-down accordion-arrow"></i>
           </div>
           <div class="accordion-content">
-            <p>🚧 coming soon 🚧</p>
+            <p>🚧 In Development 🚧</p>
             <p style="margin-top: 1em;"><a href="#" style="color: var(--accent-turkis); border-bottom: 1px solid var(--accent-turkis);">More Info →</a></p>
           </div>
         </div>
@@ -80,7 +80,7 @@ permalink: /kasme/guides/
       <div class="info-grid sub-grid">
         <div class="accordion-card">
           <div class="accordion-content">
-            <p style="text-align: center; padding: 2em; color: var(--text-secondary);">🚧 Coming Soon 🚧<br>More guides for traders coming soon!</p>
+            <p style="text-align: center; padding: 2em; color: var(--text-secondary);">🚧 In Development 🚧<br>More guides for traders in development!</p>
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@ permalink: /kasme/guides/
       <div class="info-grid sub-grid">
         <div class="accordion-card">
           <div class="accordion-content">
-            <p style="text-align: center; padding: 2em; color: var(--text-secondary);">🚧 Coming Soon 🚧<br>Expert-level content for the elite.</p>
+            <p style="text-align: center; padding: 2em; color: var(--text-secondary);">🚧 In Development 🚧<br>Expert-level content planned.</p>
           </div>
         </div>
       </div>
@@ -131,5 +131,5 @@ permalink: /kasme/guides/
 <div class="footer-links">
   <a href="https://kas.me">Discover kas.me</a>
   <a href="https://x.com/TheITCyberSpace">Follow us on X</a>
-  <a href="https://github.com/H34R7L3s/CyberPump">Dive into the Repo</a>
+  <a href="https://github.com/CyberPumpNetwork">Dive into the Repo</a>
 </div>

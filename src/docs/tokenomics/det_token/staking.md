@@ -34,7 +34,7 @@ permalink: /kasme/det_tokenomics/staking/
   <div class="resource-card">
     <i class="fas fa-percentage" style="color: var(--accent-green);"></i>
     <h3>Classic Yield Staking</h3>
-    <p><strong>Coming soon</strong></p>
+    <p><strong>Planned</strong></p>
     <p>Stake $CYPU/$CYPUV → Earn rewards</p>
     <p>APY, pools, and mechanics TBA</p>
     <p>Details when ecosystem is ready</p>

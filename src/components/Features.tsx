@@ -61,8 +61,8 @@ const features = [
 export function Features() {
   return (
     <section id="about" className="py-24 relative">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent" />
+      {/* Background - subtle, different from other sections */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-muted/30 to-transparent" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -70,33 +70,87 @@ export function Features() {
           <Badge className="mb-4 bg-accent/10 text-accent hover:bg-accent/20 uppercase tracking-wider">
             Why Choose Us
           </Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-4 mb-6">
             Built for the{' '}
-            <span className="bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
+            <span
+              className="bg-gradient-to-r from-accent via-[#2dd4bf] to-accent/70 bg-clip-text text-transparent"
+              style={{ textShadow: '0 0 50px rgba(20, 184, 166, 0.2)' }}
+            >
               Future
             </span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            CyperPump combines innovative technology with sustainable tokenomics
-            to create a truly revolutionary DeFi experience.
+            kas.me combines real-time Kaspa analytics with sustainable tokenomics -
+            built by The IT CyberSpace, a German IT startup.
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
+        {/* Features Grid - Asymmetric with Kaspa turquoise accents */}
+        {/* Row 1: 1 tall + 2 stacked */}
+        <div className="grid md:grid-cols-3 gap-5 mb-5">
+          {/* Tall card - Analytics (Kaspa speed feature) */}
+          <Card className="group md:row-span-2 bg-gradient-to-b from-accent/5 to-transparent border-accent/30 hover:shadow-xl hover:shadow-accent/10 transition-all duration-300">
+            <CardContent className="p-8 h-full flex flex-col">
+              <div className="w-14 h-14 rounded-2xl bg-accent/15 flex items-center justify-center text-accent mb-6">
+                {features[0].icon}
+              </div>
+              <h3 className="text-2xl font-bold mb-4" style={{ textShadow: '0 0 40px rgba(20, 184, 166, 0.15)' }}>{features[0].title}</h3>
+              <p className="text-muted-foreground leading-relaxed flex-1">
+                {features[0].description}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* 2 stacked cards */}
+          <Card className="group bg-card/50 border-border/40 hover:border-accent/40 hover:scale-[1.02] transition-all duration-200">
+            <CardContent className="p-6">
+              <div className="w-12 h-12 rounded-xl bg-muted/60 flex items-center justify-center text-accent/80 mb-4">
+                {features[1].icon}
+              </div>
+              <h3 className="text-lg font-semibold mb-2">{features[1].title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{features[1].description}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="group bg-card/50 border-border/40 hover:border-accent/40 hover:scale-[1.02] transition-all duration-200">
+            <CardContent className="p-6">
+              <div className="w-12 h-12 rounded-xl bg-muted/60 flex items-center justify-center text-accent/80 mb-4">
+                {features[2].icon}
+              </div>
+              <h3 className="text-lg font-semibold mb-2">{features[2].title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{features[2].description}</p>
+            </CardContent>
+          </Card>
+
+          {/* Row 2 right side: BlockDAG (key Kaspa feature) with turquoise border */}
+          <Card className="group md:col-span-2 bg-card/40 border-[#14b8a6]/40 hover:border-[#14b8a6]/60 hover:shadow-lg hover:shadow-[#14b8a6]/5 transition-all duration-300">
+            <CardContent className="p-8 flex gap-6 items-start">
+              <div className="w-14 h-14 rounded-2xl bg-[#14b8a6]/10 flex items-center justify-center text-[#14b8a6] shrink-0">
+                {features[3].icon}
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2 text-[#14b8a6]">{features[3].title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{features[3].description}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Row 3: 2 remaining cards */}
+        <div className="grid md:grid-cols-2 gap-5">
+          {features.slice(4).map((feature, index) => (
             <Card
-              key={index}
-              className="group bg-card/50 backdrop-blur-sm border-border/50 hover:border-accent/40 hover:bg-card/80 transition-all duration-300 hover:-translate-y-1"
+              key={index + 4}
+              className="group bg-card/30 border-border/30 hover:bg-card/50 hover:border-border/50 transition-all duration-200"
             >
-              <CardContent className="p-8">
-                <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-6 group-hover:bg-accent/20 transition-colors duration-300">
+              <CardContent className="p-6 flex gap-5 items-start">
+                <div className="w-11 h-11 rounded-xl bg-muted/40 flex items-center justify-center text-accent/70 shrink-0 group-hover:bg-accent/10 transition-colors">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
+                <div>
+                  <h3 className="text-lg font-semibold mb-1">{feature.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+                </div>
               </CardContent>
             </Card>
           ))}

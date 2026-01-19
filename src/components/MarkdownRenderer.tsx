@@ -2,6 +2,8 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import { cn } from '@/lib/utils'
+import { CodeBlock } from './CodeBlock'
+import { Callout } from './docs/Callout'
 
 interface MarkdownRendererProps {
   content: string
@@ -111,27 +113,28 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
           li: ({ children }) => (
             <li className="text-muted-foreground">{children}</li>
           ),
-          // Code styling
-          code: ({ className, children }) => {
-            const isInline = !className
-            if (isInline) {
+          // Code styling with syntax highlighting
+          code: ({ className, children, ...props }) => {
+            const match = /language-(\w+)/.exec(className || '')
+            const language = match ? match[1] : 'text'
+            const code = String(children).replace(/\n$/, '')
+
+            // Inline code
+            if (!match) {
               return (
-                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-accent">
+                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-accent" {...props}>
                   {children}
                 </code>
               )
             }
-            return (
-              <code className={cn('block', className)}>
-                {children}
-              </code>
-            )
+
+            // Block code with syntax highlighting
+            return <CodeBlock code={code} language={language} />
           },
-          pre: ({ children }) => (
-            <pre className="bg-muted/50 border border-border rounded-lg p-4 overflow-x-auto mb-4">
-              {children}
-            </pre>
-          ),
+          pre: ({ children }) => {
+            // Let CodeBlock handle the pre styling
+            return <>{children}</>
+          },
           // Blockquote styling
           blockquote: ({ children }) => (
             <blockquote className="border-l-4 border-accent pl-4 py-2 my-4 bg-accent/5 rounded-r-lg">
@@ -174,8 +177,30 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
               className="rounded-lg max-w-full h-auto my-4"
             />
           ),
-          // Handle divs with custom classes (from Jekyll HTML)
-          div: ({ className, children, ...props }) => {
+          // Handle divs with custom classes (from Jekyll HTML and custom components)
+          div: ({ className, children, node, ...props }: any) => {
+            // Handle Callout component
+            if (className?.includes('callout')) {
+              const type = className.match(/callout-(\w+)/)?.[1] || 'info'
+              const titleMatch = node?.properties?.['data-title']
+              return (
+                <Callout type={type as any} title={titleMatch}>
+                  {children}
+                </Callout>
+              )
+            }
+
+            // Handle StatsGrid component
+            if (className?.includes('stats-grid')) {
+              // Stats will be passed via data attributes
+              // For now, return a styled grid container
+              return (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
+                  {children}
+                </div>
+              )
+            }
+
             // Handle hero sections
             if (className?.includes('hero-section')) {
               return (
@@ -184,6 +209,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                 </div>
               )
             }
+
             // Handle resource grids
             if (className?.includes('resource-grid') || className?.includes('info-grid')) {
               return (
@@ -192,6 +218,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                 </div>
               )
             }
+
             // Handle resource cards
             if (className?.includes('resource-card')) {
               return (
@@ -200,6 +227,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                 </div>
               )
             }
+
             // Handle accordion cards
             if (className?.includes('accordion-card') || className?.includes('category-card')) {
               return (
@@ -208,6 +236,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                 </div>
               )
             }
+
             return <div className={className} {...props}>{children}</div>
           },
           // Definition list styling (for DevTalks timeline)

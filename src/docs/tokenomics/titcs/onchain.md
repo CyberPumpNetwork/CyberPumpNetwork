@@ -5,7 +5,7 @@ ecochain: true
 ecochain_data:
   - id: "1"
     title: "Community PEG Bot"
-    text: "Our automated PEG bot maintains price stability between $CYPU and $CYPUV through real-time liquidity provision. It ensures fair access, prevents dumps, and builds trust. Over the next 5 years, it will autonomously scale liquidity until $CYPUV launches as a 1:1 smart contract peg.<br><br><a href='/kasme/bb_v_m/pegbot' style='color:var(--accent-turkis); text-decoration:underline;'>→ Learn how it works</a>"
+    text: "Our automated PEG bot maintains price stability between $CYPU and $CYPUV through real-time liquidity provision. It ensures fair access, prevents dumps, and builds trust. It autonomously scales liquidity as the project evolves toward a 1:1 smart contract peg.<br><br><a href='/kasme/bb_v_m/pegbot' style='color:var(--accent-turkis); text-decoration:underline;'>→ Learn how it works</a>"
     img: "/skaslogo.png"
 
   - id: "2"

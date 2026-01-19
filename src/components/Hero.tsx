@@ -1,6 +1,7 @@
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Card, CardContent } from './ui/card'
+import { LiveDAGBackground } from './LiveDAGBackground'
 
 export function Hero() {
   return (
@@ -8,26 +9,29 @@ export function Hero() {
       id="home"
       className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
     >
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000" />
-      
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+      {/* Background - Kaspa Energy Waves */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#14b8a608_1px,transparent_1px),linear-gradient(to_bottom,#14b8a608_1px,transparent_1px)] bg-[size:40px_40px]" />
+      {/* Live Kaspa DAG Visualization */}
+      <LiveDAGBackground />
+      {/* Turquoise energy gradient - top corner */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-radial from-[#14b8a615] via-[#14b8a608] to-transparent rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Badge */}
         <Badge className="mb-8 px-4 py-2 bg-accent/10 text-accent border-accent/20 hover:bg-accent/20">
           <span className="w-2 h-2 bg-accent rounded-full animate-pulse mr-2" />
-          Built on Kaspa's BlockDAG Technology
+          Built on Kaspa Technology
         </Badge>
 
-        {/* Main Heading */}
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6">
-          <span className="text-foreground">Unveiling Insights for the</span>
+        {/* Main Heading - Bolder with turquoise shadow */}
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
+          <span className="text-foreground drop-shadow-sm">Unveiling Insights for the</span>
           <br />
-          <span className="bg-gradient-to-r from-accent via-accent/80 to-accent/60 bg-clip-text text-transparent">
+          <span
+            className="bg-gradient-to-r from-accent via-[#2dd4bf] to-accent/70 bg-clip-text text-transparent"
+            style={{ textShadow: '0 0 80px rgba(20, 184, 166, 0.3)' }}
+          >
             Kaspa Ecosystem
           </span>
         </h1>
@@ -82,26 +86,33 @@ export function Hero() {
           </Button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-          {[
-            { label: 'Total Supply', value: '1B $CYPU' },
-            { label: 'Initial Circulating', value: '~200M' },
-            { label: 'Locked in Vault', value: '~110M' },
-            { label: 'Minting Ratio', value: '1:1 KAS' },
-          ].map((stat) => (
-            <Card
-              key={stat.label}
-              className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-accent/30 transition-colors duration-300"
-            >
-              <CardContent className="p-6">
-                <div className="text-2xl sm:text-3xl font-bold text-accent mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Stats - Asymmetric layout: 1 large left, 3 stacked right */}
+        <div className="flex flex-col md:flex-row gap-4 max-w-4xl mx-auto">
+          {/* Large featured stat */}
+          <Card className="flex-1 bg-gradient-to-br from-accent/10 to-accent/5 border-accent/30 hover:scale-[1.02] transition-transform duration-200">
+            <CardContent className="p-8 text-center md:text-left">
+              <div className="text-4xl sm:text-5xl font-extrabold text-accent mb-2" style={{ textShadow: '0 0 30px rgba(20, 184, 166, 0.2)' }}>
+                1B $CYPU
+              </div>
+              <div className="text-sm text-muted-foreground">Total Supply</div>
+            </CardContent>
+          </Card>
+
+          {/* 3 smaller stats stacked */}
+          <div className="flex-1 grid grid-cols-3 md:grid-cols-1 gap-3">
+            {[
+              { label: 'Initial Circulating', value: '~200M' },
+              { label: 'Locked in Vault', value: '~110M' },
+              { label: 'Minting Ratio', value: '1:1 KAS' },
+            ].map((stat) => (
+              <Card key={stat.label} className="bg-card/30 border-border/30 hover:border-accent/20 transition-colors duration-200">
+                <CardContent className="p-4">
+                  <div className="text-xl font-bold text-foreground">{stat.value}</div>
+                  <div className="text-xs text-muted-foreground">{stat.label}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
 

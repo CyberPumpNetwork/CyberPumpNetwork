@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Navbar } from '@/components/Navbar'
 import { DevBanner } from '@/components/DevBanner'
 import { Hero } from '@/components/Hero'
@@ -9,6 +11,18 @@ import { CTA } from '@/components/CTA'
 import { Footer } from '@/components/Footer'
 
 export function LandingPage() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.scrollTo) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        const element = document.getElementById(location.state.scrollTo);
+        element?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [location]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />

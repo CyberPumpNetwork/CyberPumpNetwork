@@ -31,14 +31,14 @@ permalink: /dev/
 <!-- Popup für API & Tools -->
 <div id="api-popup" class="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-dark); border: 2px solid var(--accent-turkis); border-radius: 8px; padding: 1.5em; box-shadow: 0 4px 12px var(--shadow-turkis); z-index: 1001; color: var(--text-primary); max-width: 400px; text-align: center;">
   <h3 style="color: var(--accent-turkis);">API & Tools Notice</h3>
-  <p>Explore our API documentation and tools to begin developing on Kaspa. Please note: Certain features require registration at our <a style="color: var(--accent-turkis); border-bottom: 1px solid var(--accent-turkis);">KAS.ME API</a>. Stay informed about future enhancements!</p>
+  <p>Explore our API documentation and tools to begin developing on Kaspa. Please note: Certain features require registration at our <a style="color: var(--accent-turkis); border-bottom: 1px solid var(--accent-turkis);">KAS.ME API</a>.</p>
   <button class="popup-close" style="background: var(--accent-turkis); color: #000; border: none; padding: 0.5em 1em; border-radius: 25px; cursor: pointer; margin-top: 1em;">Close</button>
 </div>
 
 <!-- Popup für Dev Talk -->
 <div id="devtalk-popup" class="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-dark); border: 2px solid var(--accent-turkis); border-radius: 8px; padding: 1.5em; box-shadow: 0 4px 12px var(--shadow-turkis); z-index: 1001; color: var(--text-primary); max-width: 400px; text-align: center;">
   <h3 style="color: var(--accent-turkis);">Dev Talk Preview</h3>
-  <p>We’re thrilled by your interest in Dev Talk! This feature is currently in the very early planning stages and won’t be available for some time. If you’re eager to stay informed or share ideas, please <a href="mailto:theitcyberspace@gmail.com" style="color: var(--accent-turkis); border-bottom: 1px solid var(--accent-turkis);">reach out to us</a>. We’ll notify you as development progresses!</p>
+  <p>We're thrilled by your interest in Dev Talk! This feature is in planning. If you're eager to stay informed or share ideas, please <a href="mailto:theitcyberspace@gmail.com" style="color: var(--accent-turkis); border-bottom: 1px solid var(--accent-turkis);">reach out to us</a>.</p>
   <button class="popup-close" onclick="window.location.href = '/dev/01';" style="background: var(--accent-turkis); color: #000; border: none; padding: 0.5em 1em; border-radius: 25px; cursor: pointer; margin-top: 1em;">Close</button>
 </div>
 
@@ -47,5 +47,5 @@ permalink: /dev/
 <div class="footer-links">
   <a href="https://kas.me">Discover kas.me</a>
   <a href="https://x.com/TheITCyberSpace">Follow us on X</a>
-  <a href="https://github.com/H34R7L3s/CyberPump">Dive into the Repo</a>
+  <a href="https://github.com/CyberPumpNetwork">Dive into the Repo</a>
 </div>
