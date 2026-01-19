@@ -84,8 +84,10 @@ const MILESTONES: Milestone[] = [
   { id: 'business-plan', year: 2024, quarter: 3, branch: 'career', label: 'Business Plan' },
   { id: 'it-cyberspace', year: 2025, quarter: 1, branch: 'career', label: 'The IT CyberSpace' },
   { id: 'self-employ-prep', year: 2025, quarter: 2, branch: 'career', label: 'Prep Independence' },
+  { id: 'community-x', year: 2026, quarter: 1, branch: 'career', label: 'Community Building on X' },
   { id: 'q3-goal', year: 2026, quarter: 3, branch: 'career', label: 'Full Independence', type: 'future' },
-  { id: 'it-cyberspace-future', year: 2027, quarter: 1, branch: 'career', label: 'The IT CyberSpace v2', type: 'future' },
+  { id: 'community-worker-program', year: 2028, quarter: 3, branch: 'career', label: 'Community Worker Program', type: 'future' },
+  { id: 'it-cyberspace-services', year: 2029, quarter: 2, branch: 'career', label: 'IT CyberSpace Services', type: 'future' },
 
   // === CRYPTO BRANCH (DASHED GREEN - FINANCIAL EXPLORATION) ===
   { id: 'curiosity-money', year: 2019, quarter: 1, branch: 'crypto', label: 'Money Curiosity' },
@@ -97,9 +99,14 @@ const MILESTONES: Milestone[] = [
   { id: 'kaspa-rediscovered', year: 2024, quarter: 2, branch: 'crypto', label: 'Kaspa Revisited' },
   { id: 'first-kaspa-buy', year: 2025, quarter: 1, branch: 'crypto', label: 'First KAS Buy' },
   { id: 'tokenomics-design', year: 2025, quarter: 2, branch: 'crypto', label: 'Tokenomics Design' },
-  { id: 'token-launch', year: 2025, quarter: 4, branch: 'crypto', label: 'Token Launch' },
-  { id: 'compliance-framework', year: 2026, quarter: 3, branch: 'crypto', label: 'Compliance Framework', type: 'future' },
-  { id: 'crypto-audits', year: 2027, quarter: 1, branch: 'crypto', label: 'Crypto Audits', type: 'future' },
+  { id: 'token-launch', year: 2025, quarter: 4, branch: 'crypto', label: '$CYPU Token Launch' },
+  { id: 'bafin-mica', year: 2026, quarter: 3, branch: 'crypto', label: 'BaFin / MiCA Path', type: 'future' },
+  { id: 'investor-outreach', year: 2027, quarter: 1, branch: 'crypto', label: 'Investor Outreach', type: 'future' },
+  { id: 'compliance-framework', year: 2027, quarter: 3, branch: 'crypto', label: 'Compliance Framework', type: 'future' },
+  { id: 'ecoloop-integration', year: 2028, quarter: 2, branch: 'crypto', label: 'EcoLoop Integration', type: 'future' },
+  { id: 'defi-peg', year: 2028, quarter: 4, branch: 'crypto', label: 'DeFi Mechanisms (PEG)', type: 'future' },
+  { id: 'crypto-audits', year: 2029, quarter: 2, branch: 'crypto', label: 'Security Audits', type: 'future' },
+  { id: 'governance-cypuv', year: 2029, quarter: 4, branch: 'crypto', label: '$CYPUV Governance', type: 'future' },
 
   // === LEARNING BRANCH (DASHED YELLOW - INTELLECTUAL GROWTH) ===
   { id: 'start-mining', year: 2019, quarter: 3, branch: 'learning', label: 'Start Mining' },
@@ -114,7 +121,8 @@ const MILESTONES: Milestone[] = [
   { id: 'deep-understanding', year: 2025, quarter: 1, branch: 'learning', label: 'Deep Knowledge' },
   { id: 'hft-research', year: 2025, quarter: 2, branch: 'learning', label: 'HFT Research' },
   { id: 'system-architecture', year: 2025, quarter: 4, branch: 'learning', label: 'Architecture' },
-  { id: 'regulatory', year: 2026, quarter: 3, branch: 'learning', label: 'Regulatory', type: 'future' },
+  { id: 'regulatory-learning', year: 2027, quarter: 3, branch: 'learning', label: 'Regulatory Deep Dive', type: 'future' },
+  { id: 'mining-solar-impact', year: 2030, quarter: 2, branch: 'learning', label: 'Mining & Solar Impact', type: 'future' },
 
   // === DEV BRANCH (DASHED BLUE - DEVELOPMENT WORK) ===
   { id: 'backend-learn', year: 2017, quarter: 2, branch: 'dev', label: 'Java Backend' },
@@ -122,6 +130,9 @@ const MILESTONES: Milestone[] = [
   { id: 'gta', year: 2023, quarter: 2, branch: 'dev', label: 'GTA Server' },
   { id: 'qbcore', year: 2023, quarter: 4, branch: 'dev', label: 'QBCore Framework' },
   { id: 'rust-learning', year: 2024, quarter: 4, branch: 'dev', label: 'Rust Learning' },
+  { id: 'api-layer', year: 2027, quarter: 2, branch: 'dev', label: 'API Layer (Internal)', type: 'future' },
+  { id: 'api-docs', year: 2027, quarter: 4, branch: 'dev', label: 'Developer API Docs', type: 'future' },
+  { id: 'multi-wallet', year: 2028, quarter: 2, branch: 'dev', label: 'Multi-Wallet Tracking', type: 'future' },
 
   // === BUILDING BRANCH (DASHED PURPLE - TECHNICAL PROJECTS & PRODUCTS) ===
   { id: 'minecraft', year: 2012, quarter: 2, branch: 'building', label: 'Minecraft Servers' },
@@ -131,7 +142,12 @@ const MILESTONES: Milestone[] = [
   { id: 'devtalk-1', year: 2025, quarter: 4, branch: 'building', label: 'DevTalk #1 (Nov)' },
   { id: 'devtalk-2', year: 2025, quarter: 4, branch: 'building', label: 'DevTalk #2 (Dez)' },
   { id: 'current-dev', year: 2026, quarter: 2, branch: 'building', label: 'Active Dev' },
-  { id: 'building-kasme', year: 2027, quarter: 1, branch: 'building', label: 'Building kas.me', type: 'future' },
+  { id: 'worker-node-arch', year: 2026, quarter: 4, branch: 'building', label: 'Worker Node Architecture', type: 'future' },
+  { id: 'platform-dev', year: 2027, quarter: 2, branch: 'building', label: 'kas.me Platform Dev', type: 'future' },
+  { id: 'platform-beta', year: 2027, quarter: 4, branch: 'building', label: 'Platform Public Beta', type: 'future' },
+  { id: 'intelligence-center', year: 2028, quarter: 2, branch: 'building', label: 'Intelligence Center (ML)', type: 'future' },
+  { id: 'worker-node-network', year: 2028, quarter: 4, branch: 'building', label: 'Worker Node Network', type: 'future' },
+  { id: 'building-kasme', year: 2029, quarter: 4, branch: 'building', label: 'kas.me Full Launch', type: 'future' },
 ];
 
 const CONNECTIONS: Connection[] = [
@@ -159,8 +175,10 @@ const CONNECTIONS: Connection[] = [
   { from: 'health-it', to: 'business-plan', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'business-plan', to: 'it-cyberspace', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'it-cyberspace', to: 'self-employ-prep', sourceHandle: 'right', targetHandle: 'left' },
-  { from: 'self-employ-prep', to: 'q3-goal', sourceHandle: 'right', targetHandle: 'left', animated: true },
-  { from: 'q3-goal', to: 'it-cyberspace-future', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'self-employ-prep', to: 'community-x', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'community-x', to: 'q3-goal', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'q3-goal', to: 'community-worker-program', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'community-worker-program', to: 'it-cyberspace-services', sourceHandle: 'right', targetHandle: 'left', animated: true },
 
   // === CRYPTO BRANCH (FROM MAIN TIMELINE DOWNWARD, THEN HORIZONTAL) ===
   { from: 'age19', to: 'curiosity-money', sourceHandle: 'bottom', targetHandle: 'top' }, // Age 19 → Crypto starts
@@ -173,7 +191,13 @@ const CONNECTIONS: Connection[] = [
   { from: 'kaspa-rediscovered', to: 'first-kaspa-buy', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'first-kaspa-buy', to: 'tokenomics-design', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'tokenomics-design', to: 'token-launch', sourceHandle: 'right', targetHandle: 'left' },
-  { from: 'token-launch', to: 'compliance-framework', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'token-launch', to: 'bafin-mica', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'bafin-mica', to: 'investor-outreach', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'investor-outreach', to: 'compliance-framework', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'compliance-framework', to: 'ecoloop-integration', sourceHandle: 'bottom', targetHandle: 'left', animated: true },
+  { from: 'compliance-framework', to: 'crypto-audits', sourceHandle: 'right', targetHandle: 'top', animated: true },
+  { from: 'ecoloop-integration', to: 'defi-peg', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'crypto-audits', to: 'governance-cypuv', sourceHandle: 'right', targetHandle: 'left', animated: true },
 
   // === LEARNING BRANCH (FROM CAREER DOWNWARD, THEN HORIZONTAL) ===
   { from: 'bank-training', to: 'learn-crypto', sourceHandle: 'bottom', targetHandle: 'top' }, // From Career → Learning starts
@@ -187,6 +211,8 @@ const CONNECTIONS: Connection[] = [
   { from: 'btc-goodbye', to: 'deep-understanding', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'deep-understanding', to: 'hft-research', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'hft-research', to: 'system-architecture', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'system-architecture', to: 'regulatory-learning', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'regulatory-learning', to: 'mining-solar-impact', sourceHandle: 'right', targetHandle: 'left', animated: true },
 
   // === DEV BRANCH (FROM CAREER DOWNWARD, THEN HORIZONTAL) ===
   { from: 'age17', to: 'backend-learn', sourceHandle: 'bottom', targetHandle: 'top' }, // Main → Dev (Age 17)
@@ -199,6 +225,9 @@ const CONNECTIONS: Connection[] = [
   { from: 'fw-plugin-dev', to: 'gta', sourceHandle: 'right', targetHandle: 'left' }, // FW Plugin Dev → GTA
   { from: 'gta', to: 'qbcore', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'qbcore', to: 'rust-learning', sourceHandle: 'right', targetHandle: 'left' },
+  { from: 'rust-learning', to: 'api-layer', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'api-layer', to: 'api-docs', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'api-docs', to: 'multi-wallet', sourceHandle: 'right', targetHandle: 'left', animated: true },
   { from: 'software-coach', to: 'qbcore', sourceHandle: 'bottom', targetHandle: 'top' }, // Career → Dev connection
 
   // === BUILDING BRANCH (FROM MAIN TIMELINE DOWNWARD, THEN HORIZONTAL) ===
@@ -209,7 +238,12 @@ const CONNECTIONS: Connection[] = [
   { from: 'platform-idea', to: 'devtalk-1', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'devtalk-1', to: 'devtalk-2', sourceHandle: 'right', targetHandle: 'left' },
   { from: 'devtalk-2', to: 'current-dev', sourceHandle: 'right', targetHandle: 'left' },
-  { from: 'current-dev', to: 'building-kasme', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'current-dev', to: 'worker-node-arch', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'worker-node-arch', to: 'platform-dev', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'platform-dev', to: 'platform-beta', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'platform-beta', to: 'intelligence-center', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'intelligence-center', to: 'worker-node-network', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  { from: 'worker-node-network', to: 'building-kasme', sourceHandle: 'right', targetHandle: 'left', animated: true },
 
   // === CROSS-BRANCH CONNECTIONS (LOGICAL RELATIONSHIPS) ===
   // Crypto → Learning: Discoveries trigger learning
@@ -247,16 +281,37 @@ const CONNECTIONS: Connection[] = [
   { from: 'age22', to: 'freakyworld', sourceHandle: 'bottom', targetHandle: 'top' },
   { from: 'age26', to: 'current-dev', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
   
-  // Career → Building: Future convergence
-  { from: 'it-cyberspace-future', to: 'building-kasme', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
+  // Career → Crypto: IT Services enables governance
+  { from: 'it-cyberspace-services', to: 'governance-cypuv', sourceHandle: 'right', targetHandle: 'left', animated: true },
   
-  // Future convergence → Regulatory & Audits
-  { from: 'token-launch', to: 'regulatory', sourceHandle: 'right', targetHandle: 'left', animated: true, offset: 30 },
-  { from: 'system-architecture', to: 'regulatory', sourceHandle: 'right', targetHandle: 'left', animated: true, offset: 30 },
-  { from: 'current-dev', to: 'regulatory', sourceHandle: 'top', targetHandle: 'bottom', animated: true, offset: -20 },
-  { from: 'q3-goal', to: 'regulatory', sourceHandle: 'bottom', targetHandle: 'top', animated: true, offset: 20 },
-  { from: 'regulatory', to: 'compliance-framework', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
-  { from: 'compliance-framework', to: 'crypto-audits', sourceHandle: 'right', targetHandle: 'left', animated: true },
+  // === ENDPHASE 2029 Q4: CONVERGENCE ===
+  // Building kas.me Platform → Token Governance (Platform needs governance)
+  { from: 'building-kasme', to: 'governance-cypuv', sourceHandle: 'top', targetHandle: 'bottom', animated: true },
+  
+  // Worker Node Network → Token Economy (Nodes need token incentives)
+  { from: 'worker-node-network', to: 'ecoloop-integration', sourceHandle: 'top', targetHandle: 'bottom', animated: true },
+  { from: 'worker-node-network', to: 'defi-peg', sourceHandle: 'top', targetHandle: 'bottom', animated: true, offset: 20 },
+  
+  // Learning → Crypto: Regulatory knowledge feeds compliance
+  { from: 'regulatory-learning', to: 'compliance-framework', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
+  
+  // === DEV → BUILDING: APIs ENABLE PLATFORM ===
+  // API Layer powers Platform Development (same quarter 2027 Q2)
+  { from: 'api-layer', to: 'platform-dev', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
+  
+  // API Docs ready for Platform Beta (same quarter 2027 Q4)
+  { from: 'api-docs', to: 'platform-beta', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
+  
+  // Multi-Wallet tracking feeds Intelligence Center (same quarter 2028 Q2)
+  { from: 'multi-wallet', to: 'intelligence-center', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
+  
+  // === CAREER → BUILDING: COMMUNITY ENABLES WORKER NODES ===
+  // Community Worker Program feeds into Worker Node Network
+  { from: 'community-worker-program', to: 'worker-node-network', sourceHandle: 'bottom', targetHandle: 'top', animated: true },
+  
+  // === BUILDING → CRYPTO: PLATFORM NEEDS COMPLIANCE ===
+  // Platform Beta requires compliance check before full launch
+  { from: 'platform-beta', to: 'compliance-framework', sourceHandle: 'top', targetHandle: 'bottom', animated: true },
 ];
 
 // === FRAMEWORK: POSITION CALCULATOR ===
