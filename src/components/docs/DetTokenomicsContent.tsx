@@ -69,7 +69,7 @@ export function DetTokenomicsContent() {
           },
           {
             label: 'Locked Tokens',
-            value: `~${formatSupply(TOKENOMICS.TREASURY.companyColdStorage.amount)}`,
+            value: `~${formatSupply(TOKENOMICS.TREASURY.tangemVaults.amount)}`,
             icon: Lock,
           },
           {
@@ -371,7 +371,7 @@ export function DetTokenomicsContent() {
                 },
                 {
                   label: 'Locked (Tangem Vaults)',
-                  value: `~${TOKENOMICS.TREASURY.companyColdStorage.amount.toLocaleString()}`,
+                  value: `~${TOKENOMICS.TREASURY.tangemVaults.amount.toLocaleString()}`,
                   icon: Lock,
                 },
                 {
