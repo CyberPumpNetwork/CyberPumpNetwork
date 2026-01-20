@@ -245,7 +245,7 @@ export function EcoLoopContent() {
               <li>Solar panel installations (powering miners)</li>
               <li>Heat recovery systems (greenhouse heating)</li>
               <li>kas.me platform infrastructure (running internally for development - Godfather nodes, Workers tested)</li>
-              <li>$CYPU token (live on Kaspa, tradable on Chainge DEX)</li>
+              <li>$CYPU token (live on Kaspa, tradable on DEX)</li>
               <li>$CYPUV token (governance rights, on-chain voting)</li>
             </ul>
           </div>

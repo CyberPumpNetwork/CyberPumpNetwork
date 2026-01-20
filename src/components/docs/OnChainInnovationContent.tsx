@@ -146,7 +146,7 @@ export function OnChainInnovationContent() {
 
               <div>
                 <p className="font-semibold mb-1">Current Status</p>
-                <p className="italic">Arbitrage already happening organically (Chainge DEX live). No official bots deployed by project - community runs own bots. Future: Open-source reference bot for educational purposes (not financial advice).</p>
+                <p className="italic">Arbitrage already happening organically (DEX live). No official bots deployed by project - community runs own bots. Future: Open-source reference bot for educational purposes (not financial advice).</p>
               </div>
             </div>
           </div>
@@ -256,7 +256,7 @@ export function OnChainInnovationContent() {
             <ul className="space-y-2 text-muted-foreground">
               <li>$CYPU token live on Kaspa (200M circulating supply)</li>
               <li>$CYPUV governance token live (voting rights design complete)</li>
-              <li>Chainge DEX trading (organic arbitrage already happening)</li>
+              <li>DEX trading (organic arbitrage already happening)</li>
               <li>Analytics platform architecture (whale tracking, ML models)</li>
               <li>Smart contract logic designed (PEG Bot, Mint System)</li>
               <li>Risk models documented (failure mode analysis)</li>
