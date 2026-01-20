@@ -1,5 +1,4 @@
 import { Coins, CheckCircle, Users, XCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { Callout } from './Callout';
 import { TOKENOMICS } from '@/lib/tokenomics-data';
 

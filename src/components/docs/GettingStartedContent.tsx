@@ -13,7 +13,6 @@ import {
   Network,
   Shield,
   BarChart3,
-  FileText,
   MessageSquare,
   CheckCircle,
   AlertTriangle

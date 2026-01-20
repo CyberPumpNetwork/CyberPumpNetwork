@@ -1,14 +1,8 @@
-import { Callout } from './Callout'
 import {
   Shield,
   CheckCircle,
   XCircle,
-  FileCheck,
   Scale,
-  Server,
-  Lock,
-  TrendingUp,
-  RefreshCw,
   Egg,
   AlertTriangle,
 } from 'lucide-react'

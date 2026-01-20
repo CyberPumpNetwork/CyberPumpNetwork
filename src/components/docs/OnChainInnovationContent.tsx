@@ -1,5 +1,5 @@
 import { Callout } from '@/components/docs/Callout'
-import { Bot, Coins, TrendingUp, AlertTriangle, Shield, Zap, Target } from 'lucide-react'
+import { Bot, Coins, TrendingUp, Zap, Target } from 'lucide-react'
 
 export function OnChainInnovationContent() {
   return (
