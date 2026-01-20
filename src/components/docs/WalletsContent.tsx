@@ -84,7 +84,7 @@ function copyToClipboard(address: string) {
 }
 
 export function WalletsContent() {
-  const { highlightedId, getAnimationClasses, getAnimationStyles } = useScrollAndHighlight({
+  const { getAnimationClasses, getAnimationStyles } = useScrollAndHighlight({
     rotations: 2,
     rotationDuration: 3000,
     glowDuration: 2000

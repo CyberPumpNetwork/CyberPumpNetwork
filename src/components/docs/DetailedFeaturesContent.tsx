@@ -234,7 +234,7 @@ export function DetailedFeaturesContent() {
       <section className="space-y-8">
         <h2 className="text-3xl font-bold">Feature-by-Feature Breakdown</h2>
 
-        {detailedFeatures.map((feature, index) => {
+        {detailedFeatures.map((feature) => {
           const Icon = feature.icon;
 
           return (

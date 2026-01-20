@@ -1,11 +1,9 @@
 import { ResourceCard } from './ResourceCard'
 import { Callout } from './Callout'
-import { StatsGrid } from './StatsGrid'
 import { TOKENOMICS } from '@/lib/tokenomics-data'
 import { useScrollAndHighlight } from '@/hooks/useScrollAndHighlight'
 import {
   Lock,
-  Shield,
   CheckCircle,
   XCircle,
   FileText,
@@ -18,7 +16,7 @@ import {
 } from 'lucide-react'
 
 export function LockContent() {
-  const { highlightedId, getAnimationClasses, getAnimationStyles } = useScrollAndHighlight({
+  const { getAnimationClasses, getAnimationStyles } = useScrollAndHighlight({
     rotations: 2,
     rotationDuration: 3000,
     glowDuration: 2000

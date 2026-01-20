@@ -31,7 +31,7 @@ interface BlockPosition {
 export function LiveDAGBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [dagData, setDagData] = useState<DAGData | null>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(0)
   const offsetRef = useRef(0)
 
   // Fetch DAG data
@@ -95,6 +95,7 @@ export function LiveDAGBackground() {
       animationRef.current = requestAnimationFrame(animate)
     }
 
+    // Start animation with initial timestamp
     animationRef.current = requestAnimationFrame(animate)
 
     return () => {
