@@ -48,6 +48,10 @@ export const TOKENOMICS = {
       amount: 70_000_000, // CYPU
       description: 'Company treasury in cold storage',
     },
+    tangemVaults: {
+      amount: 109_100_000, // 54.55M Firm + 54.55M Vault
+      description: 'Locked in Tangem hardware wallets',
+    },
     multisigConfig: '2-of-3',
     purpose: 'Operations, development, marketing, buybacks',
   },
