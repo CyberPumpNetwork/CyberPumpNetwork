@@ -13,7 +13,7 @@ const footerLinks = {
     { name: 'Documentation', href: '/docs' },
     { name: 'EcoLoop', href: '/docs/tokenomics/ecoloop' },
     { name: 'Audits & Compliance', href: '/docs/community/hub/audits' },
-    { name: 'Whitepaper', href: 'https://drive.google.com/file/d/1zMFJSHH6YH8BvDm03LdZDzP3K99bNjZK/view?usp=sharing', external: true },
+    { name: 'Whitepaper', href: 'https://drive.google.com/file/d/15VvRoxo2g-s6Q1FiX-BYvyxYhJTAGjBs/view', external: true },
   ],
   Community: [
     { name: '@TheITCyberSpace', href: 'https://x.com/TheITCyberSpace', external: true },
