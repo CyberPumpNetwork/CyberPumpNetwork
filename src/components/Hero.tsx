@@ -2,6 +2,7 @@ import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Card, CardContent } from './ui/card'
 import { LiveDAGBackground } from './LiveDAGBackground'
+import { Link } from 'react-router-dom'
 
 export function Hero() {
   return (
@@ -50,7 +51,7 @@ export function Hero() {
             className="bg-accent hover:bg-accent/90 text-background font-semibold px-8 py-6 text-lg rounded-xl shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 transition-all duration-300"
             asChild
           >
-            <a href="/docs" target="_blank" rel="noopener noreferrer">
+            <Link to="/docs">
               Open the Docs
               <svg
                 className="w-5 h-5 ml-2"
@@ -65,7 +66,7 @@ export function Hero() {
                   d="M13 7l5 5m0 0l-5 5m5-5H6"
                 />
               </svg>
-            </a>
+            </Link>
           </Button>
           <Button
             variant="outline"
