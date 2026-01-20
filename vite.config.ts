@@ -3,8 +3,8 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from "path"
 
-// https://vite.dev/config/
 export default defineConfig({
+  base: '/', // 🔥 ZWINGEND für GitHub Pages + Custom Domain
   plugins: [
     react({
       babel: {

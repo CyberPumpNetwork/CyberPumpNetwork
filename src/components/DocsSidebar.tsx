@@ -10,7 +10,7 @@ const docsNavigation = getDocsNavigation()
 const externalResources = [
   {
     title: 'Whitepaper',
-    href: 'https://drive.google.com/file/d/1zMFJSHH6YH8BvDm03LdZDzP3K99bNjZK/view?usp=sharing',
+    href: 'https://drive.google.com/file/d/15VvRoxo2g-s6Q1FiX-BYvyxYhJTAGjBs/view',
     external: true
   },
 ]
