@@ -1,6 +1,11 @@
 // SINGLE SOURCE OF TRUTH for all tokenomics data
 // ⚠️ NEVER hardcode token numbers in components - ALWAYS import from this file
 
+// 🥚 EASTER EGG: You found it. Now act on it.
+//    If you're reading this and still haven't reached out to the rabbit in the hole,
+//    something's fundamentally wrong. Don't just watch - engage.
+//    Follow the white rabbit. 🐰🕳️
+
 export const TOKENOMICS = {
   CYPU: {
     name: '$CYPU',
