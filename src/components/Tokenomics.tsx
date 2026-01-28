@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge } from './ui/badge'
+import { Info } from 'lucide-react'
 
 // Dev Lock Enddatum: 10. September 2030, 10:45 UTC (1695d 12h 28m ab 18.01.2026 22:17 UTC)
 const DEV_LOCK_END_DATE = new Date('2030-09-10T10:45:00Z').getTime()
@@ -214,15 +215,21 @@ export function Tokenomics() {
           <div className="flex items-center justify-center gap-3 mb-6">
             <h3 className="text-2xl font-bold text-red-500">$CYPUV</h3>
             <Badge className="bg-red-500/20 text-red-500 border-red-500/30">Governance Token</Badge>
+            <div className="group relative">
+              <Info className="w-4 h-4 text-muted-foreground hover:text-red-500 cursor-help transition-colors" />
+              <div className="absolute hidden group-hover:block z-50 w-64 p-3 bg-popover border border-border rounded-lg shadow-lg -top-2 left-6 text-xs">
+                <p className="text-muted-foreground">Data may not be current. Verify on <a href="https://lfg.kaspa.com" target="_blank" rel="noopener noreferrer" className="text-red-500 hover:underline">lfg.kaspa.com</a></p>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {/* Bonding Curve Progress */}
             <div className="text-center space-y-2">
               <div className="text-xs text-muted-foreground uppercase tracking-wide">Bonding Curve</div>
-              <div className="text-3xl font-bold text-red-500">26%</div>
+              <div className="text-3xl font-bold text-red-500">34%</div>
               <div className="w-full h-1.5 bg-red-500/20 rounded-full overflow-hidden">
-                <div className="h-full bg-red-500 rounded-full" style={{ width: '26%' }} />
+                <div className="h-full bg-red-500 rounded-full" style={{ width: '34%' }} />
               </div>
               <div className="text-xs text-muted-foreground">Complete</div>
             </div>
@@ -239,13 +246,13 @@ export function Tokenomics() {
                   {countdown.days}d {countdown.hours}h {countdown.minutes}m
                 </div>
               </div>
-              <div className="text-xs text-muted-foreground">Curve: 25.99%</div>
+              <div className="text-xs text-muted-foreground">Curve: 32.12%</div>
             </div>
 
             {/* Curve Rest */}
             <div className="text-center space-y-2">
               <div className="text-xs text-muted-foreground uppercase tracking-wide">Curve</div>
-              <div className="text-3xl font-bold text-foreground">59.52%</div>
+              <div className="text-3xl font-bold text-foreground">53.40%</div>
               <div className="text-xs text-muted-foreground">Remaining</div>
             </div>
 
