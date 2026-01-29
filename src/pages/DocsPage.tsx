@@ -394,9 +394,11 @@ function MarkdownDocPage({ slug }: { slug: string }) {
 
         {/* Category Badge */}
         {slug === 'tokenomics/det-token/cypuv' ? (
-          <Badge className="mb-6 bg-gradient-to-r from-accent/20 to-blue-500/20 text-accent border-accent/30 backdrop-blur-sm">
-            🐇
-          </Badge>
+          <Link to="/0x">
+            <Badge className="mb-6 bg-gradient-to-r from-accent/20 to-blue-500/20 text-accent border-accent/30 backdrop-blur-sm cursor-pointer hover:from-accent/30 hover:to-blue-500/30 transition-all">
+              🐇
+            </Badge>
+          </Link>
         ) : doc?.category ? (
           <Badge className="mb-6 bg-gradient-to-r from-accent/20 to-blue-500/20 text-accent border-accent/30 backdrop-blur-sm">
             {doc.category}

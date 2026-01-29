@@ -33,6 +33,7 @@ interface RecoveryState {
   lastClick: number | null
   _dm: boolean
   _au: boolean
+  _p2?: boolean
 }
 
 // Internal validation
@@ -82,6 +83,14 @@ export function DocumentRecoveryHandler() {
       _au: false,
       clickCount: 0,
     }))
+  }, [])
+
+  // Cascade failover — overlay teardown with delayed integrity-check reinit
+  const _triggerP2 = useCallback(() => {
+    setState(prev => ({ ...prev, _dm: false, _au: false }))
+    setTimeout(() => {
+      setState(prev => ({ ...prev, _dm: true, _au: true, _p2: true }))
+    }, 5000)
   }, [])
 
   const _ha = useCallback(() => {
@@ -144,6 +153,8 @@ export function DocumentRecoveryHandler() {
           _au={state._au}
           onClose={closeDiagnostic}
           _oa={_ha}
+          _p2={state._p2}
+          _onP2={_triggerP2}
         />
       )}
     </div>
@@ -155,17 +166,21 @@ function DiagnosticOverlay({
   _au,
   onClose,
   _oa,
+  _p2,
+  _onP2,
 }: {
   _au: boolean
   onClose: () => void
   _oa: () => void
+  _p2?: boolean
+  _onP2: () => void
 }) {
   const [history, setHistory] = useState<string[]>([])
   const [outputStart, setOutputStart] = useState(0) // index where latest output begins
   const [input, setInput] = useState('')
   const [_ai, setAuthInput] = useState('')
   const [_ae, setAuthError] = useState(false)
-  const [termState, setTermState] = useState<TerminalState>({ cwd: '/', _l1: false, _l2: false })
+  const [termState, setTermState] = useState<TerminalState>({ cwd: '/', _l1: false, _l2: false, _phase: _p2 ? 2 : 1 })
   const [animating, setAnimating] = useState(false)
   const [copyFeedback, setCopyFeedback] = useState<'idle' | 'ok' | 'fail'>('idle')
   const [_tp, _stp] = useState<'idle' | 'p1' | 'p2' | 'p3' | 'p4' | 'r1' | 'r2' | 'r3' | 'r4' | 'b1' | 'b2' | 'b3' | 'b4' | 'f1' | 'f2' | 'j1' | 'j2' | 'j3' | 'l1' | 'l2' | 'n1' | 'n2' | 'n3' | 'n4' | 'n5'>('idle')
@@ -189,6 +204,37 @@ function DiagnosticOverlay({
 
   // Diagnostic visualization state
   const [spriteState, setSpriteState] = useState({ x: -40, step: 0 })
+
+  // Integrity-check init sequence — runs once on degraded-state mount
+  useEffect(() => {
+    if (!_p2) return
+    setAnimating(true)
+    const bootLines = [
+      '> CRITICAL: Filesystem integrity check FAILED',
+      '> Sectors 0x4B-0x61-0x73 corrupted',
+      '> Scanning partitions...',
+      '> \u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591 48%',
+      '> \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591 72%',
+      '> \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591 80% — cascade fault detected',
+      '> Recovery aborted at 80%',
+      '> WARNING: Data may be unreliable',
+      '> Entering restricted maintenance shell...',
+      '',
+    ]
+    let i = 0
+    const interval = setInterval(() => {
+      if (i < bootLines.length) {
+        setHistory(prev => [...prev, bootLines[i]])
+        i++
+      } else {
+        clearInterval(interval)
+        setAnimating(false)
+        setTimeout(() => inputRef.current?.focus(), 50)
+      }
+    }, 350)
+    return () => clearInterval(interval)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Ambient sprite animation
   useEffect(() => {
@@ -415,7 +461,12 @@ function DiagnosticOverlay({
     if (_tp === 'f2') {
       setSpriteState(prev => ({ ...prev, step: 0 }))
       const timer = setTimeout(() => {
-        onClose()
+        // Primary teardown triggers cascade failover reinit
+        if (!_p2) {
+          _onP2()
+        } else {
+          onClose()
+        }
       }, 1200)
       return () => clearTimeout(timer)
     }
