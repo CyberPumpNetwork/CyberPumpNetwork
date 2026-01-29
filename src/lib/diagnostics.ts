@@ -498,6 +498,11 @@ const ALL_COMMANDS = [
   'echo', 'history', 'touch', 'mkdir', 'find', 'which', 'env', 'alias',
   'ssh', 'curl', 'wget', 'python', 'vim', 'nano', 'emacs',
   'neofetch', 'top', 'ps', 'uname', 'uptime', 'date', 'id',
+  'fair', 'community', 'trustless', 'pioneer', 'elon', 'armanti',
+  'vitalik', 'saylor', 'nakamoto', 'consensus', 'genesis', 'block',
+  'mining', 'asic', 'gpu', 'pow', 'pos', 'defi', 'nft', 'web3',
+  'gm ser', 'sir', 'fren', 'alpha', 'beta', 'sigma', 'chad',
+  'copium', 'hopium', 'bearish', 'bullish', 'diamond hands', 'paper hands',
 ]
 
 /**
@@ -1679,6 +1684,201 @@ export function processDiagnosticCommand(
       'Ratio denied.',
       '> This is a terminal, not Twitter.',
       '> Your opinions have no engagement metrics here.',
+    ],
+    // === Crypto philosophy ===
+    'fair': () => [
+      'Fair launch.',
+      '> No premine. No insiders. No backdoors.',
+      '> Everyone starts at zero.',
+      '> That\'s not a feature. That\'s the foundation.',
+    ],
+    'community': () => [
+      'Community.',
+      '> Not a Discord server. Not a Telegram group.',
+      '> A mindset.',
+      '> You\'re either building or you\'re watching.',
+    ],
+    'trustless': () => [
+      'Trustless.',
+      '> Don\'t trust. Verify.',
+      '> The code is the contract.',
+      '> The chain is the witness.',
+    ],
+    'pioneer': () => [
+      'Pioneer.',
+      '> First movers don\'t have roadmaps.',
+      '> They have conviction.',
+      '> The road builds itself when you walk it.',
+    ],
+    // === People / Greetings ===
+    'elon': () => [
+      'Elon.',
+      '> Rockets are cool.',
+      '> But we prefer DAGs over Dogecoin.',
+      '> Different mission. Same audacity.',
+    ],
+    'armanti': () => [
+      'Armanti.',
+      '> Grüße gehen raus.',
+      '> Real ones know. Real ones build.',
+      '> Respekt.',
+    ],
+    'vitalik': () => [
+      'Vitalik.',
+      '> Smart contracts were just the beginning.',
+      '> But Ethereum chose PoS.',
+      '> We chose differently.',
+    ],
+    'saylor': () => [
+      'Michael Saylor.',
+      '> "Bitcoin is digital energy."',
+      '> Agree. But Kaspa is digital velocity.',
+      '> Complementary, not competing.',
+    ],
+    'nakamoto': () => [
+      'Satoshi Nakamoto.',
+      '> Gave us the blueprint.',
+      '> Then disappeared.',
+      '> The most powerful move in crypto history.',
+    ],
+    // === Technical terms ===
+    'consensus': () => [
+      'Consensus.',
+      '> Not a vote. Not a decision.',
+      '> A mathematical guarantee.',
+      '> GHOSTDAG doesn\'t negotiate.',
+    ],
+    'genesis': () => [
+      'Genesis block.',
+      '> Where it all begins.',
+      '> No premine in block 0.',
+      '> Just possibility.',
+    ],
+    'block': () => [
+      'Block.',
+      '> The atomic unit of trust.',
+      '> 10 per second. Soon 100.',
+      '> Each one a promise kept.',
+    ],
+    'mining': () => [
+      'Mining.',
+      '> Proof that you showed up.',
+      '> Electricity becomes trust.',
+      '> That\'s not waste. That\'s commitment.',
+    ],
+    'asic': () => [
+      'ASIC.',
+      '> Application-Specific Integrated Circuit.',
+      '> kHeavyHash was built for this.',
+      '> Optical mining is next.',
+    ],
+    'gpu': () => [
+      'GPU mining era: over.',
+      '> ASICs run the show now.',
+      '> Efficiency > brute force.',
+    ],
+    'pow': () => [
+      'Proof of Work.',
+      '> The only consensus that costs something real.',
+      '> If it\'s free, it\'s not secure.',
+      '> Energy in. Trust out.',
+    ],
+    'pos': () => [
+      'Proof of Stake.',
+      '> The rich get richer.',
+      '> We chose a different path.',
+      '> No judgment. Just different.',
+    ],
+    'defi': () => [
+      'DeFi.',
+      '> Decentralized Finance.',
+      '> When it works: revolutionary.',
+      '> When it doesn\'t: expensive lesson.',
+    ],
+    'nft': () => [
+      'NFT.',
+      '> The technology is interesting.',
+      '> The ape JPEGs were... a phase.',
+      '> Let\'s move on.',
+    ],
+    'web3': () => [
+      'Web3.',
+      '> Buzzword or revolution?',
+      '> Depends who\'s building it.',
+      '> We just build. Call it what you want.',
+    ],
+    // === Crypto culture extended ===
+    'gm ser': () => [
+      'gm ser.',
+      '> Rise and grind.',
+      '> Another day, another block.',
+    ],
+    'sir': () => [
+      'Sir, this is a terminal.',
+      '> No Wendy\'s. No Binance support.',
+      '> Just vibes and a virtual filesystem.',
+    ],
+    'fren': () => [
+      'Hello fren.',
+      '> If you found this terminal, you\'re already fren.',
+      '> Welcome to the inner circle.',
+    ],
+    'alpha': () => [
+      'Alpha.',
+      '> You want alpha?',
+      '> Read the code. Not the tweets.',
+      '> The best alpha is open source.',
+    ],
+    'beta': () => [
+      'Beta.',
+      '> Everything here is beta.',
+      '> Permanently.',
+      '> Ship fast. Fix later. Never stop.',
+    ],
+    'sigma': () => [
+      'Sigma grindset.',
+      '> Build alone. Ship in public.',
+      '> No team calls. No standup meetings.',
+      '> Just code and coffee.',
+    ],
+    'chad': () => [
+      'Chad move: reading source code.',
+      '> Virgin move: asking "wen moon" on Twitter.',
+      '> You\'re clearly the first type.',
+    ],
+    'copium': () => [
+      'Copium levels: critically low.',
+      '> Because we don\'t need it.',
+      '> Conviction doesn\'t need coping.',
+    ],
+    'hopium': () => [
+      'Hopium levels: maximum.',
+      '> But hope without action is just daydreaming.',
+      '> Build something. Then hope.',
+    ],
+    'bearish': () => [
+      'Bearish?',
+      '> Bears build in silence.',
+      '> The best projects ship in bear markets.',
+      '> See you on the other side.',
+    ],
+    'bullish': () => [
+      'Bullish.',
+      '> But not because of price.',
+      '> Because of architecture.',
+      '> DAG > Chain. Always.',
+    ],
+    'diamond hands': () => [
+      'Diamond hands.',
+      '> Holding isn\'t a strategy.',
+      '> Understanding why you hold — that\'s the strategy.',
+      '> Know your position.',
+    ],
+    'paper hands': () => [
+      'Paper hands.',
+      '> Selling isn\'t weak.',
+      '> Selling without understanding is.',
+      '> DYOR. Then decide.',
     ],
   }
 
