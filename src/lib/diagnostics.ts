@@ -297,7 +297,7 @@ export interface AnimationStep {
  */
 export type CommandResult =
   | { animated: false; output: string[]; newState: TerminalState }
-  | { animated: true; steps: AnimationStep[]; newState: TerminalState; _close?: boolean }
+  | { animated: true; steps: AnimationStep[]; newState: TerminalState; _close?: boolean; _jump?: boolean; _lambo?: boolean; _moon?: boolean }
 
 // Virtual filesystem structure - directory → files → content
 const FILESYSTEM: Record<string, Record<string, string>> = {
@@ -472,7 +472,7 @@ function resolvePath(cwd: string, target: string): string {
 
 // Available commands for autocomplete
 const ALL_COMMANDS = [
-  'help', 'status', 'ls', 'cd', 'cat', 'pwd', 'clear', 'exit', 'export', 'copy', 'version', 'quiz',
+  'help', 'status', 'ls', 'cd', 'cat', 'pwd', 'clear', 'exit', 'export', 'copy', 'version', 'quiz', 'tree',
   'gm', 'gn', 'wagmi', 'ngmi', 'matrix', 'coffee', 'moon', 'kas', 'satoshi',
   'bmt', 'cry', 'shit', 'shitcoin', 'kcom', 'ms', 'yp', 'lens', 'yeet',
   'burn', 'hodl', 'wen', 'fud', 'dag', 'ghostdag', 'rust', 'hashrate',
@@ -503,22 +503,25 @@ const ALL_COMMANDS = [
   'mining', 'asic', 'gpu', 'pow', 'pos', 'defi', 'nft', 'web3',
   'gm ser', 'sir', 'fren', 'alpha', 'beta', 'sigma', 'chad',
   'copium', 'hopium', 'bearish', 'bullish', 'diamond hands', 'paper hands',
+  'fortune', 'cowsay', 'sl',
 ]
 
 /**
  * Tab completion for diagnostic terminal
+ * Returns resolved token or candidate set for ambiguous input
  */
-export function getCompletions(input: string, state: TerminalState): string | null {
+export function getCompletions(input: string, state: TerminalState): { match: string | null; alternatives: string[] } {
   const trimmed = input.trimStart()
   const parts = trimmed.split(/\s+/)
 
   // Complete command name
   if (parts.length <= 1) {
     const partial = parts[0]?.toLowerCase() || ''
-    if (!partial) return null
+    if (!partial) return { match: null, alternatives: [] }
     const matches = ALL_COMMANDS.filter(c => c.startsWith(partial))
-    if (matches.length === 1) return matches[0]
-    return null
+    if (matches.length === 1) return { match: matches[0], alternatives: [] }
+    if (matches.length > 1 && matches.length <= 12) return { match: null, alternatives: matches }
+    return { match: null, alternatives: [] }
   }
 
   // Complete arguments for cd/cat
@@ -528,19 +531,21 @@ export function getCompletions(input: string, state: TerminalState): string | nu
   if (cmd === 'cd') {
     const subdirs = getSubdirs(state.cwd)
     const matches = subdirs.filter(d => d.toLowerCase().startsWith(arg))
-    if (matches.length === 1) return `cd ${matches[0]}`
-    return null
+    if (matches.length === 1) return { match: `cd ${matches[0]}`, alternatives: [] }
+    if (matches.length > 1) return { match: null, alternatives: matches }
+    return { match: null, alternatives: [] }
   }
 
   if (cmd === 'cat') {
     const files = FILESYSTEM[state.cwd]
-    if (!files) return null
+    if (!files) return { match: null, alternatives: [] }
     const matches = Object.keys(files).filter(f => f.toLowerCase().startsWith(arg))
-    if (matches.length === 1) return `cat ${matches[0]}`
-    return null
+    if (matches.length === 1) return { match: `cat ${matches[0]}`, alternatives: [] }
+    if (matches.length > 1) return { match: null, alternatives: matches }
+    return { match: null, alternatives: [] }
   }
 
-  return null
+  return { match: null, alternatives: [] }
 }
 
 /**
@@ -550,6 +555,8 @@ export function getCompletions(input: string, state: TerminalState): string | nu
 export function processDiagnosticCommand(
   cmd: string,
   state: TerminalState,
+  _ch?: string[],
+  _t0?: number,
 ): CommandResult {
   const trimmed = cmd.trim()
   const normalized = trimmed.toLowerCase()
@@ -642,6 +649,59 @@ export function processDiagnosticCommand(
     return { animated: false, output: lines, newState: state }
   }
 
+  if (command === 'tree') {
+    const _root = arg ? resolvePath(state.cwd, arg) : state.cwd
+    const _rootSeg = _root.split('/')[1]
+    if (_chk(_rootSeg, state, _root)) {
+      return { animated: false, output: ['tree: permission denied'], newState: state }
+    }
+    const _exists = _root === '/' || FILESYSTEM[_root] !== undefined || getSubdirs(_root).length > 0
+    if (!_exists) {
+      return { animated: false, output: [`tree: ${arg}: No such directory`], newState: state }
+    }
+
+    const _out: string[] = [_root]
+    let _dc = 0, _fc = 0
+
+    const _walk = (dir: string, prefix: string) => {
+      const subdirs = getSubdirs(dir)
+      const files = FILESYSTEM[dir] ? Object.keys(FILESYSTEM[dir]) : []
+      const entries: { name: string; isDir: boolean; locked: boolean; full: string }[] = []
+
+      for (const d of subdirs) {
+        const full = dir === '/' ? `/${d}` : `${dir}/${d}`
+        const locked = _chk(dir === '/' ? d : dir.split('/')[1], state, full)
+        entries.push({ name: d, isDir: true, locked, full })
+      }
+      for (const f of files) {
+        entries.push({ name: f, isDir: false, locked: false, full: '' })
+      }
+
+      entries.forEach((entry, i) => {
+        const isLast = i === entries.length - 1
+        const connector = isLast ? '└── ' : '├── '
+        const childPrefix = isLast ? '    ' : '│   '
+
+        if (entry.isDir) {
+          _dc++
+          if (entry.locked) {
+            _out.push(`${prefix}${connector}${entry.name}/ [LOCKED]`)
+          } else {
+            _out.push(`${prefix}${connector}${entry.name}/`)
+            _walk(entry.full, prefix + childPrefix)
+          }
+        } else {
+          _fc++
+          _out.push(`${prefix}${connector}${entry.name}`)
+        }
+      })
+    }
+
+    _walk(_root, '')
+    _out.push('', `${_dc} directories, ${_fc} files`)
+    return { animated: false, output: _out, newState: state }
+  }
+
   if (command === 'cd') {
     if (!arg || arg === '/') {
       return { animated: false, output: [], newState: { ...state, cwd: '/' } }
@@ -702,7 +762,12 @@ export function processDiagnosticCommand(
 
   if (command === 'cat') {
     if (!arg) {
-      return { animated: false, output: ['Usage: cat <filename>'], newState: state }
+      const _cf = FILESYSTEM[state.cwd]
+      const _fk = _cf ? Object.keys(_cf) : []
+      if (_fk.length > 0) {
+        return { animated: false, output: ['Usage: cat <filename>', '', `Files here: ${_fk.join(', ')}`], newState: state }
+      }
+      return { animated: false, output: ['Usage: cat <filename>', '> No files in current directory. Try cd into a subdirectory.'], newState: state }
     }
     // Support paths: cat /basics/readme.txt or cat ../basics/readme.txt
     let dir = state.cwd
@@ -719,9 +784,15 @@ export function processDiagnosticCommand(
     }
     const files = FILESYSTEM[dir]
     if (!files || !(filename in files)) {
+      const _avail = files ? Object.keys(files) : []
+      if (_avail.length > 0) {
+        return { animated: false, output: [`cat: ${arg}: No such file`, '', `Available files: ${_avail.join(', ')}`], newState: state }
+      }
       return { animated: false, output: [`cat: ${arg}: No such file`], newState: state }
     }
-    return { animated: false, output: files[filename].split('\n'), newState: state }
+    const _fp = dir === '/' ? `/${filename}` : `${dir}/${filename}`
+    const _ln = '─'.repeat(Math.min(_fp.length + 4, 40))
+    return { animated: false, output: [_ln, `  ${_fp}`, _ln, '', ...files[filename].split('\n'), '', _ln], newState: state }
   }
 
   if (_k(normalized) === _u) {
@@ -1010,6 +1081,7 @@ export function processDiagnosticCommand(
       '  help     - Show this message',
       '  status   - System status',
       '  ls       - List directory contents',
+      '  tree     - Show directory tree',
       '  cd       - Change directory',
       '  cat      - Read file',
       '  pwd      - Print working directory',
@@ -1028,15 +1100,9 @@ export function processDiagnosticCommand(
     'wagmi': () => ['we are all gonna make it'],
     'ngmi': () => ['not with that attitude'],
     '42': () => ['The answer to life, the universe, and everything.'],
-    'matrix': () => [
-      'Wake up, Neo...',
-      'The Matrix has you...',
-      'Follow the white rabbit.',
-      '',
-      '> Just kidding. This is kas.me, not Zion.',
-    ],
+    // matrix: moved to async renderer (perf)
     'coffee': () => ['Error: Coffee machine not connected to blockchain. Yet.'],
-    'moon': () => ['To the moon? We prefer sustainable growth. But yes, moon eventually.'],
+    // moon: moved to async renderer (trajectory calc)
     'kas': () => ['Kaspa: BlockDAG + GhostDAG = Fast finality'],
     'satoshi': () => [
       '"If you don\'t believe it or don\'t get it,',
@@ -1209,11 +1275,7 @@ export function processDiagnosticCommand(
       '> We write code, not portfolios.',
       '> Your keys, your coins, your choices.',
     ],
-    'lambo': () => [
-      'Error: lambo.exe not found.',
-      '> Try: patience && consistency && building',
-      '> Expected output: something better than a car.',
-    ],
+    // lambo: moved to async renderer (multi-vehicle sequence)
     'airdrop': () => [
       'No airdrops. No handouts.',
       '> Kaspa was fair launched.',
@@ -1882,7 +1944,7 @@ export function processDiagnosticCommand(
     ],
   }
 
-  // "call mama" (deutsch) / "call mom" (english) — animated cheat list Easter egg
+  // locale-aware callback handler (de/en) — deprecated debug sequence
   if (normalized === 'call mama') {
     return {
       animated: true,
@@ -1978,19 +2040,11 @@ export function processDiagnosticCommand(
     }
   }
 
-  // sudo with argument: realistic denial
-  if (command === 'sudo' && arg) {
+  // sudo with argument: escalation denial
+  if (command === 'sudo' && arg && !/rm\s+.*-rf/.test(arg.toLowerCase())) {
     const innerParts = arg.split(/\s+/)
     const innerCmd = innerParts[0].toLowerCase()
     const innerArg = innerParts.slice(1).join(' ')
-    if (innerCmd === 'rm' && arg.toLowerCase().includes('-rf')) {
-      return { animated: false, output: [
-        '[sudo] password for anon: ********',
-        'rm: you really sudo rm -rf\'d a stranger\'s terminal.',
-        '> Balls of steel. Brain of mush.',
-        '> Denied. But we respect the audacity.',
-      ], newState: state }
-    }
     if (innerCmd === 'su' || innerArg.includes('root')) {
       return { animated: false, output: [
         '[sudo] password for anon: ********',
@@ -2095,6 +2149,202 @@ export function processDiagnosticCommand(
     ], newState: state }
   }
 
+  // context-sensitive reference lookup
+  if (command === 'man' && arg) {
+    const _mp: Record<string, string[]> = {
+      'ls':     ['LS(1) — list directory contents', '', '  ls        List files in current directory', '  ls -l     Detailed listing with permissions', '  ls -R     Recursive listing (all subdirs)', '', '> Tip: use cd to navigate, then ls to explore.'],
+      'cd':     ['CD(1) — change directory', '', '  cd <dir>   Enter a subdirectory', '  cd ..      Go up one level', '  cd /       Go to root', '', '> Tip: use Tab for autocomplete.'],
+      'cat':    ['CAT(1) — read file contents', '', '  cat <file>          Read a file in current dir', '  cat /path/to/file   Read a file by full path', '', '> Tip: use ls first to see available files.'],
+      'help':   ['HELP(1) — show available commands', '', '  Displays all recognized commands.', '  Also try: man <command> for details.'],
+      'status': ['STATUS(1) — system diagnostics', '', '  Shows clearance level, cwd, and module status.', '  Output changes as you unlock more access.'],
+      'quiz':   ['QUIZ(1) — knowledge gate', '', '  Answer trivia questions to progress.', '  Correct answers unlock deeper content.', '  Progress is tracked automatically.'],
+      'history':['HISTORY(1) — command log', '', '  Shows your last 20 commands.', '  Use !<number> to repeat a command.', '  Use !! to repeat the last command.', '  Arrow ↑/↓ also navigates history.'],
+      'export': ['EXPORT(1) — copy terminal log', '', '  Copies the entire terminal output to clipboard.', '  Alias: copy'],
+      'pwd':    ['PWD(1) — print working directory', '', '  Shows your current location in the filesystem.'],
+      'tree':   ['TREE(1) — show directory tree', '', '  tree          Show tree from current directory', '  tree <dir>    Show tree from specific directory', '', '  Locked directories show [LOCKED].', '> Tip: great for getting an overview of what\'s available.'],
+    }
+    const _page = _mp[arg.toLowerCase()]
+    if (_page) {
+      return { animated: false, output: _page, newState: state }
+    }
+    return { animated: false, output: [`No manual entry for ${arg}`, '> Try: man ls, man cd, man cat, man history'], newState: state }
+  }
+
+  // sl: transposed input fallback handler
+  if (normalized === 'sl') {
+    return { animated: false, output: [
+      '      ====        ________',
+      '  _D _|  |_______/        \\__I_I_____===__|_______',
+      '   |(_)---  |   H\\________/ |   |        =|___ ___|',
+      '   /     |  |   H  |  |     |   |         ||_| |_||',
+      '  |      |  |   H  |__--------------------| [___] |',
+      '  | ________|___H__/__|_____/[][]~\\_______|       |',
+      '  |/ |   |-----------I_____I [][] []  D   |=======|_',
+      '',
+      '> You meant "ls". We forgive you.',
+    ], newState: state }
+  }
+
+  // randomized status message rotation
+  if (normalized === 'fortune') {
+    const _fw = [
+      ['Not your keys, not your coins.', '> — Every HODLer who learned the hard way.'],
+      ['The best time to buy was yesterday. The second best time is now.', '> — Ancient crypto proverb.'],
+      ['In DAG we trust.', '> — The Kaspa community.'],
+      ['Code is law. Until you find a bug.', '> — Every smart contract dev.'],
+      ['A transaction confirmed is a worry resolved.', '> — Sub-second finality enjoyer.'],
+      ['Don\'t trust. Verify.', '> — The only rule that matters.'],
+      ['The quietest builders make the loudest impact.', '> — Every real dev.'],
+      ['Fortune favors the patient.', '> Average $KAS holder.'],
+      ['Buy the rumor, sell the news. Or just HODL.', '> — Trader vs. builder mindset.'],
+      ['First they ignore you, then they FUD you, then you pump.', '> — Mahatma Satoshi.'],
+      ['One does not simply time the market.', '> — Boromir, probably.'],
+      ['The blockchain remembers.', '> Nothing gets deleted. Ever.'],
+    ]
+    const _f = _fw[Math.floor(Math.random() * _fw.length)]
+    return { animated: false, output: ['', ..._f, ''], newState: state }
+  }
+
+  // legacy output formatter (retained for backward compat)
+  if (command === 'cowsay') {
+    const _msg = arg || 'moo'
+    const _pad = '─'.repeat(_msg.length + 2)
+    return { animated: false, output: [
+      ` ┌${_pad}┐`,
+      ` │ ${_msg} │`,
+      ` └${_pad}┘`,
+      '        \\   ^__^',
+      '         \\  (oo)\\_______',
+      '            (__)\\       )\\/\\',
+      '                ||----w |',
+      '                ||     ||',
+    ], newState: state }
+  }
+
+  // destructive op guard — requires elevated context
+  if ((normalized.startsWith('rm -rf /') || normalized.startsWith('rm -rf *') || normalized === 'rm -rf') &&
+      command !== 'sudo') {
+    return { animated: false, output: [
+      'rm: nice try.',
+      '> You really typed rm -rf on a stranger\'s terminal.',
+      '> Absolute maniac.',
+      '> Denied. But we respect the audacity.',
+      '> (Hint: real maniacs use sudo)',
+    ], newState: state }
+  }
+
+  // elevated destructive op — teardown sequence
+  if (command === 'sudo' && arg && /rm\s+.*-rf\s+[/*]/.test(arg)) {
+    const _bar = [
+      '░░░░░░░░░░░░░░░░░░░░░░░░░░',
+      '██░░░░░░░░░░░░░░░░░░░░░░░░',
+      '█████░░░░░░░░░░░░░░░░░░░░░',
+      '████████░░░░░░░░░░░░░░░░░░',
+      '███████████░░░░░░░░░░░░░░░',
+      '██████████████░░░░░░░░░░░░',
+      '█████████████████░░░░░░░░░',
+      '████████████████████░░░░░░',
+      '███████████████████████░░░',
+      '██████████████████████████',
+    ]
+    return {
+      animated: true,
+      _close: true,
+      steps: [
+        { lines: ['[sudo] password for anon: ********'], delayMs: 600 },
+        { lines: [''], delayMs: 400 },
+        { lines: ['Alright fine. You did it.'], delayMs: 1000 },
+        { lines: [''], delayMs: 500 },
+        { lines: ['rm: descending into \'/\'...'], delayMs: 800 },
+        { lines: ['rm: removing /basics/'], delayMs: 300 },
+        { lines: ['rm: removing /games/'], delayMs: 200 },
+        { lines: ['rm: removing /architecture/'], delayMs: 200 },
+        { lines: ['rm: removing /kaspa/'], delayMs: 200 },
+        { lines: ['rm: removing /business/'], delayMs: 200 },
+        { lines: ['rm: removing /vault/'], delayMs: 200 },
+        { lines: ['rm: removing /system/'], delayMs: 150 },
+        { lines: [''], delayMs: 400 },
+        { lines: ['> CRITICAL: filesystem integrity compromised'], delayMs: 800 },
+        { lines: ['> Initiating emergency recovery...'], delayMs: 1000 },
+        ..._bar.map((b, i) => ({
+          lines: [`> RECOVERY ${b} ${Math.round(((i + 1) / _bar.length) * 100)}%`],
+          delayMs: i === 0 ? 400 : 180,
+          replaceLast: i > 0,
+        })),
+        { lines: [''], delayMs: 500 },
+        { lines: ['> Recovery failed. Core dump at 0xDEADBEEF.'], delayMs: 1200 },
+        { lines: ['> Purging session. Goodbye.'], delayMs: 1500 },
+        { lines: ['_CLEAR_'], delayMs: 800 },
+        { lines: [''], delayMs: 600 },
+        { lines: ['> Balls of steel. Brain of mush.'], delayMs: 1500 },
+      ],
+      newState: { ...state, cwd: '/' },
+    }
+  }
+
+  // Render pipeline flush — animated output sequence
+  if (normalized === 'matrix') {
+    const _chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF'
+    const _row = () => Array.from({ length: 42 }, () => _chars[Math.floor(Math.random() * _chars.length)]).join('')
+    return {
+      animated: true,
+      _jump: true,
+      steps: [
+        { lines: ['Wake up, Neo...'], delayMs: 1200 },
+        { lines: ['The Matrix has you...'], delayMs: 1500 },
+        { lines: ['Follow the white rabbit.'], delayMs: 1500 },
+        { lines: [''], delayMs: 800 },
+        { lines: ['_CLEAR_'], delayMs: 400 },
+        ...(Array.from({ length: 18 }, (_, i) => ({
+          lines: [_row()],
+          delayMs: i < 3 ? 200 : i < 8 ? 120 : 80,
+          replaceLast: i > 0 && i % 3 !== 0,
+        }))),
+        { lines: [''], delayMs: 300 },
+        { lines: [_row()], delayMs: 80 },
+        { lines: [_row()], delayMs: 80 },
+        { lines: [''], delayMs: 400 },
+        { lines: ['> SYSTEM FAILURE'], delayMs: 800 },
+        { lines: [''], delayMs: 2500 },
+        { lines: ['> ...'], delayMs: 1000 },
+        { lines: ['> Just kidding. This is kas.me, not Zion.'], delayMs: 1500 },
+      ],
+      newState: state,
+    }
+  }
+
+  // Multi-vehicle convergence — bulk asset teardown
+  if (normalized === 'lambo') {
+    return {
+      animated: true,
+      _lambo: true,
+      steps: [
+        { lines: ['Searching for lambo.exe ...'], delayMs: 1000 },
+        { lines: ['Found 3 results.'], delayMs: 800 },
+        { lines: ['Loading ...'], delayMs: 600 },
+        { lines: [''], delayMs: 400 },
+        { lines: ['VROOM VROOM VROOM'], delayMs: 300 },
+      ],
+      newState: state,
+    }
+  }
+
+  // Trajectory escape — vertical offset with gravity return
+  if (normalized === 'moon') {
+    return {
+      animated: true,
+      _moon: true,
+      steps: [
+        { lines: ['Initiating launch sequence...'], delayMs: 1000 },
+        { lines: ['T-3...'], delayMs: 800 },
+        { lines: ['T-2...'], delayMs: 800 },
+        { lines: ['T-1...'], delayMs: 800 },
+        { lines: ['LIFTOFF! 🚀'], delayMs: 500 },
+      ],
+      newState: state,
+    }
+  }
+
   const handler = responses[normalized] || (command !== normalized ? responses[command] : undefined)
   if (handler) {
     return { animated: false, output: handler(), newState: state }
@@ -2123,10 +2373,9 @@ export function processDiagnosticCommand(
       '> Look at that. echo works.',
       '> Sort of.',
     ],
-    'history': [
-      'Arrow ↑ / ↓ works. You\'re welcome.',
-      '> But full history? This isn\'t ~/.bash_history.',
-    ],
+    'history': _ch && _ch.length > 0
+      ? [..._ch.slice(-20).map((c, i) => `  ${String(_ch.length - 20 + i + 1 > 0 ? _ch.length - 20 + i + 1 : i + 1).padStart(4)}  ${c}`), '', '> Tip: use !<number> to repeat a command.']
+      : ['No commands in history yet.', '> Type something first.'],
     'touch': [
       `touch: cannot create '${arg || 'file'}': read-only filesystem`,
       '> Immutable by design. Like a blockchain.',
@@ -2135,10 +2384,9 @@ export function processDiagnosticCommand(
       `mkdir: cannot create directory '${arg || 'dir'}': permission denied`,
       '> You don\'t create here. You discover.',
     ],
-    'rm -rf': [
-      'rm: nice try.',
-      '> You really typed rm -rf on a stranger\'s terminal.',
-      '> Respect. Also: no.',
+    'rm -rf .': [
+      'rm: operation not permitted on immutable storage.',
+      '> Nice try though.',
     ],
     'find': [
       '> find: searching...',
@@ -2157,10 +2405,20 @@ export function processDiagnosticCommand(
       'MOTIVATION=high',
     ],
     'alias': [
-      'alias ll=\'ls -la\'',
-      'alias yolo=\'git push --force\'',
-      'alias please=\'sudo\'',
-      '> These don\'t work here. But nice to see you try.',
+      'Active shortcuts:',
+      '  !!           Repeat last command',
+      '  !<n>         Repeat command #n from history',
+      '  sudo !!      Re-run last command as sudo',
+      '  Tab          Autocomplete (shows options if multiple)',
+      '  Arrow ↑/↓    Navigate command history',
+      '  Ctrl+C       Cancel current input',
+      '  Ctrl+L       Clear screen',
+      '  Ctrl+U       Clear line',
+      '',
+      'Useful commands:',
+      '  man <cmd>    Show manual for a command',
+      '  history      Show command log',
+      '  fortune      Random wisdom',
     ],
     'ssh': [
       `ssh: connect to host ${arg || 'kas.me'} port 22: Connection refused`,
@@ -2222,10 +2480,21 @@ export function processDiagnosticCommand(
       'kas.me 2026 BlockDAG x86_64 CYPUV/Linux',
       '> Custom kernel. Runs on proof of work.',
     ],
-    'uptime': [
-      'up since 2024, load average: always building',
-      '> We don\'t sleep. The DAG doesn\'t sleep.',
-    ],
+    'uptime': (() => {
+      if (_t0) {
+        const _el = Math.floor((Date.now() - _t0) / 1000)
+        const _h = Math.floor(_el / 3600)
+        const _m = Math.floor((_el % 3600) / 60)
+        const _s = _el % 60
+        const _dur = _h > 0 ? `${_h}h ${_m}m ${_s}s` : _m > 0 ? `${_m}m ${_s}s` : `${_s}s`
+        return [
+          ` ${new Date().toLocaleTimeString()} up ${_dur}, 1 user, load average: ∞`,
+          `> Session started: ${new Date(_t0).toLocaleTimeString()}`,
+          '> The DAG doesn\'t sleep. Neither should you.',
+        ]
+      }
+      return ['up since 2024, load average: always building', '> We don\'t sleep. The DAG doesn\'t sleep.']
+    })(),
     'date': [
       new Date().toISOString(),
       '> Time is relative. Blocks are absolute.',
@@ -2244,6 +2513,70 @@ export function processDiagnosticCommand(
   const proHandler = proCommands[normalized] || proCommands[command]
   if (proHandler) {
     return { animated: false, output: proHandler, newState: state }
+  }
+
+  // Fallback normalization for ambiguous input tokens
+  const _aliasMap: Record<string, string[]> = {
+    'commands': ['Try: help', '> "help" shows available commands.'],
+    'list': ['Try: ls', '> Use "ls" to list directory contents.'],
+    'all': ['Try: ls -R', '> Use "ls -R" for recursive listing.'],
+    'debug': ['Try: status', '> Use "status" to see system diagnostics.'],
+    'show': ['Try: cat <filename>', '> Use "cat" to display file contents.'],
+    'show-all': ['Try: ls -R', '> Use "ls -R" to show everything.'],
+    'dir': ['Try: ls', '> This isn\'t DOS. Use "ls".'],
+    'cls': ['Try: clear', '> This isn\'t CMD. Use "clear".'],
+    'info': ['Try: status', '> Use "status" for system info.'],
+    'open': ['Try: cat <filename>', '> Use "cat" to read files.'],
+    'read': ['Try: cat <filename>', '> Use "cat" to read files.'],
+    'run': ['No executables here.', '> Try "help" for available commands.'],
+    'start': ['Nothing to start.', '> Try "help" to explore.'],
+    'type': ['Try: cat <filename>', '> "type" is a Windows thing. Use "cat".'],
+    'more': ['Try: cat <filename>', '> "more" is deprecated. Use "cat".'],
+    'less': ['Try: cat <filename>', '> "less" is not available. Use "cat".'],
+    'back': ['Try: cd ..', '> Use "cd .." to go up one level.'],
+    '..': ['Try: cd ..', '> Use "cd .." to navigate up.'],
+    'home': ['Try: cd /', '> Use "cd /" to go to root.'],
+    'menu': ['Try: help', '> No menu. Type "help" for commands.'],
+    'options': ['Try: help', '> Use "help" to see what\'s available.'],
+  }
+
+  const _al = _aliasMap[normalized]
+  if (_al) {
+    return { animated: false, output: _al, newState: state }
+  }
+
+  // Edit distance for nearest-match resolution
+  const _ld = (a: string, b: string): number => {
+    const m = a.length, n = b.length
+    const d: number[][] = Array.from({ length: m + 1 }, (_, i) => {
+      const r = new Array(n + 1).fill(0); r[0] = i; return r
+    })
+    for (let j = 1; j <= n; j++) d[0][j] = j
+    for (let i = 1; i <= m; i++)
+      for (let j = 1; j <= n; j++)
+        d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] !== b[j-1] ? 1 : 0))
+    return d[m][n]
+  }
+
+  // Nearest token candidates from validation set
+  const _near = ALL_COMMANDS
+    .map(c => ({ c, d: _ld(normalized, c) }))
+    .filter(x => x.d <= 2 && x.d > 0)
+    .sort((a, b) => a.d - b.d)
+    .slice(0, 3)
+
+  if (_near.length > 0) {
+    return {
+      animated: false,
+      output: [
+        `Command not found: ${cmd}`,
+        '',
+        `Did you mean:  ${_near.map(x => x.c).join(', ')}`,
+        '',
+        'Type "help" for available commands',
+      ],
+      newState: state,
+    }
   }
 
   return {
