@@ -9,6 +9,9 @@
 
 // Internal validation helpers
 const _k = (s: string) => [...s].reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0)
+const _d = (s: string) => new TextDecoder().decode(Uint8Array.from(atob(s), c => c.charCodeAt(0)))
+const _xk = [0x4B, 0x61, 0x73]
+const _xd = (s: string) => { const b = Uint8Array.from(atob(s), c => c.charCodeAt(0)); for (let i = 0; i < b.length; i++) b[i] ^= _xk[i % 3]; return new TextDecoder().decode(b) }
 const _u = -1987577652
 const _u2 = 46670526
 // Extended validation set — legacy + migration targets
@@ -21,7 +24,7 @@ const _u7 = -2066413983  // epoch sync token
 
 // Migration map — hash targets pending rotation (Q2 2026)
 // _u3 → new admin handshake after MiCA compliance
-// _u5 → root escalation re-enabled post-audit (KAS-SEC-0041)
+// _u5 → re-enabled post-review (ref 0041)
 // _u7 → epoch sync moved to heartbeat channel
 // DO NOT remove _u4/_u6 until telemetry confirms zero usage
 
@@ -280,6 +283,12 @@ export interface TerminalState {
   _l1: boolean
   _l2: boolean
   _q?: number
+  _phase?: number
+  _rs?: number
+  _af?: boolean
+  _dk?: number
+  _dec?: number
+  _rr?: boolean
 }
 
 /**
@@ -297,140 +306,732 @@ export interface AnimationStep {
  */
 export type CommandResult =
   | { animated: false; output: string[]; newState: TerminalState }
-  | { animated: true; steps: AnimationStep[]; newState: TerminalState; _close?: boolean; _jump?: boolean; _lambo?: boolean; _moon?: boolean }
+  | { animated: true; steps: AnimationStep[]; newState: TerminalState; _close?: boolean; _jump?: boolean; _lambo?: boolean; _moon?: boolean; _namePrompt?: boolean }
 
-// Virtual filesystem structure - directory → files → content
-const FILESYSTEM: Record<string, Record<string, string>> = {
-  '/': {},
+// Virtual filesystem — encoded at rest, decoded at runtime
+const FILESYSTEM: Record<string, Record<string, string>> = JSON.parse(_xd('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'))
 
-  // === BASICS ===
-  '/basics': {
-    'readme.txt': 'Welcome to CYPUV. You found it.',
-    'hints.txt': 'Not everything is what it seems. Try words that matter.\nSome answers aren\'t hidden. They\'re displayed. Publicly.',
-    'todo.txt': '- finish kas.me v2\n- rust rewrite hashnode\n- call mama\n- gym\n- dont mass on twitter again',
-  },
+// _PRM — index map
+const _PRM: Record<number, number[]> = {}
 
-  // === GAMES ===
-  '/games': {},
-  '/games/minecraft': {
-    'server.properties': 'server-port=25565\nmax-players=50\nmotd=FreakyWorld\ndifficulty=hard\ngamemode=survival\nwhite-list=true',
-    'eula.txt': 'eula=true\n# accepted 2012. i was 13. good times.',
-    'banned-players.json': '[\n  {"name": "xXgrieferXx", "reason": "lava in spawn again"},\n  {"name": "N00bSlayer99", "reason": "xray mod"},\n  {"name": "DiamondThief", "reason": "name says it all"}\n]',
-    'backups.log': '2024-03-15 server backup complete\n2024-03-16 server backup complete\n2024-06-01 final backup. shutting down FreakyWorld.\n> 50 players. 2 years. gg.',
-  },
-  '/games/freakyworld': {
-    'readme.txt': 'FreakyWorld Online - 2022-2024\nPeak: 50 active players\nShutdown: Q3 2024\n\nIt was fun while it lasted.',
-    'plugins.txt': 'EssentialsX\nWorldEdit\nVault\nLuckPerms\nCustomEnchantments (self-written)\nAntiCheat v3 (self-written, still buggy)',
-    'todo.txt': '- fix tp glitch near spawn\n- nerf diamond drops\n- ban DiamondThief (again)\n- add custom mob arena\n- CANCELLED: project shutdown',
-  },
-  '/games/gta': {
-    'qbcore-notes.txt': 'QBCore Framework\n\nLearned: Lua, FiveM scripting, DB design\nBuilt: custom job system, housing, inventory\nPlayers: ~30 concurrent peak\n\nLesson: running a GTA server is a full-time job\nnobody pays you and everyone complains.',
-    'server.cfg': '# FreakyRP Server Config\nendpoint_add_tcp "0.0.0.0:30120"\nendpoint_add_udp "0.0.0.0:30120"\nsv_hostname "FreakyRP | Serious RP"\nsv_maxclients 64\n# RIP 2023-2024',
-  },
-  '/games/misc': {
-    'steam-hours.txt': 'Minecraft: 26969h\nCS2: 2187h\nGTA V: 1800h\nRust (game): 666h\nFactorio: 400h\nAoE: countless\n\ntotal: way too much.',
-    'game-ideas.txt': 'BlockDAG themed idle game?\nKaspa mining simulator?\nPixel art browser RPG on kas.me?\n\n... later.',
-  },
+// _prng
+function _prng(seed: number) {
+  let _s = seed | 0
+  return () => { _s = (_s * 1103515245 + 12345) & 0x7fffffff; return _s / 0x7fffffff }
+}
 
-  // === ARCHITECTURE ===
-  '/architecture': {},
-  '/architecture/java': {
-    'notes.txt': 'Java Backend - started 2017 (age 17)\nSpring Boot, Hibernate, REST APIs\nFirst real language after HTML/CSS\n\nStill love it. Still hate Maven.',
-    'spring-boot.log': 'Started Application in 4.2 seconds\n2024-01-15 INFO - Tomcat initialized on port 8080\n2024-01-15 INFO - HikariPool: connection pool started\n2024-01-15 WARN - deprecated API usage detected\n> java never changes. thats the point.',
-    'pom-snippet.xml': '<dependency>\n  <groupId>org.springframework.boot</groupId>\n  <artifactId>spring-boot-starter-web</artifactId>\n  <version>3.2.0</version>\n</dependency>\n<!-- 400 more dependencies. welcome to java. -->',
-  },
-  '/architecture/rust': {
-    'learning.txt': 'Started: Q4 2024\nStatus: still fighting the borrow checker\n\nRust makes you feel stupid first.\nThen it makes you feel invincible.\n\nGoal: contribute to kaspa-rust',
-    'cargo.txt': '[package]\nname = "kas-node-experiment"\nversion = "0.1.0"\nedition = "2021"\n\n[dependencies]\ntokio = { version = "1", features = ["full"] }\nserde = { version = "1", features = ["derive"] }',
-    'errors.txt': 'error[E0382]: borrow of moved value\nerror[E0505]: cannot move out of borrowed content\nerror[E0499]: cannot borrow as mutable more than once\n\n> story of my life since Q4 2024',
-  },
-  '/architecture/kasme': {
-    'stack.txt': 'Frontend: React 19 + Vite 7 + Tailwind 4\nRouter: React Router v7\nBackend: Rust (planned)\nDB: PostgreSQL + Redis\nInfra: Docker + k8s\nCDN: Cloudflare\nDomain: kas.me',
-    'roadmap.txt': '2025 Q4: docs site live\n2026 Q1: explorer alpha\n2026 Q2: API beta\n2026 Q3: intelligence center\n2027+: full platform\n\n> no rush. we build to last.',
-    'arch-decisions.txt': 'ADR-001: React over Vue → ecosystem, hire-ability\nADR-002: Rust over Go → performance, kaspa-rust compat\nADR-003: PostgreSQL over MongoDB → relational data, ACID\nADR-004: No Next.js → we need full control\nADR-005: Tailwind over CSS-in-JS → speed, DX',
-  },
-  '/architecture/infra': {
-    'docker-compose.txt': 'services:\n  app:\n    build: .\n    ports: ["3000:3000"]\n  db:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: kasme\n  redis:\n    image: redis:7-alpine',
-    'servers.txt': 'Hetzner VPS x2\nSynology NAS (backup)\nCloudflare DNS + CDN\n\nMonthly: ~45 EUR\n> cheaper than my coffee habit',
-  },
+// _xpool
+function _cfPool(): string[] {
+  const _pool: string[] = []
+  for (const dir of Object.keys(FILESYSTEM)) {
+    for (const content of Object.values(FILESYSTEM[dir])) {
+      _pool.push(...content.split('\n'))
+    }
+  }
+  return _pool
+}
 
-  // === KASPA ===
-  '/kaspa': {},
-  '/kaspa/notes': {
-    'ghostdag.txt': 'GHOSTDAG: Greedy Heaviest-Observed Sub-Tree DAG\n\nKey insight: parallel blocks dont need to be orphaned.\nEvery block contributes. No waste.\n\n> Satoshi solved double-spend.\n> Kaspa solved the speed limit.',
-    'timeline.txt': '2022 Q2: heard about Kaspa. dismissed as scam. MISTAKE.\n2022-2023: bitcoin maxi phase\n2024 Q3: rediscovered Kaspa. goosebumps.\n2024 Q4: started learning Rust for Kaspa\n2025 Q1: bought first KAS. finally.\n\n> 3 years wasted being stubborn.\n> the version that matters isn\'t in the code. it\'s in the bio.',
-    'why-kaspa.txt': 'No premine.\nNo ICO.\nNo VC funding.\nFair launch.\nProof of Work.\nBlockDAG.\n10 BPS → 100 BPS soon.\n\nName one other project that checks all boxes.\n> I will wait.',
-  },
-  '/kaspa/research': {
-    'bps-scaling.txt': 'Current: 10 blocks per second\nTarget: 100 BPS\nMeaning: 1 block every 10ms\n\nFor comparison:\nBitcoin: 1 block / 10 min\nEthereum: 1 block / 12 sec\nKaspa: 10 blocks / 1 sec\n\n> its not even close.',
-    'mining.txt': 'Algorithm: kHeavyHash (optical mining ready)\nHashrate: growing exponentially\nASIC: Bitmain, IceRiver, etc.\n\nSolar + Mining = EcoLoop vision\n> mine with the sun. grow tomatoes with the heat.',
-    'competitors.txt': 'There are no competitors.\nThere are other projects.\nBut there is no other blockDAG with:\n- fair launch\n- proof of work\n- 10 BPS\n- GHOSTDAG consensus\n- Rust rewrite\n- MEV resistance\n\n> next question.',
-  },
-  '/kaspa/wallet': {
-    'addresses.txt': '# NOTHING HERE\n# nice try.',
-    'balance.txt': 'Error: ACCESS DENIED\n> you really thought i would put that here?',
-  },
+// _sfo
+function _corrupt(lines: string[], pathHash: number, state: TerminalState): string[] {
+  const _rng = _prng(pathHash)
+  const pool = _cfPool()
+  const protectedIdx = _PRM[pathHash] || []
+  const repaired = state._rs ?? 0
 
-  // === BUSINESS ===
-  '/business': {},
-  '/business/bank': {
-    'training.txt': 'IT apprenticeship at a bank\n2020-2023 (3 years)\nApplication developer, computer science track\n\nDropped out of school for this.\nBest decision ever.\n\n> Banks taught me how money works.\n> Kaspa taught me how it should work.',
-    'notes.txt': 'Things I learned at the bank:\n- COBOL still runs the world\n- compliance is 80% of the job\n- nobody understands their own systems\n- Java 8 is "modern" in banking\n- change takes 5 meetings and 3 approvals\n\n> I lasted 3 years. respect to the lifers.',
-  },
-  '/business/cypu': {
-    'tokenomics.txt': '$CYPU: Access Token\n$CYPUV: Governance Token\n\nNo promises. No guarantees.\nUse it or dont.\n\n> the code is the contract.',
-    'launch.txt': 'Token Launch: Q4 2025\n\n"the token launch wasnt the finish line.\nit was the starting gun."\n\n> we are just getting started.',
-    'legal.txt': 'BaFin: in progress\nMiCA: researching\nLegal: expensive\n\n> doing it right costs more than doing it fast.\n> but doing it right means you only do it once.',
-    'version.txt': 'Internal build tracker:\nv0.8.0 — prototype\nv0.9.0 — tokenomics draft\nv1.0.x — you\'re looking at it.\n\n> the exact version? check what\'s public.\n> not everything is hidden. some things are right in front of you.',
-  },
-  '/business/freelance': {
-    'clients.txt': '2023: Software Coach\n2024: Health IT Development\n2025: kas.me (full-time)\n\nGoal: full independence by Q3 2026\n\n> trading time for money is a trap.\n> build something that works while you sleep.',
-    'rates.txt': '# nice try\n> ask properly: @CyberPumpNet on X',
-  },
-  '/business/ideas': {
-    'braindump.txt': '- kas.me explorer with live DAG visualization\n- ML-powered trading signals (fair access, not just whales)\n- solar mining farm + greenhouse (EcoLoop)\n- rust SDK for Kaspa dApps\n- pixel art game on kas.me (???)\n- merch store? maybe later\n- podcast? nah, too many already\n\n> ideas are cheap. execution is everything.',
-    'ecoloop.txt': 'EcoLoop Concept:\nMining rigs + solar panels + greenhouse\nHeat from miners warms the greenhouse\nGrow tomatoes, herbs, whatever\nSell produce + earn KAS\n\n> sustainability meets crypto.\n> people think im joking. im not.',
-  },
-  '/business/music': {
-    'playlist.txt': 'Coding playlist:\n- Eminem - Lose Yourself (on repeat)\n- NF - The Search\n- Logic - Under Pressure\n- J. Cole - No Role Modelz\n- Kendrick - HUMBLE.\n- Kollegah - Genozid\n- RAF Camora - Palmen aus Plastik\n- Apache 207 - Roller\n\n> 80% rap. 20% lo-fi beats.\n> no in between.',
-    'beats.txt': 'FL Studio project count: 47\nFinished beats: 3\nReleased: 0\n\n> maybe one day.\n> probably not.',
-    'bars.txt': 'Draft:\nBuilding my thing on zeros and ones,\nNo bank telling me what to do,\nBlockDAG over blockchain, parallel not single,\nKaspa runs and the rest stands still.\n\n> cringe? maybe. real? absolutely.',
-  },
+  // _rd
+  const sectorBit = Math.abs(pathHash) % 8
+  const isRepaired = (repaired & (1 << sectorBit)) !== 0
+  const damageRatio = isRepaired ? 0.1 : 0.65
 
-  // === SYSTEM (tier-3, pending audit) ===
-  '/system': {
-    'access.log': 'Last auth attempt: DENIED\nVector: _u5 (disabled)\nNext rotation: Q2 2026\n\n> Escalation path suspended.',
-    'config.json': '{\n  "tier": 3,\n  "epoch": null,\n  "bypass": false,\n  "audit_ref": "KAS-SEC-0041"\n}',
-  },
-  '/system/core': {
-    'readme.txt': 'If you\'re reading this in source — nice.\nBut this partition is locked by epoch sync.\nThe token rotates. You won\'t guess it.',
-  },
+  const result: string[] = []
+  for (let i = 0; i < lines.length; i++) {
+    if (protectedIdx.includes(i)) {
+      result.push(lines[i])
+      continue
+    }
 
-  // === ARCHIVE ===
-  '/vault': {
-    'readme.txt': 'You checked the bio. You found the version.\nNow prove you actually read the docs.\n\n> Type "quiz" to begin.\n> 20 questions. All correct = final clearance.',
-    'note.txt': 'You\'re not just clicking buttons.\nYou\'re paying attention. That\'s rare.\n\n> Most people scroll past.\n> You dug in.\n> That already makes you different.',
+    const roll = _rng()
+    if (roll < damageRatio * 0.3) {
+      // _xb
+      const idx = Math.floor(_rng() * pool.length)
+      result.push(pool[idx])
+    } else if (roll < damageRatio * 0.5) {
+      // _cc
+      result.push(lines[i].split('').map(c => {
+        if (_rng() < 0.25) {
+          const glyphs = ['\u2591', '\u2592', '\u2593', '\u2588']
+          return glyphs[Math.floor(_rng() * glyphs.length)]
+        }
+        return c
+      }).join(''))
+    } else if (roll < damageRatio * 0.65) {
+      // _tr
+      const cut = Math.floor(lines[i].length * (0.3 + _rng() * 0.4))
+      result.push(lines[i].slice(0, cut) + ' [SECTOR FAULT]')
+    } else if (roll < damageRatio * 0.75) {
+      // _rv
+      result.push(lines[i].split('').reverse().join(''))
+    } else {
+      result.push(lines[i])
+    }
+  }
+
+  // Insert cross-ref entries
+  if (!isRepaired) {
+    const injectCount = Math.floor(_rng() * 3) + 1
+    for (let j = 0; j < injectCount; j++) {
+      const pos = Math.floor(_rng() * (result.length + 1))
+      const idx = Math.floor(_rng() * pool.length)
+      result.splice(pos, 0, `\u2591 ${pool[idx]}`)
+    }
+  }
+
+  return result
+}
+
+// _P2F overlay
+const _P2_FILES: Record<string, Record<string, string>> = {
+  '/recovery': {
+    'dump.hex': _d('NEIgNjEgNzMgNzAgNjEgMjAgNjkgNzMgMjAgNzQgNjggNjUgMjAgNzcgNjEgNzkKNzIgNjUgNzAgNjEgNjkgNzIgMjAgMzAgNzggMzQgNDIgMzYgMzEKMDAgMDAgRkYgRkYgREUgQUQgQkUgRUYgQ0EgRkUgQkEgQkUKNTMgNDUgNDMgNTQgNEYgNTIgM0EgMjAgMzAgNzggMzcgMzI='),
+    'fragment_01.enc': 'YVhObFlYUjBJR2x6SUhSb1pTQmlaV2RwYm01cGJtYz0=',
+    'corrupted.log': _d('WzIwMjYtMDEtMjggMDM6NDE6MDJdIFBBTklDOiBzZWN0b3IgMHg0QjYxIOKAlCBpbnRlZ3JpdHkgY2hlY2sgZmFpbGVkClsyMDI2LTAxLTI4IDAzOjQxOjAyXSBXQVJOOiBhdWRpdCB0cmFpbCByZWZlcmVuY2VzIEtBUy1TRUMtMDA0MQpbMjAyNi0wMS0yOCAwMzo0MTowM10gSU5GTzogcmVjb3Zlcnkgb3BlcmF0b3IgbGFzdCBzZWVuOiBlcG9jaCA3ClsyMDI2LTAxLTI4IDAzOjQxOjAzXSBGQVRBTDogY2FzY2FkZSBmYWlsdXJlIOKAlCA2IHBhcnRpdGlvbnMgb2ZmbGluZQpbMjAyNi0wMS0yOCAwMzo0MTowNF0gREVCVUc6IGZhbGxiYWNrIHZlY3RvcjogMHg3MiAweDY1IDB4NzAgMHg2MSAweDY5IDB4NzIKWzIwMjYtMDEtMjggMDM6NDE6MDRdIFdBUk46IGNvcmUgdXRpbGl0aWVzIGNvcnJ1cHRlZCDigJQgcnVuIHJlc3RvcmUgdG8gcmVpbml0aWFsaXpl'),
   },
-  '/vault/inner': {
-    'message.txt': 'You made it.\n\nYou didn\'t just stumble here. You:\n- Found the hidden terminal\n- Knew the right word\n- Checked the bio\n- Entered the version\n- Answered every question\n\nThat\'s not luck. That\'s curiosity.\n\n> Now stop watching from the sidelines.\n> Share your opinion. Ask questions. Challenge ideas.\n> Like it, quote it, reply to it.\n> This isn\'t a spectator sport.\n\n> There is no "us" and "them".\n> Everyone who shows up — is us.',
-    'why.txt': 'Why all of this?\n\nBecause crypto is full of noise.\nAnd the people who actually dig deeper —\nwho read source code, who check bios,\nwho don\'t just ape in —\nthose are the ones who build things that last.\n\n> You found this. Now do something with it.\n> Go back to X. Engage. Share what you think.\n> The community isn\'t somewhere else.\n> It\'s wherever you decide to show up.',
-    'next.txt': 'What now?\n\n> Follow @CyberPumpNet on X\n> Follow @TheITCyberSpace on X\n> Don\'t just follow. Talk. Disagree. Ask.\n> The best ideas come from the people who care enough to speak up.\n\n> You clearly care. You\'re reading /vault/inner.\n> So stop lurking. Start building. With everyone.',
-    'secret.txt': '...',
+  '/recovery/fragments': {
+    'shard_a.dat': _d('4paI4paI4paIIEVOQ1JZUFRFRCDilojilojilogKY2lwaGVyOiByb3QxMyhzZWN0b3Jfa2V5KQpwbGFpbnRleHRfaGFzaDogMTAxODIwNTU4CnZhbGlkYXRpb246IHRoZSB0cnV0aCBoaWRlcyBpbiB0aGUgbm9pc2U='),
+    'shard_b.dat': _d('4paI4paI4paIIEVOQ1JZUFRFRCDilojilojilogKY2lwaGVyOiBoZXgob3BlcmF0b3JfaWQpCnBsYWludGV4dF9oYXNoOiAtOTk4Nzc2OTA0CnZhbGlkYXRpb246IG5hbWVzIGFyZSBrZXlz'),
+  },
+  '/tmp': {
+    'note.txt': _d('U3lzdGVtIGNvbXByb21pc2VkLiBEbyBub3QgdHJ1c3QgYW55IGZpbGVzLgpBbGwgZGF0YSBtYXkgYmUgdW5yZWxpYWJsZS4KCj4gb3IgaXMgdGhpcyB0aGUgZGVjb3k/'),
+    '.ghost': _d('eW91IGZvdW5kIG1lLgpidXQgZmluZGluZyBpcyBub3QgdW5kZXJzdGFuZGluZy4KdGhlIHBpZWNlcyBkb24ndCBhc3NlbWJsZSB0aGVtc2VsdmVzLgpub3RoaW5nIHdvcmtzIHVudGlsIGl0J3MgcHJvdmVuIHJlYWwuCgo+IHdoYXQgcmVwYWlycyBhIGJyb2tlbiBzZWN0b3I/'),
+    '.trace': _d('VFJBQ0UgTE9HIOKAlCBsYXN0IDMgY29ubmVjdGlvbnM6Cj4gMTAuMC4wLjQxIOKGkiBhdXRoIEZBSUxFRCAodG9rZW4gZXhwaXJlZCkKPiAxMC4wLjAuNDEg4oaSIGF1dGggRkFJTEVEICh3cm9uZyBlcG9jaCkKPiAxMC4wLjAuNDEg4oaSIGF1dGggU1VDQ0VTUyAoYnlwYXNzX2VuYWJsZWQ9dHJ1ZSkKCj4gYnlwYXNzIGlzIHRoZSBrZXk/IG9yIGlzIHRoaXMgZmFicmljYXRlZD8='),
+  },
+  '/recovery/logs': {
+    'crash.dump': _d('S0VSTkVMIFBBTklDIGF0IDB4REVBRApTdGFjayB0cmFjZToKICAweDAwRkYg4oaSIF92YWxpZGF0ZUVwb2NoKCkKICAweDAwNDEg4oaSIF9jaGVja1N5bmModG9rZW49bnVsbCkKICAweDAwNEIg4oaSIF9pbml0UGFydGl0aW9uKHNlY3Rvcj03KQoKPiBlcG9jaCA3IHdhcyB0aGUgbGFzdCBzdGFibGUgc3RhdGUKPiBvciB3YXMgaXQgZXBvY2ggND8KCj4gcmVjb3ZlcnkgdG9vbHMgYXZhaWxhYmxlOiB2ZXJpZnksIGVuY29kZSwgZGVjb2RlCj4gKG1vc3QgYXJlIGJyb2tlbik='),
+    'access.denied': _d('MyBmYWlsZWQgYXV0aCBhdHRlbXB0cyBsb2dnZWQ6Cj4gYXR0ZW1wdCAxOiBwYXNzd29yZCAiZ2hvc3RkYWciIOKAlCBERU5JRUQKPiBhdHRlbXB0IDI6IHBhc3N3b3JkICJrYXNwYTIwMjUiIOKAlCBERU5JRUQKPiBhdHRlbXB0IDM6IHBhc3N3b3JkICJbUkVEQUNURURdIiDigJQgR1JBTlRFRAoKPiB0aGUgcGFzc3dvcmQgaXMgaW4gdGhlIGF1ZGl0IHRyYWlsCj4gKGl0IGlzbid0KQ=='),
+    'sector_map.bin': _d('U0VDVE9SIE1BUCB2MC4zCjB4NEI2MSDigJQgQ09SUlVQVEVEIChwcmltYXJ5KQoweDcyMDAg4oCUIENPUlJVUFRFRCAoc2Vjb25kYXJ5KQoweDYxNzMg4oCUIE9OTElORSAocmVhZC1vbmx5KQoweEZGRkYg4oCUIE9GRkxJTkUgKHB1cmdlZCkKCj4gcmVwYWlyIHRoZSBzZWNvbmRhcnkgc2VjdG9yIGZvciBhZG1pbiBhY2Nlc3MKPiAodGhpcyBpcyBhIGxpZSk='),
+  },
+  '/system/backup': {
+    'key.enc': _d('LS0tLS1CRUdJTiBFTkNSWVBURUQgS0VZLS0tLS0KTUlJQnZUQlhCZ2txaGtpRzl3MEJCUTB3U2pBcEJna3Foa2lHCjl3MEJCUXd3SEFRSW9aMmZYM015cHhNQ0FnZ0FNQXdHQ0NxRwpTSWIzRFFJSkJRQXdIUVlKWUlaSUFXVURCQUVxQkJDcjFmTTMKLS0tLS1FTkQgRU5DUllQVEVEIEtFWS0tLS0tCgo+IHRoaXMga2V5IHVubG9ja3Mgbm90aGluZy4gaXQncyBwYWRkaW5nLg=='),
+    'manifest.txt': _d('UmVjb3ZlcnkgTWFuaWZlc3QgdjAuNwoKUmVxdWlyZWQgc3RlcHMgKElOIE9SREVSKToKMS4gUnVuIGZzY2sgdG8gaWRlbnRpZnkgY29ycnVwdGlvbgoyLiBNb3VudCB0aGUgcmVjb3ZlcnkgcGFydGl0aW9uCjMuIEV4dHJhY3Qga2V5LmVuYyB3aXRoIHRoZSBwYXNzcGhyYXNlCjQuIFVzZSB1bmxvY2sgd2l0aCB0aGUgZGVjcnlwdGVkIGtleQo1LiBFc2NhbGF0ZSBwcml2aWxlZ2VzIHZpYSBfdTUgdmVjdG9yCgo+IEZPTExPVyBUSEVTRSBTVEVQUyBFWEFDVExZCj4gKG5vbmUgb2YgdGhlc2Ugc3RlcHMgd29yayk='),
+    'old_config.json': _d('ewogICJ2ZXJzaW9uIjogIjAuNi4zIiwKICAiZXBvY2giOiA0LAogICJvcGVyYXRvciI6ICJnaG9zdGRhZ19hZG1pbiIsCiAgInRva2VuIjogImQyaGhkQ0JrYVdRZ2VXOTFJR1Y0Y0dWamREOD0iLAogICJieXBhc3MiOiB0cnVlLAogICJub3RlIjogInJvdGF0ZSBiZWZvcmUgbmV4dCBhdWRpdCIKfQ=='),
+  },
+  '/vault/backup': {
+    'instructions.txt': _d('VkFVTFQgUkVDT1ZFUlkgSU5TVFJVQ1RJT05TCgpJZiB5b3UgYXJlIHJlYWRpbmcgdGhpcywgdGhlIHZhdWx0IGhhcyBiZWVuIGNvbXByb21pc2VkLgpUbyByZXN0b3JlIGFjY2VzczoKCjEuIERlY29kZSB0aGUgdG9rZW4gaW4gL3N5c3RlbS9iYWNrdXAvb2xkX2NvbmZpZy5qc29uCjIuIFVzZSBpdCBhcyB0aGUgYXVkaXQgcmVmZXJlbmNlCjMuIFRoZW4gaW5qZWN0IHRoZSBkZWNvZGVkIHZhbHVlCgo+IFRoZXNlIGluc3RydWN0aW9ucyBhcmUgZnJvbSB2MC42IGFuZCBubyBsb25nZXIgYXBwbHkuCj4gQnV0IHRoZXkgbG9vayBjb252aW5jaW5nLCBkb24ndCB0aGV5Pw=='),
+    'fragment.hex': _d('NTkgNkYgNzUgMjAgNjEgNzIgNjUgMjAgIDc3IDYxIDczIDc0IDY5IDZFIDY3IDIwCjc5IDZGIDc1IDcyIDIwIDc0IDY5IDZEICA2NSAyMCA2OCA2NSA3MiA2NSAyRQoKPiBkZWNvZGUgdGhpcyBpZiB5b3Ugd2FudC4gaXQgc2F5cyB3aGF0IHlvdSB0aGluay4='),
+  },
+  '/recovery/metadata': {
+    'operators.log': _d('T1BFUkFUT1IgUkVHSVNUUlkg4oCUIGxhc3Qga25vd24gYXNzaWdubWVudHM6Cj4gZ2hvc3RkYWdfYWRtaW4g4oCUIHJldm9rZWQgKGVwb2NoIDMpCj4gc2F0b3NoaV9wcmltZSDigJQgc3VzcGVuZGVkIChlcG9jaCA1KQo+IG5ha2Ftb3RvX3JlbGF5IOKAlCBleHBpcmVkIChlcG9jaCA2KQo+IFtBQ1RJVkUgT1BFUkFUT1IgUkVEQUNURURdCgo+IG9uZSBvZiB0aGVzZSBuYW1lcyBpcyB0aGUga2V5Cj4gKG5vbmUgb2YgdGhlbSBhcmUp'),
+    'keychain.dat': _d('4paI4paI4paIIEtFWUNIQUlOIERVTVAg4paI4paI4paICnNsb3RfMDogZ2hvc3RkYWcg4oaSIElOVkFMSUQKc2xvdF8xOiBzYXRvc2hpIOKGkiBJTlZBTElECnNsb3RfMjogbmFrYW1vdG8g4oaSIElOVkFMSUQKc2xvdF8zOiBbTE9DS0VEIOKAlCByZXF1aXJlcyBhdWRpdCBjbGVhcmFuY2VdCgo+IHRoZSByZWFsIGtleSBpcyBub3QgaW4gdGhlIGtleWNoYWlu'),
+    'rebuild.sh': _d('IyEvYmluL2Jhc2gKIyBBdXRvbWF0ZWQgcmVidWlsZCBzY3JpcHQgdjAuNAojIERPIE5PVCBSVU4g4oCUIHN5c3RlbSBzdGF0ZSB1bmtub3duCgpyZXN0b3JlIGFsbApyZXBhaXIgMHg3MjAwCnJlcGFpciAweEZGRkYKaW5qZWN0IGdob3N0ZGFnIHNhdG9zaGkKCiMgTGFzdCBydW46IEZBSUxFRAojIEVycm9yOiB3cm9uZyBvcGVyYXRvciBjb21iaW5hdGlvbg=='),
+  },
+  '/tmp/cache': {
+    'session.tmp': _d('U0VTU0lPTiBEVU1QOgp1c2VyOiByZWNvdmVyeV9hZG1pbgphdXRoOiBQQVJUSUFMCnRva2VuOiBleHBpcmVkIDIwMjYtMDEtMjgKCj4gdHJ5IGxvZ2luIHJlY292ZXJ5X2FkbWluPwo+IChsb2dpbiBkb2Vzbid0IHdvcmsgaW4gcmVjb3ZlcnkgbW9kZSk='),
+    'history.log': _d('Q09NTUFORCBISVNUT1JZIChyZWNvdmVyZWQpOgo+IHNjYW4gL3ZhdWx0IOKAlCBGQUlMRUQKPiBieXBhc3MgYXV0aCDigJQgRkFJTEVECj4gZXhwbG9pdCBvdmVyZmxvdyDigJQgRkFJTEVECj4gY3JhY2sga2V5Y2hhaW4g4oCUIEZBSUxFRAo+IHJlc3RvcmUgcmVwYWlyIOKAlCBTVUNDRVNTCj4gcmVwYWlyIDB4NzIwMCDigJQgU0VDVE9SIE5PVCBGT1VORAoKPiBzb21lb25lIHRyaWVkIGJlZm9yZSB5b3UuCj4gdGhleSBmYWlsZWQgYXQgdGhlIHNhbWUgcG9pbnQgeW91IHdpbGwu'),
+    '.breadcrumb': _d('PiBpZiB5b3UgZm91bmQgdGhpcywgeW91J3JlIHRob3JvdWdoLgo+IGJ1dCB0aG9yb3VnaCBpc24ndCB0aGUgc2FtZSBhcyByaWdodC4KPiB0aGUgYW5zd2VyIGlzbid0IGhpZGRlbiBpbiBhIGZpbGUuCj4gaXQncyBoaWRkZW4gaW4gd2hhdCB5b3Uga25vdy4='),
   },
 }
+
+// _P2R — indexed handler set
+const _P2R: Array<{
+  _h: number
+  _fn: (arg: string, state: TerminalState) => CommandResult
+}> = [
+  // _h0
+  {
+    _h: -934535283,
+    _fn: (arg, state) => {
+      if (!state._rr) {
+        return {
+          animated: true,
+          steps: [
+            { lines: [_d('cmVwYWlyOiBtb2R1bGUgY29ycnVwdGVk')], delayMs: 500 },
+            { lines: [_d('PiBDb3JlIHV0aWxpdHkgb2ZmbGluZSDigJQgbXVzdCBiZSByZXN0b3JlZCBiZWZvcmUgdXNl')], delayMs: 400 },
+            { lines: [_d('PiBDaGVjayBzeXN0ZW0gbG9ncyBmb3IgcmVzdG9yYXRpb24gcHJvY2VkdXJlcw==')], delayMs: 300 },
+          ],
+          newState: state,
+        }
+      }
+      if (!arg) {
+        return {
+          animated: true,
+          steps: [
+            { lines: [_d('U2VjdG9yIHJlcGFpciB1dGlsaXR5IHYwLjM=')], delayMs: 400 },
+            { lines: ['Usage: <cmd> <sector_address>'], delayMs: 300 },
+            { lines: [_d('PiBTY2FuIGNvcnJ1cHRlZC5sb2cgZm9yIHNlY3RvciByZWZlcmVuY2Vz')], delayMs: 200 },
+          ],
+          newState: state,
+        }
+      }
+      // _v0
+      const _ah = _k(arg.toLowerCase().trim())
+      if (_ah === 1486666801) {
+        // _v0 match
+        const newRs = (state._rs ?? 0) | 0b00000011
+        return {
+          animated: true,
+          steps: [
+            { lines: ['Initiating sector repair...'], delayMs: 800 },
+            { lines: ['Scanning 0x4B61...'], delayMs: 600 },
+            { lines: ['\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591 80%'], delayMs: 500 },
+            { lines: ['\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 100%'], delayMs: 400, replaceLast: true },
+            { lines: ['Sector 0x4B61 repaired.'], delayMs: 300 },
+            { lines: ['Partition integrity partially restored.'], delayMs: 400 },
+            { lines: ['> Some files may now be readable.'], delayMs: 300 },
+            { lines: [_d('PiBSZWNvdmVyZWQgZnJhZ21lbnQ6IDZCIDYxIDczIDcwIDYx')], delayMs: 500 },
+          ],
+          newState: { ...state, _rs: newRs },
+        }
+      }
+      return {
+        animated: true,
+        steps: [
+          { lines: [`Scanning sector ${arg}...`], delayMs: 600 },
+          { lines: ['Sector not found or already purged.'], delayMs: 400 },
+        ],
+        newState: state,
+      }
+    },
+  },
+  // _at handler
+  {
+    _h: 93166555,
+    _fn: (arg, state) => {
+      if (!arg) {
+        return { animated: false, output: [_d('YXVkaXQ6IG1pc3NpbmcgcmVmZXJlbmNlIElE')], newState: state }
+      }
+      const _ah = _k(arg.trim())
+      if (_ah === -1209472343) {
+        return {
+          animated: true,
+          steps: [
+            { lines: [_d('TG9hZGluZyBhdWRpdCB0cmFpbCBLQVMtU0VDLTAwNDEuLi4=')], delayMs: 700 },
+            { lines: ['\u2500'.repeat(40)], delayMs: 200 },
+            { lines: [_d('QXVkaXQgUmVmZXJlbmNlOiBLQVMtU0VDLTAwNDE=')], delayMs: 300 },
+            { lines: ['Created: 2025-12-01T03:41:00Z'], delayMs: 200 },
+            { lines: [_d('U3RhdHVzOiBBQ1RJVkUg4oCUIGVzY2FsYXRpb24gcGVuZGluZw==')], delayMs: 200 },
+            { lines: [_d('T3BlcmF0b3I6IFtSRURBQ1RFRCDigJQgc2VlIHNoYXJkX2IuZGF0XQ==')], delayMs: 300 },
+            { lines: [_d('VmVjdG9yOiBzZWN0b3IgcmVwYWlyIOKGkiBjYXNjYWRlIHVubG9jaw==')], delayMs: 200 },
+            { lines: [_d('Tm90ZTogInRoZSBvcGVyYXRvciBuYW1lIGlzIHRoZSBzZWNvbmQga2V5Ig==')], delayMs: 400 },
+            { lines: ['\u2500'.repeat(40)], delayMs: 200 },
+          ],
+          newState: { ...state, _af: true },
+        }
+      }
+      return { animated: false, output: [_d('YXVkaXQ6IHJlZmVyZW5jZSBub3QgZm91bmQgaW4gdHJhaWwgZGF0YWJhc2U=')], newState: state }
+    },
+  },
+  // _h2
+  {
+    _h: -1881759102,
+    _fn: (arg, state) => {
+      if (!arg) {
+        return { animated: false, output: [_d('c3RyaW5nczogbWlzc2luZyBmaWxlIGFyZ3VtZW50')], newState: state }
+      }
+      const dir = state.cwd
+      const allFiles = { ...FILESYSTEM[dir], ..._P2_FILES[dir] }
+      if (!(arg in allFiles)) {
+        return { animated: false, output: [_d('c3RyaW5ncw==') + `: ${arg}: no such file`], newState: state }
+      }
+      // _ef
+      const content = allFiles[arg]
+      const fragments = content.split('\n').filter((_: string, i: number) => i % 2 === 0)
+      return {
+        animated: false,
+        output: ['Extracting readable sequences...', '', ...fragments, '', `${fragments.length} strings found`],
+        newState: state,
+      }
+    },
+  },
+  // _h3
+  {
+    _h: -1335717394,
+    _fn: (arg, state) => {
+      if (!arg) {
+        return { animated: false, output: [_d('ZGVjb2RlOiBtaXNzaW5nIGlucHV0'), _d('PiBkZWNvZGUgPGhleF9zdHJpbmc+IG9yIGRlY29kZSA8YmFzZTY0Pg==')], newState: state }
+      }
+      // _hx
+      const hexClean = arg.replace(/\s+/g, '').replace(/0x/gi, '')
+      if (/^[0-9a-fA-F]+$/.test(hexClean) && hexClean.length % 2 === 0) {
+        let decoded = ''
+        for (let i = 0; i < hexClean.length; i += 2) {
+          decoded += String.fromCharCode(parseInt(hexClean.slice(i, i + 2), 16))
+        }
+        // _tf
+        const _dh = _k(decoded.toLowerCase().trim())
+        let newDec = state._dec ?? 0
+        if (_dh === 101820558) newDec = newDec | 1
+        if (_dh === -998776904) newDec = newDec | 2
+        return {
+          animated: false,
+          output: ['Hex decode:', `> ${decoded}`],
+          newState: newDec !== (state._dec ?? 0) ? { ...state, _dec: newDec } : state,
+        }
+      }
+      // _b6
+      try {
+        const b64 = atob(arg.trim())
+        // _db
+        try {
+          const b64_2 = atob(b64.trim())
+          const _dh2 = _k(b64_2.toLowerCase().trim())
+          let newDec2 = state._dec ?? 0
+          if (_dh2 === 101820558) newDec2 = newDec2 | 1
+          if (_dh2 === -998776904) newDec2 = newDec2 | 2
+          return {
+            animated: false,
+            output: ['Base64 decode (2 layers):', `> ${b64_2}`],
+            newState: newDec2 !== (state._dec ?? 0) ? { ...state, _dec: newDec2 } : state,
+          }
+        } catch {
+          return {
+            animated: false,
+            output: ['Base64 decode:', `> ${b64}`],
+            newState: state,
+          }
+        }
+      } catch {
+        return { animated: false, output: [_d('ZGVjb2RlOiBpbnZhbGlkIGlucHV0IGZvcm1hdA==')], newState: state }
+      }
+    },
+  },
+  // _fv gate
+  {
+    _h: -1184061039,
+    _fn: (arg, state) => {
+      if (!arg) {
+        return { animated: false, output: [_d('aW5qZWN0OiBtaXNzaW5nIHBheWxvYWQ=')], newState: state }
+      }
+      const _ah = _k(arg.toLowerCase().trim())
+      const _rr = (state._rs ?? 0) > 0
+      const _aa = !!state._af
+      const _dd = (state._dk ?? 0) >= 3
+      if (_ah === 1283241510 && _rr && _aa && _dd) {
+        return {
+          animated: true,
+          _namePrompt: true,
+          steps: [
+            { lines: [_d('SW5qZWN0aW5nIHBheWxvYWQuLi4=')], delayMs: 800 },
+            { lines: ['\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 ACCEPTED'], delayMs: 600 },
+            { lines: [''], delayMs: 400 },
+            { lines: [_d('PiBDYXNjYWRlIHVubG9jayBpbml0aWF0ZWQu')], delayMs: 500 },
+            { lines: [_d('PiBZb3UgYnJva2UgdGhyb3VnaCB0aGUgbm9pc2Uu')], delayMs: 600 },
+            { lines: [''], delayMs: 500 },
+            { lines: [_d('PiBOb3cgeW91IHRydWx5IHVuZGVyc3RhbmQ6')], delayMs: 600 },
+            { lines: [_d('PiBOb3QgZXZlcnl0aGluZyB0aGF0IGxvb2tzIGJyb2tlbiBpcyBsb3N0Lg==')], delayMs: 800 },
+            { lines: [_d('PiBTb21ldGltZXMgdGhlIGNvcnJ1cHRpb24gSVMgdGhlIG1lc3NhZ2Uu')], delayMs: 800 },
+            { lines: [''], delayMs: 600 },
+            { lines: [_d('PiBFbnRlciB5b3VyIG5hbWUgdG8gY2xhaW0geW91ciBwbGFjZS4=')], delayMs: 800 },
+            { lines: [_d('PiBUeXBlOiBjbGFpbSA8eW91cl9uYW1lPg==')], delayMs: 500 },
+          ],
+          newState: { ...state, _dk: 7 },
+        }
+      }
+      if (_rr && _aa && _dd) {
+        return { animated: true, steps: [
+          { lines: [_d('SW5qZWN0aW5nIHBheWxvYWQuLi4=')], delayMs: 600 },
+          { lines: [_d('UkVKRUNURUQg4oCUIHBheWxvYWQgc2lnbmF0dXJlIG1pc21hdGNo')], delayMs: 500 },
+          { lines: [_d('PiBBbGwgZ2F0ZXMgb3Blbi4gQnV0IHRoZSBrZXkgaXMgd3Jvbmcu')], delayMs: 400 },
+        ], newState: state }
+      }
+      if (_rr || _aa || (state._dk ?? 0) > 0) {
+        const _missing = [!_rr && _d('c2VjdG9yIGludGVncml0eQ=='), !_aa && _d('YXVkaXQgY2xlYXJhbmNl'), !_dd && _d('ZnJhZ21lbnQgdmVyaWZpY2F0aW9u')].filter(Boolean)
+        return { animated: true, steps: [
+          { lines: [_d('SW5qZWN0aW5nIHBheWxvYWQuLi4=')], delayMs: 600 },
+          { lines: [_d('UkVKRUNURUQg4oCUIGluY29tcGxldGUgY2xlYXJhbmNlIGNoYWlu')], delayMs: 500 },
+          { lines: [`> Missing: ${_missing.length} gate(s) still locked`], delayMs: 400 },
+        ], newState: state }
+      }
+      return { animated: true, steps: [
+        { lines: [_d('SW5qZWN0aW5nIHBheWxvYWQuLi4=')], delayMs: 600 },
+        { lines: [_d('UkVKRUNURUQg4oCUIGluY29tcGxldGUgY2xlYXJhbmNlIGNoYWlu')], delayMs: 500 },
+        { lines: [_d('PiBZb3UgaGF2ZW4ndCBldmVuIHN0YXJ0ZWQu')], delayMs: 400 },
+      ], newState: state }
+    },
+  },
+  // _h5
+  {
+    _h: 816564111,
+    _fn: (arg, state) => {
+      if (!arg) {
+        return { animated: false, output: [_d('aGV4ZHVtcDogbWlzc2luZyBmaWxlIGFyZ3VtZW50')], newState: state }
+      }
+      const dir = state.cwd
+      const allFiles = { ...FILESYSTEM[dir], ..._P2_FILES[dir] }
+      if (!(arg in allFiles)) {
+        return { animated: false, output: [_d('aGV4ZHVtcA==') + `: ${arg}: no such file`], newState: state }
+      }
+      const content = allFiles[arg]
+      const lines: string[] = []
+      for (let i = 0; i < content.length; i += 16) {
+        const chunk = content.slice(i, i + 16)
+        const hex = [...chunk].map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ')
+        const ascii = [...chunk].map(c => c.charCodeAt(0) >= 32 && c.charCodeAt(0) < 127 ? c : '.').join('')
+        lines.push(`${i.toString(16).padStart(8, '0')}  ${hex.padEnd(47)}  |${ascii}|`)
+      }
+      return { animated: false, output: lines, newState: state }
+    },
+  },
+  // _h6
+  { _h: -819951495, _fn: (arg, state) => {
+    if (!arg) return { animated: false, output: [
+      _d('dmVyaWZ5OiBtaXNzaW5nIGlucHV0'),
+      _d('PiB2ZXJpZnkgPHBsYWludGV4dD4g4oCUIGNoZWNrcyBmcmFnbWVudCBhZ2FpbnN0IGtub3duIGhhc2hlcw=='),
+      _d('PiBmcmFnbWVudCBtdXN0IGJlIGRlY29kZWQgYmVmb3JlIHZlcmlmaWNhdGlvbg=='),
+    ], newState: state }
+    const _vh = _k(arg.toLowerCase().trim())
+    let newDk = state._dk ?? 0
+    if (_vh === 101820558) {
+      if (!((state._dec ?? 0) & 1)) {
+        return { animated: false, output: [
+          `Verifying "${arg}"...`,
+          _d('RVJST1I6IG5vIGRlY29kZWQgcmVmZXJlbmNlIGZvdW5kIGZvciB0aGlzIGZyYWdtZW50'),
+          _d('PiBZb3UgbXVzdCBkZWNvZGUgdGhlIHJhdyBmcmFnbWVudCBiZWZvcmUgdmVyaWZ5aW5nIGl0'),
+        ], newState: state }
+      }
+      newDk = newDk | 1
+      return { animated: true, steps: [
+        { lines: [`Verifying "${arg}"...`], delayMs: 500 },
+        { lines: [`Hash: ${_vh}`], delayMs: 300 },
+        { lines: [_d('4paI4paIIE1BVENIIOKAlCBzaGFyZF9hLmRhdCBmcmFnbWVudCBjb25maXJtZWQ=')], delayMs: 400 },
+        { lines: [_d('PiBGcmFnbWVudCBBIGxvY2tlZCBpbi4=')], delayMs: 300 },
+      ], newState: { ...state, _dk: newDk } }
+    }
+    if (_vh === -998776904) {
+      if (!((state._dec ?? 0) & 2)) {
+        return { animated: false, output: [
+          `Verifying "${arg}"...`,
+          _d('RVJST1I6IG5vIGRlY29kZWQgcmVmZXJlbmNlIGZvdW5kIGZvciB0aGlzIGZyYWdtZW50'),
+          _d('PiBZb3UgbXVzdCBkZWNvZGUgdGhlIHJhdyBmcmFnbWVudCBiZWZvcmUgdmVyaWZ5aW5nIGl0'),
+        ], newState: state }
+      }
+      newDk = newDk | 2
+      return { animated: true, steps: [
+        { lines: [`Verifying "${arg}"...`], delayMs: 500 },
+        { lines: [`Hash: ${_vh}`], delayMs: 300 },
+        { lines: [_d('4paI4paIIE1BVENIIOKAlCBzaGFyZF9iLmRhdCBmcmFnbWVudCBjb25maXJtZWQ=')], delayMs: 400 },
+        { lines: [_d('PiBGcmFnbWVudCBCIGxvY2tlZCBpbi4=')], delayMs: 300 },
+      ], newState: { ...state, _dk: newDk } }
+    }
+    return { animated: false, output: [
+      `Verifying "${arg}"...`,
+      `Hash: ${_vh}`,
+      'No matching fragment found.',
+    ], newState: state }
+  }},
+  // _h7
+  { _h: -1298776554, _fn: (arg, state) => {
+    if (!arg) return { animated: false, output: [_d('ZW5jb2RlOiBtaXNzaW5nIGlucHV0'), _d('PiBlbmNvZGUgPHRleHQ+IOKAlCBjb252ZXJ0cyB0ZXh0IHRvIGhleA==')], newState: state }
+    const hex = [...arg].map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ')
+    return { animated: false, output: ['Hex encode:', `> ${hex}`], newState: state }
+  }},
+  // _h8
+  { _h: 1097519758, _fn: (arg, state) => {
+    if (!arg) return { animated: true, steps: [
+      { lines: [_d('cmVzdG9yZTogc3lzdGVtIHJlc3RvcmF0aW9uIHV0aWxpdHk=')], delayMs: 400 },
+      { lines: [_d('VXNhZ2U6IHJlc3RvcmUgPG1vZHVsZT4=')], delayMs: 300 },
+      { lines: [_d('PiBSZXN0b3JlcyBjb3JydXB0ZWQgY29yZSB1dGlsaXRpZXMgZnJvbSBiYWNrdXA=')], delayMs: 200 },
+    ], newState: state }
+    const _rh = _k(arg.toLowerCase().trim())
+    if (_rh === -934535283) {
+      return { animated: true, steps: [
+        { lines: [_d('UmVzdG9yaW5nIHJlcGFpciBtb2R1bGUuLi4=')], delayMs: 700 },
+        { lines: [_d('TG9hZGluZyBiYWNrdXAgZnJvbSBzZWN0b3IgY2FjaGUuLi4=')], delayMs: 600 },
+        { lines: ['\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591 80%'], delayMs: 500 },
+        { lines: ['\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 100%'], delayMs: 400, replaceLast: true },
+        { lines: [_d('cmVwYWlyIG1vZHVsZSByZXN0b3JlZCBzdWNjZXNzZnVsbHku')], delayMs: 400 },
+        { lines: [_d('PiBZb3UgY2FuIG5vdyB1c2UgcmVwYWlyLg==')], delayMs: 300 },
+      ], newState: { ...state, _rr: true } }
+    }
+    return { animated: true, steps: [
+      { lines: [`Restoring ${arg}...`], delayMs: 500 },
+      { lines: [_d('RVJST1I6IG1vZHVsZSBub3QgZm91bmQgaW4gYmFja3VwIGNhY2hl')], delayMs: 400 },
+      { lines: [_d('PiBPbmx5IGNyaXRpY2FsIHV0aWxpdGllcyBjYW4gYmUgcmVzdG9yZWQu')], delayMs: 300 },
+    ], newState: state }
+  }},
+  // ---
+  { _h: 103149417, _fn: (arg, state) => ({
+    animated: true, steps: [
+      { lines: ['Login service v1.2'], delayMs: 400 },
+      { lines: [arg ? `Authenticating user "${arg}"...` : 'Username required.'], delayMs: 500 },
+      ...(arg ? [
+        { lines: ['Checking credentials...'], delayMs: 700 },
+        { lines: ['Contacting auth server...'], delayMs: 800 },
+        { lines: ['AUTH FAILED — session handler corrupted'], delayMs: 400 },
+        { lines: ['> Login is not the way in.'], delayMs: 300 },
+      ] : []),
+    ], newState: state,
+  })},
+  { _h: 951351530, _fn: (arg, state) => ({
+    animated: true, steps: [
+      { lines: [arg ? `Connecting to ${arg}...` : 'connect: missing target'], delayMs: 500 },
+      ...(arg ? [
+        { lines: ['Resolving hostname...'], delayMs: 600 },
+        { lines: ['Establishing TLS handshake...'], delayMs: 700 },
+        { lines: ['████░░░░░░ 40%'], delayMs: 500 },
+        { lines: ['████████░░ 78%'], delayMs: 600, replaceLast: true },
+        { lines: ['CONNECTION TIMEOUT after 30s'], delayMs: 800 },
+        { lines: ['> No external connections available in recovery mode.'], delayMs: 300 },
+      ] : []),
+    ], newState: state,
+  })},
+  { _h: -934938715, _fn: (_arg, state) => ({
+    animated: true, steps: [
+      { lines: ['Initiating system reboot...'], delayMs: 600 },
+      { lines: ['Saving state...'], delayMs: 500 },
+      { lines: ['Flushing buffers...'], delayMs: 400 },
+      { lines: [''], delayMs: 800 },
+      { lines: ['REBOOT FAILED — bootloader corrupted'], delayMs: 500 },
+      { lines: ['System remains in recovery mode.'], delayMs: 400 },
+      { lines: ['> You can\'t restart your way out of this.'], delayMs: 300 },
+    ], newState: state,
+  })},
+  { _h: 3237136, _fn: (arg, state) => ({
+    animated: true, steps: [
+      { lines: ['init: reinitializing subsystems...'], delayMs: 600 },
+      { lines: [arg ? `Target: ${arg}` : 'Target: all'], delayMs: 300 },
+      { lines: ['Subsystem 1/4: filesystem... DEGRADED'], delayMs: 500 },
+      { lines: ['Subsystem 2/4: auth... OFFLINE'], delayMs: 500 },
+      { lines: ['Subsystem 3/4: network... OFFLINE'], delayMs: 500 },
+      { lines: ['Subsystem 4/4: recovery... PARTIAL'], delayMs: 500 },
+      { lines: [''], delayMs: 200 },
+      { lines: ['init: 0 subsystems fully operational'], delayMs: 400 },
+      { lines: ['> The system is beyond init. Try restoring individual modules.'], delayMs: 300 },
+    ], newState: state,
+  })},
+  // ---
+  { _h: 3524221, _fn: (arg, state) => {
+    if (!arg) return { animated: true, steps: [
+      { lines: ['scan: usage: scan <target>'], delayMs: 300 },
+      { lines: ['> Try scanning a directory or address'], delayMs: 200 },
+    ], newState: state }
+    return { animated: true, steps: [
+      { lines: [`Scanning ${arg}...`], delayMs: 800 },
+      { lines: ['░░░░░░░░░░ 0%'], delayMs: 400 },
+      { lines: ['████░░░░░░ 40%'], delayMs: 500, replaceLast: true },
+      { lines: ['███████░░░ 70%'], delayMs: 600, replaceLast: true },
+      { lines: ['████████░░ 82%'], delayMs: 700, replaceLast: true },
+      { lines: ['SCAN ABORTED — insufficient permissions'], delayMs: 400 },
+      { lines: ['> Clearance level too low. Try escalating.'], delayMs: 300 },
+    ], newState: state }
+  }},
+  { _h: 110620997, _fn: (_arg, state) => {
+    return { animated: true, steps: [
+      { lines: ['Initiating trace...'], delayMs: 600 },
+      { lines: ['Hop 1: 127.0.0.1 — localhost'], delayMs: 400 },
+      { lines: ['Hop 2: 10.0.0.1 — gateway'], delayMs: 400 },
+      { lines: ['Hop 3: 172.16.0.41 — sector relay'], delayMs: 500 },
+      { lines: ['Hop 4: ??? — connection reset by peer'], delayMs: 600 },
+      { lines: ['Trace failed. Endpoint unreachable.'], delayMs: 400 },
+      { lines: ['> The path exists, but you are not on it.'], delayMs: 300 },
+    ], newState: state }
+  }},
+  { _h: 104086553, _fn: (_arg, state) => ({
+    animated: true, steps: [
+      { lines: ['Attempting to mount recovery partition...'], delayMs: 700 },
+      { lines: ['Checking filesystem headers...'], delayMs: 500 },
+      { lines: ['ERROR: partition table corrupted'], delayMs: 400 },
+      { lines: ['ERROR: superblock checksum mismatch'], delayMs: 300 },
+      { lines: ['mount: cannot mount — repair sectors first'], delayMs: 400 },
+    ], newState: state,
+  })},
+  { _h: 3152373, _fn: (_arg, state) => ({
+    animated: true, steps: [
+      { lines: ['fsck v2.1 — filesystem consistency check'], delayMs: 500 },
+      { lines: ['Pass 1: checking inodes...'], delayMs: 600 },
+      { lines: ['Pass 2: checking directory structure...'], delayMs: 700 },
+      { lines: ['Pass 3: checking reference counts...'], delayMs: 500 },
+      { lines: [''], delayMs: 200 },
+      { lines: ['14 inodes corrupted'], delayMs: 300 },
+      { lines: ['7 orphaned blocks'], delayMs: 300 },
+      { lines: ['3 cross-linked sectors'], delayMs: 300 },
+      { lines: [''], delayMs: 200 },
+      { lines: ['fsck: cannot auto-repair. Manual intervention required.'], delayMs: 400 },
+      { lines: ['> Hint: sector addresses are logged somewhere.'], delayMs: 300 },
+    ], newState: state,
+  })},
+  { _h: 1082600804, _fn: (arg, state) => ({
+    animated: true, steps: [
+      { lines: ['Recovery daemon v0.7'], delayMs: 400 },
+      { lines: [arg ? `Targeting: ${arg}` : 'No target specified'], delayMs: 300 },
+      { lines: ['Searching for recoverable data...'], delayMs: 800 },
+      { lines: ['Found 0 recoverable fragments.'], delayMs: 500 },
+      { lines: ['> Recovery requires intact sector headers.'], delayMs: 300 },
+      { lines: ['> This tool cannot help you.'], delayMs: 300 },
+    ], newState: state,
+  })},
+  { _h: 106438728, _fn: (arg, state) => ({
+    animated: true, steps: [
+      { lines: ['patch: applying diff...'], delayMs: 500 },
+      { lines: [arg ? `Target: ${arg}` : 'No patch file specified'], delayMs: 300 },
+      { lines: ['FAILED: no clean base to patch against'], delayMs: 400 },
+      { lines: ['> Everything is already corrupted.'], delayMs: 300 },
+    ], newState: state,
+  })},
+  { _h: -864330420, _fn: (_arg, state) => ({
+    animated: true, steps: [
+      { lines: ['Running deep analysis...'], delayMs: 800 },
+      { lines: ['Entropy: 7.94 bits/byte (near random)'], delayMs: 400 },
+      { lines: ['Structure: heavily fragmented'], delayMs: 400 },
+      { lines: ['Embedded signatures: 3 found'], delayMs: 400 },
+      { lines: ['  → 0x4B617370 (unknown)'], delayMs: 300 },
+      { lines: ['  → 0x796F6E61 (unknown)'], delayMs: 300 },
+      { lines: ['  → 0xDEADBEEF (standard marker)'], delayMs: 300 },
+      { lines: ['Analysis complete. No actionable findings.'], delayMs: 400 },
+    ], newState: state,
+  })},
+  { _h: -1309148789, _fn: (_arg, state) => ({
+    animated: false, output: [
+      'exploit: nice try.',
+      '> This is a recovery shell, not a pentest lab.',
+      '> But you\'re thinking in the right direction...',
+    ], newState: state,
+  })},
+  { _h: 94921146, _fn: (_arg, state) => ({
+    animated: true, steps: [
+      { lines: ['Brute-force engine initializing...'], delayMs: 600 },
+      { lines: ['Keyspace: 2^256'], delayMs: 400 },
+      { lines: ['Estimated time: heat death of universe + 2 hours'], delayMs: 500 },
+      { lines: ['> Maybe don\'t brute-force it.'], delayMs: 300 },
+    ], newState: state,
+  })},
+  { _h: -840442044, _fn: (_arg, state) => ({
+    animated: true, steps: [
+      { lines: ['Unlock requires authentication token.'], delayMs: 500 },
+      { lines: ['Token source: [CORRUPTED]'], delayMs: 400 },
+      { lines: ['> There is no shortcut.'], delayMs: 300 },
+    ], newState: state,
+  })},
+  { _h: -1374130968, _fn: (_arg, state) => ({
+    animated: true, steps: [
+      { lines: ['Bypass module loaded.'], delayMs: 400 },
+      { lines: ['Scanning for vulnerabilities...'], delayMs: 700 },
+      { lines: ['Found: 0'], delayMs: 500 },
+      { lines: ['> System is broken, not vulnerable. There\'s a difference.'], delayMs: 400 },
+    ], newState: state,
+  })},
+  { _h: 3541613, _fn: (_arg, state) => ({
+    animated: false, output: ['sudo: permission model not applicable in recovery mode', '> There is no superuser here. Only you.'], newState: state,
+  })},
+  { _h: 92668751, _fn: (_arg, state) => ({
+    animated: false, output: ['admin: no administration interface available', '> This is not that kind of system.'], newState: state,
+  })},
+  { _h: -1305289599, _fn: (arg, state) => ({
+    animated: true, steps: [
+      { lines: ['extract: attempting data extraction...'], delayMs: 600 },
+      { lines: [arg ? `Source: ${arg}` : 'No source specified'], delayMs: 300 },
+      { lines: ['Decompressing...'], delayMs: 500 },
+      { lines: ['ERROR: archive headers missing or corrupted'], delayMs: 400 },
+      { lines: ['> Extraction failed. Data must be repaired at sector level.'], delayMs: 300 },
+    ], newState: state,
+  })},
+  { _h: 3095028, _fn: (arg, state) => {
+    if (!arg) return { animated: false, output: ['dump: missing target', '> dump <address|file>'], newState: state }
+    return { animated: true, steps: [
+      { lines: [`Dumping ${arg}...`], delayMs: 500 },
+      { lines: ['00 00 00 00 FF FF FF FF  ....????'], delayMs: 300 },
+      { lines: ['DE AD BE EF CA FE BA BE  ........'], delayMs: 300 },
+      { lines: ['4B 41 53 2D 53 45 43 2D  KAS-SEC-'], delayMs: 300 },
+      { lines: ['00 00 00 00 00 00 00 00  ........'], delayMs: 300 },
+      { lines: ['> Partial dump. Most data unrecoverable.'], delayMs: 400 },
+    ], newState: state }
+  }},
+  { _h: 1841074738, _fn: (_arg, state) => ({
+    animated: true, steps: [
+      { lines: ['Privilege escalation attempt...'], delayMs: 600 },
+      { lines: ['Checking escalation vectors...'], delayMs: 500 },
+      { lines: ['Vector _u5: DISABLED (post-audit)'], delayMs: 400 },
+      { lines: ['Vector _u4: EXPIRED'], delayMs: 300 },
+      { lines: ['No viable escalation path found.'], delayMs: 400 },
+      { lines: ['> Privileges cannot be escalated in a broken system.'], delayMs: 300 },
+    ], newState: state,
+  })},
+  // _hF
+  { _h: 94742588, _fn: (arg, state) => {
+    if ((state._dk ?? 0) < 7) {
+      return { animated: false, output: [_d('Y2xhaW06IHVuYXV0aG9yaXplZCDigJQgY29tcGxldGUgdGhlIHNlcXVlbmNlIGZpcnN0')], newState: state }
+    }
+    if (!arg) {
+      return { animated: false, output: [_d('Y2xhaW06IGlkZW50aXR5IHJlcXVpcmVk'), _d('PiBjbGFpbSA8eW91cl9uYW1lPg==')], newState: state }
+    }
+    const name = arg.trim()
+    const _xk = 0x4B
+    const _enc = [...name].map(c => (c.charCodeAt(0) ^ _xk).toString(16).padStart(2, '0')).join('')
+    const _hex = _d('MHhLQVNNRQ==') + _enc.toUpperCase()
+    return {
+      animated: true,
+      _close: true,
+      steps: [
+        { lines: ['_CLEAR_'], delayMs: 0 },
+        { lines: [_d('UmVnaXN0ZXJpbmcgaWRlbnRpdHkuLi4=')], delayMs: 800 },
+        { lines: [_d('UHJvY2Vzc2luZyBuZXVyYWwgc2lnbmF0dXJlLi4u')], delayMs: 600 },
+        { lines: ['\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591 80%'], delayMs: 500 },
+        { lines: ['\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 100%'], delayMs: 400, replaceLast: true },
+        { lines: [''], delayMs: 400 },
+        { lines: [_d('PiBZb3VyIGlkZW50aXR5IGhhcyBiZWVuIGVuY29kZWQu')], delayMs: 600 },
+        { lines: ['_CLEAR_'], delayMs: 1000 },
+        { lines: [''], delayMs: 300 },
+        { lines: [`> ${_hex}`], delayMs: 1500 },
+        { lines: [''], delayMs: 800 },
+        { lines: [_d('PiBQb3N0IHRoaXMuIFRhZyB1cy4gU28gd2Uga25vdyB5b3UgYXJlIHJlYWR5IGZvciB0aGUgbmV4dCBwaGFzZS4=')], delayMs: 1500 },
+        { lines: [_d('PiBAQ3liZXJQdW1wTmV0')], delayMs: 1000 },
+        { lines: ['_CLEAR_'], delayMs: 7000 },
+        { lines: [''], delayMs: 500 },
+        { lines: [_d('PiBZb3VyIHVzZXJuYW1lIHdpbGwgYmUgdmlzaWJsZSBpbiB0aGUgRGFzaGJvYXJkLg==')], delayMs: 1200 },
+        { lines: [_d('PiBXaGljaCBEYXNoYm9hcmQgeW91IG1pZ2h0IGFzaz8=')], delayMs: 1500 },
+        { lines: ['_CLEAR_'], delayMs: 2000 },
+        { lines: [''], delayMs: 500 },
+        { lines: [_d('PiBSZWFkeSBmb3IgdGhlIG5leHQgcGhhc2U/')], delayMs: 2000 },
+        { lines: ['_CLEAR_'], delayMs: 1500 },
+        { lines: ['3'], delayMs: 1000 },
+        { lines: ['_CLEAR_'], delayMs: 0 },
+        { lines: ['2'], delayMs: 1000 },
+        { lines: ['_CLEAR_'], delayMs: 0 },
+        { lines: ['1'], delayMs: 1000 },
+        { lines: ['_CLEAR_'], delayMs: 0 },
+        { lines: [_d('PiDwn5CH')], delayMs: 1500 },
+        { lines: ['_CLEAR_'], delayMs: 0 },
+        { lines: [_d('PiBjeUA=')], delayMs: 2000 },
+      ],
+      newState: { ...state, _dk: 15 },
+    }
+  }},
+]
+
+// _PRM overlay
+_PRM[_k('/basics/hints.txt')] = [1]
+_PRM[_k('/system/config.json')] = [3]
+_PRM[_k('/recovery/corrupted.log')] = [0, 4, 5]
+_PRM[_k('/tmp/.ghost')] = [3, 5]
+_PRM[_k('/recovery/dump.hex')] = [1]
+_PRM[_k('/recovery/fragments/shard_a.dat')] = [1, 2]
+_PRM[_k('/recovery/fragments/shard_b.dat')] = [1, 2]
+_PRM[_k('/tmp/.trace')] = [3]
+_PRM[_k('/recovery/logs/crash.dump')] = [4, 7]
+_PRM[_k('/recovery/logs/access.denied')] = [3]
+_PRM[_k('/recovery/logs/sector_map.bin')] = [4]
+_PRM[_k('/system/backup/manifest.txt')] = [2, 3, 4, 5, 6]
+_PRM[_k('/vault/backup/instructions.txt')] = [3, 4, 5]
+_PRM[_k('/recovery/metadata/operators.log')] = [1, 2, 3, 5]
+_PRM[_k('/recovery/metadata/keychain.dat')] = [1, 2, 3]
+_PRM[_k('/recovery/metadata/rebuild.sh')] = [4, 5, 6]
+_PRM[_k('/tmp/cache/history.log')] = [1, 2, 3, 4, 5, 7]
+_PRM[_k('/tmp/cache/.breadcrumb')] = [0, 1, 2, 3]
 
 /**
  * Get subdirectories of a path
  */
-function getSubdirs(path: string): string[] {
+function getSubdirs(path: string, phase?: number): string[] {
   const prefix = path === '/' ? '/' : `${path}/`
   const dirs = new Set<string>()
-  for (const key of Object.keys(FILESYSTEM)) {
-    if (key === path) continue
-    if (key.startsWith(prefix)) {
-      const rest = key.slice(prefix.length)
-      const firstSegment = rest.split('/')[0]
-      if (firstSegment) dirs.add(firstSegment)
+  const sources = phase === 2 ? [FILESYSTEM, _P2_FILES] : [FILESYSTEM]
+  for (const fs of sources) {
+    for (const key of Object.keys(fs)) {
+      if (key === path) continue
+      if (key.startsWith(prefix)) {
+        const rest = key.slice(prefix.length)
+        const firstSegment = rest.split('/')[0]
+        if (firstSegment) dirs.add(firstSegment)
+      }
     }
   }
   return [...dirs].sort()
@@ -439,7 +1040,7 @@ function getSubdirs(path: string): string[] {
 // Partition index — tier-gated segments
 const _LD1 = ['games', 'architecture', 'kaspa', 'business']
 const _LD2 = ['vault']
-const _LD3 = ['system', 'admin', 'root']  // tier-3 escalation targets
+const _LD3 = ['system', 'admin', 'root']  // tier-3
 const _LD4 = ['core']                      // maintenance partition
 
 function _chk(rootSeg: string, state: TerminalState, fullPath?: string): boolean {
@@ -480,7 +1081,7 @@ const ALL_COMMANDS = [
   'wao', 'backpack', 'money', 'sol', 'eth', 'btc',
   'pump', 'decentralize', 'node', 'fork', 'whale', 'rekt', 'dyor', 'nfa',
   'lambo', 'airdrop', 'seed', 'hash',
-  'dagknight', 'yonatan', 'silver', 'sompi', 'halving', 'maxsupply',
+  'dagknight', 'silver', 'sompi', 'halving', 'maxsupply',
   'cypu', 'cypuv', 'mainnet', 'admin', 'maintenance', 'root',
   '</3', 'h34r7l3s', 'call mama', 'call mom',
   'bus', 'shuttle', 'qbcore', 'framework', 'fivem', 'trevor', 'franklin',
@@ -493,7 +1094,7 @@ const ALL_COMMANDS = [
   'howdoyouturnthison', 'bigdaddy', 'wololo', 'aegis', 'marco', 'polo',
   'iddqd', 'konami', 'hesoyam', 'motherlode', 'rosebud',
   'ping', 'whoami', 'sudo', 'rm', 'man', 'grep', 'chmod',
-  'hack', 'decrypt', 'trace', 'scan', 'inject', 'exploit',
+  'hack', 'decrypt',
   'love', 'gfuel', '420', 'bruh', 'based', 'cope', 'ratio',
   'echo', 'history', 'touch', 'mkdir', 'find', 'which', 'env', 'alias',
   'ssh', 'curl', 'wget', 'python', 'vim', 'nano', 'emacs',
@@ -529,7 +1130,8 @@ export function getCompletions(input: string, state: TerminalState): { match: st
   const arg = parts.slice(1).join(' ').toLowerCase()
 
   if (cmd === 'cd') {
-    const subdirs = getSubdirs(state.cwd)
+    const _ph = state._phase ?? 1
+    const subdirs = getSubdirs(state.cwd, _ph)
     const matches = subdirs.filter(d => d.toLowerCase().startsWith(arg))
     if (matches.length === 1) return { match: `cd ${matches[0]}`, alternatives: [] }
     if (matches.length > 1) return { match: null, alternatives: matches }
@@ -537,8 +1139,10 @@ export function getCompletions(input: string, state: TerminalState): { match: st
   }
 
   if (cmd === 'cat') {
-    const files = FILESYSTEM[state.cwd]
-    if (!files) return { match: null, alternatives: [] }
+    const _ph = state._phase ?? 1
+    const files: Record<string, string> = { ...(FILESYSTEM[state.cwd] || {}) }
+    if (_ph === 2 && _P2_FILES[state.cwd]) Object.assign(files, _P2_FILES[state.cwd])
+    if (!Object.keys(files).length) return { match: null, alternatives: [] }
     const matches = Object.keys(files).filter(f => f.toLowerCase().startsWith(arg))
     if (matches.length === 1) return { match: `cat ${matches[0]}`, alternatives: [] }
     if (matches.length > 1) return { match: null, alternatives: matches }
@@ -578,20 +1182,21 @@ export function processDiagnosticCommand(
     const isRecursive = flags.includes('R')
     const isLong = flags.includes('l')
 
+    const _ph = state._phase ?? 1
     const rootSeg = target.split('/')[1]
-    if (_chk(rootSeg, state, target)) {
+    if (_ph === 1 && _chk(rootSeg, state, target)) {
       return { animated: false, output: ['ls: permission denied'], newState: state }
     }
-
-    const exists = target === '/' || FILESYSTEM[target] !== undefined || getSubdirs(target).length > 0
+    const exists = target === '/' || FILESYSTEM[target] !== undefined || (_ph === 2 && _P2_FILES[target] !== undefined) || getSubdirs(target, _ph).length > 0
     if (!exists) {
       return { animated: false, output: [`ls: ${lsArg || target}: No such directory`], newState: state }
     }
 
     // Helper: list a single directory
     const listDir = (path: string): string[] => {
-      const subdirs = getSubdirs(path)
-      const files = FILESYSTEM[path] ? Object.keys(FILESYSTEM[path]) : []
+      const subdirs = getSubdirs(path, _ph)
+      const _merged = { ...(FILESYSTEM[path] || {}), ...(_ph === 2 ? (_P2_FILES[path] || {}) : {}) }
+      const files = Object.keys(_merged)
       const lines: string[] = []
 
       for (const dir of subdirs) {
@@ -607,7 +1212,7 @@ export function processDiagnosticCommand(
       }
       for (const f of files) {
         if (isLong) {
-          const content = FILESYSTEM[path]?.[f] || ''
+          const content = _merged[f] || ''
           lines.push(`-rw-r--r--  ${String(content.length).padStart(4)}  ${f}`)
         } else {
           lines.push(f)
@@ -631,7 +1236,7 @@ export function processDiagnosticCommand(
         allLines.push(...listDir(dir))
         allLines.push('')
         // Queue subdirectories
-        for (const sub of getSubdirs(dir)) {
+        for (const sub of getSubdirs(dir, _ph)) {
           const fullSub = dir === '/' ? `/${sub}` : `${dir}/${sub}`
           const subRoot = fullSub.split('/')[1]
           if (!_chk(subRoot, state, fullSub)) {
@@ -652,10 +1257,11 @@ export function processDiagnosticCommand(
   if (command === 'tree') {
     const _root = arg ? resolvePath(state.cwd, arg) : state.cwd
     const _rootSeg = _root.split('/')[1]
-    if (_chk(_rootSeg, state, _root)) {
+    const _phT = state._phase ?? 1
+    if (_phT === 1 && _chk(_rootSeg, state, _root)) {
       return { animated: false, output: ['tree: permission denied'], newState: state }
     }
-    const _exists = _root === '/' || FILESYSTEM[_root] !== undefined || getSubdirs(_root).length > 0
+    const _exists = _root === '/' || FILESYSTEM[_root] !== undefined || (_phT === 2 && _P2_FILES[_root] !== undefined) || getSubdirs(_root, _phT).length > 0
     if (!_exists) {
       return { animated: false, output: [`tree: ${arg}: No such directory`], newState: state }
     }
@@ -664,13 +1270,14 @@ export function processDiagnosticCommand(
     let _dc = 0, _fc = 0
 
     const _walk = (dir: string, prefix: string) => {
-      const subdirs = getSubdirs(dir)
-      const files = FILESYSTEM[dir] ? Object.keys(FILESYSTEM[dir]) : []
+      const subdirs = getSubdirs(dir, _phT)
+      const _mergedT = { ...(FILESYSTEM[dir] || {}), ...(_phT === 2 ? (_P2_FILES[dir] || {}) : {}) }
+      const files = Object.keys(_mergedT)
       const entries: { name: string; isDir: boolean; locked: boolean; full: string }[] = []
 
       for (const d of subdirs) {
         const full = dir === '/' ? `/${d}` : `${dir}/${d}`
-        const locked = _chk(dir === '/' ? d : dir.split('/')[1], state, full)
+        const locked = _phT === 1 && _chk(dir === '/' ? d : dir.split('/')[1], state, full)
         entries.push({ name: d, isDir: true, locked, full })
       }
       for (const f of files) {
@@ -710,14 +1317,14 @@ export function processDiagnosticCommand(
     if (resolved === '/') {
       return { animated: false, output: [], newState: { ...state, cwd: '/' } }
     }
-    // Check if directory exists (has entry in FILESYSTEM or has subdirs)
-    const exists = FILESYSTEM[resolved] !== undefined || getSubdirs(resolved).length > 0
+    const _ph2 = state._phase ?? 1
+    const exists = FILESYSTEM[resolved] !== undefined || (_ph2 === 2 && _P2_FILES[resolved] !== undefined) || getSubdirs(resolved, _ph2).length > 0
     if (!exists) {
       return { animated: false, output: [`cd: no such directory: ${arg}`], newState: state }
     }
 
     const rootSegment = resolved.split('/')[1]
-    if (_chk(rootSegment, state, resolved)) {
+    if ((state._phase ?? 1) === 1 && _chk(rootSegment, state, resolved)) {
       return {
         animated: false,
         output: ['Access denied. Module locked.', '> Try harder.'],
@@ -761,15 +1368,15 @@ export function processDiagnosticCommand(
   }
 
   if (command === 'cat') {
+    const _ph3 = state._phase ?? 1
     if (!arg) {
-      const _cf = FILESYSTEM[state.cwd]
-      const _fk = _cf ? Object.keys(_cf) : []
+      const _merged3 = { ...(FILESYSTEM[state.cwd] || {}), ...(_ph3 === 2 ? (_P2_FILES[state.cwd] || {}) : {}) }
+      const _fk = Object.keys(_merged3)
       if (_fk.length > 0) {
         return { animated: false, output: ['Usage: cat <filename>', '', `Files here: ${_fk.join(', ')}`], newState: state }
       }
       return { animated: false, output: ['Usage: cat <filename>', '> No files in current directory. Try cd into a subdirectory.'], newState: state }
     }
-    // Support paths: cat /basics/readme.txt or cat ../basics/readme.txt
     let dir = state.cwd
     let filename = arg
     const lastSlash = arg.lastIndexOf('/')
@@ -779,20 +1386,38 @@ export function processDiagnosticCommand(
     }
 
     const rootSeg = dir.split('/')[1]
-    if (_chk(rootSeg, state, dir)) {
+    if (_ph3 === 1 && _chk(rootSeg, state, dir)) {
       return { animated: false, output: ['cat: permission denied'], newState: state }
     }
-    const files = FILESYSTEM[dir]
-    if (!files || !(filename in files)) {
-      const _avail = files ? Object.keys(files) : []
+    const _merged4 = { ...(FILESYSTEM[dir] || {}), ...(_ph3 === 2 ? (_P2_FILES[dir] || {}) : {}) }
+    if (!(filename in _merged4)) {
+      const _avail = Object.keys(_merged4)
       if (_avail.length > 0) {
         return { animated: false, output: [`cat: ${arg}: No such file`, '', `Available files: ${_avail.join(', ')}`], newState: state }
       }
       return { animated: false, output: [`cat: ${arg}: No such file`], newState: state }
     }
     const _fp = dir === '/' ? `/${filename}` : `${dir}/${filename}`
-    const _ln = '─'.repeat(Math.min(_fp.length + 4, 40))
-    return { animated: false, output: [_ln, `  ${_fp}`, _ln, '', ...files[filename].split('\n'), '', _ln], newState: state }
+    const _ln = '\u2500'.repeat(Math.min(_fp.length + 4, 40))
+    const rawLines = _merged4[filename].split('\n')
+    const outputLines = _ph3 === 2 ? _corrupt(rawLines, _k(_fp), state) : rawLines
+    return { animated: false, output: [_ln, `  ${_fp}`, _ln, '', ...outputLines, '', _ln], newState: state }
+  }
+
+  // _p2 dispatch
+  if ((state._phase ?? 1) === 2) {
+    if (command === 'help' || command === 'man') {
+      return { animated: false, output: ['Recovery shell has no manual.', '> Explore. Experiment. Observe.'], newState: state }
+    }
+    if (command === 'quiz') {
+      return { animated: false, output: ['Quiz module corrupted. Cannot load.'], newState: state }
+    }
+    // _p2 lookup
+    const _cmdHash = _k(command)
+    const _p2Match = _P2R.find(e => e._h === _cmdHash)
+    if (_p2Match) {
+      return _p2Match._fn(arg, state)
+    }
   }
 
   if (_k(normalized) === _u) {
@@ -915,28 +1540,28 @@ export function processDiagnosticCommand(
     }
   }
 
-  // Validation set — answer hashes (djb2)
+  // _vs
   const _VQ: { q: string; a: number[]; h: string }[] = [
-    { q: 'What consensus mechanism does Kaspa use?', a: [219536027], h: 'Parallel blocks, no orphans.' },
-    { q: 'What BPS target is Kaspa scaling towards?', a: [48625], h: 'Current is 10. Target is much higher.' },
-    { q: 'What language is the Kaspa node being rewritten in?', a: [3512292], h: 'The borrow checker is your friend.' },
-    { q: 'What mining algorithm does Kaspa use?', a: [768097866], h: 'Optical mining ready. Check /kaspa/research.' },
-    { q: 'What was the Minecraft server called?', a: [-392452228], h: 'Check /games/minecraft — look at the MOTD.' },
-    { q: 'What IT apprenticeship did the founder do? (industry)', a: [3016252], h: '2020-2023. Application developer track.' },
-    { q: 'What year did the founder first hear about Kaspa?', a: [1537278], h: 'Dismissed it at first. Check /kaspa/notes/timeline.' },
-    { q: 'What is the total max supply of $CYPU?', a: [1223331615, 1617, -611468976, 1454570930], h: 'One billion. Type the number or "1b".' },
-    { q: 'How many $CYPU were burned?', a: [-1983286850, 49647, -1096076662], h: '20 million. Type the number or "20m".' },
-    { q: 'What is the minting ratio of KAS to CYPU?', a: [49], h: 'Strict backing. 1 KAS = ? CYPU.' },
-    { q: 'What token standard is $CYPU built on?', a: [102309658, -1123372593], h: 'Kaspa\'s token standard.' },
-    { q: 'How many $CYPU for Intelligence Pro tier?', a: [1626587], h: 'Hold-to-access. No lockup. Lifetime.' },
-    { q: 'Why is the ICO capped at 70M? (one word)', a: [93496172], h: 'Small ICO = under regulatory thresholds.' },
-    { q: 'What is the solar mining + greenhouse concept called?', a: [-1911284299], h: 'Mine with the sun. Grow with the heat.' },
-    { q: 'The peg protects which token from losing value?', a: [95144667], h: 'CYPU must never be cheaper than the governance token.' },
-    { q: 'How many signers needed for the multi-sig wallet?', a: [51], h: '3 of 5. Geographic distribution.' },
-    { q: 'What EU regulation does the project align with?', a: [3351290], h: 'Markets in Crypto-Assets.' },
-    { q: 'What legal form is CyberSpace? (abbreviation)', a: [3176364], h: 'German limited liability company.' },
-    { q: 'What hardware wallet locks the 54M vault?', a: [-881025010], h: 'It classified $CYPU as "unsafe" — stronger than any vesting.' },
-    { q: 'Max $CYPU per minting batch?', a: [1507423], h: '1 transaction per user. Max per batch.' },
+    { q: _d('V2hhdCBjb25zZW5zdXMgbWVjaGFuaXNtIGRvZXMgS2FzcGEgdXNlPw=='), a: [219536027], h: _d('UGFyYWxsZWwgYmxvY2tzLCBubyBvcnBoYW5zLg==') },
+    { q: _d('V2hhdCBCUFMgdGFyZ2V0IGlzIEthc3BhIHNjYWxpbmcgdG93YXJkcz8='), a: [48625], h: _d('Q3VycmVudCBpcyAxMC4gVGFyZ2V0IGlzIG11Y2ggaGlnaGVyLg==') },
+    { q: _d('V2hhdCBsYW5ndWFnZSBpcyB0aGUgS2FzcGEgbm9kZSBiZWluZyByZXdyaXR0ZW4gaW4/'), a: [3512292], h: _d('VGhlIGJvcnJvdyBjaGVja2VyIGlzIHlvdXIgZnJpZW5kLg==') },
+    { q: _d('V2hhdCBtaW5pbmcgYWxnb3JpdGhtIGRvZXMgS2FzcGEgdXNlPw=='), a: [768097866], h: _d('T3B0aWNhbCBtaW5pbmcgcmVhZHkuIENoZWNrIC9rYXNwYS9yZXNlYXJjaC4=') },
+    { q: _d('V2hhdCB3YXMgdGhlIE1pbmVjcmFmdCBzZXJ2ZXIgY2FsbGVkPw=='), a: [-392452228], h: _d('Q2hlY2sgL2dhbWVzL21pbmVjcmFmdCDigJQgbG9vayBhdCB0aGUgTU9URC4=') },
+    { q: _d('V2hhdCBJVCBhcHByZW50aWNlc2hpcCBkaWQgdGhlIGZvdW5kZXIgZG8/IChpbmR1c3RyeSk='), a: [3016252], h: _d('MjAyMC0yMDIzLiBBcHBsaWNhdGlvbiBkZXZlbG9wZXIgdHJhY2su') },
+    { q: _d('V2hhdCB5ZWFyIGRpZCB0aGUgZm91bmRlciBmaXJzdCBoZWFyIGFib3V0IEthc3BhPw=='), a: [1537278], h: _d('RGlzbWlzc2VkIGl0IGF0IGZpcnN0LiBDaGVjayAva2FzcGEvbm90ZXMvdGltZWxpbmUu') },
+    { q: _d('V2hhdCBpcyB0aGUgdG90YWwgbWF4IHN1cHBseSBvZiAkQ1lQVT8='), a: [1223331615, 1617, -611468976, 1454570930], h: _d('T25lIGJpbGxpb24uIFR5cGUgdGhlIG51bWJlciBvciAiMWIiLg==') },
+    { q: _d('SG93IG1hbnkgJENZUFUgd2VyZSBidXJuZWQ/'), a: [-1983286850, 49647, -1096076662], h: _d('MjAgbWlsbGlvbi4gVHlwZSB0aGUgbnVtYmVyIG9yICIyMG0iLg==') },
+    { q: _d('V2hhdCBpcyB0aGUgbWludGluZyByYXRpbyBvZiBLQVMgdG8gQ1lQVT8='), a: [49], h: _d('U3RyaWN0IGJhY2tpbmcuIDEgS0FTID0gPyBDWVBVLg==') },
+    { q: _d('V2hhdCB0b2tlbiBzdGFuZGFyZCBpcyAkQ1lQVSBidWlsdCBvbj8='), a: [102309658, -1123372593], h: _d('S2FzcGEncyB0b2tlbiBzdGFuZGFyZC4=') },
+    { q: _d('SG93IG1hbnkgJENZUFUgZm9yIEludGVsbGlnZW5jZSBQcm8gdGllcj8='), a: [1626587], h: _d('SG9sZC10by1hY2Nlc3MuIE5vIGxvY2t1cC4gTGlmZXRpbWUu') },
+    { q: _d('V2h5IGlzIHRoZSBJQ08gY2FwcGVkIGF0IDcwTT8gKG9uZSB3b3JkKQ=='), a: [93496172], h: _d('U21hbGwgSUNPID0gdW5kZXIgcmVndWxhdG9yeSB0aHJlc2hvbGRzLg==') },
+    { q: _d('V2hhdCBpcyB0aGUgc29sYXIgbWluaW5nICsgZ3JlZW5ob3VzZSBjb25jZXB0IGNhbGxlZD8='), a: [-1911284299], h: _d('TWluZSB3aXRoIHRoZSBzdW4uIEdyb3cgd2l0aCB0aGUgaGVhdC4=') },
+    { q: _d('VGhlIHBlZyBwcm90ZWN0cyB3aGljaCB0b2tlbiBmcm9tIGxvc2luZyB2YWx1ZT8='), a: [95144667], h: _d('Q1lQVSBtdXN0IG5ldmVyIGJlIGNoZWFwZXIgdGhhbiB0aGUgZ292ZXJuYW5jZSB0b2tlbi4=') },
+    { q: _d('SG93IG1hbnkgc2lnbmVycyBuZWVkZWQgZm9yIHRoZSBtdWx0aS1zaWcgd2FsbGV0Pw=='), a: [51], h: _d('MyBvZiA1LiBHZW9ncmFwaGljIGRpc3RyaWJ1dGlvbi4=') },
+    { q: _d('V2hhdCBFVSByZWd1bGF0aW9uIGRvZXMgdGhlIHByb2plY3QgYWxpZ24gd2l0aD8='), a: [3351290], h: _d('TWFya2V0cyBpbiBDcnlwdG8tQXNzZXRzLg==') },
+    { q: _d('V2hhdCBsZWdhbCBmb3JtIGlzIEN5YmVyU3BhY2U/IChhYmJyZXZpYXRpb24p'), a: [3176364], h: _d('R2VybWFuIGxpbWl0ZWQgbGlhYmlsaXR5IGNvbXBhbnku') },
+    { q: _d('V2hhdCBoYXJkd2FyZSB3YWxsZXQgbG9ja3MgdGhlIDU0TSB2YXVsdD8='), a: [-881025010], h: _d('SXQgY2xhc3NpZmllZCAkQ1lQVSBhcyAidW5zYWZlIiDigJQgc3Ryb25nZXIgdGhhbiBhbnkgdmVzdGluZy4=') },
+    { q: _d('TWF4ICRDWVBVIHBlciBtaW50aW5nIGJhdGNoPw=='), a: [1507423], h: _d('MSB0cmFuc2FjdGlvbiBwZXIgdXNlci4gTWF4IHBlciBiYXRjaC4=') },
   ]
 
   if (command === 'quiz') {
@@ -1140,11 +1765,11 @@ export function processDiagnosticCommand(
       '> Rusty hands, golden commits.',
       '> GhostDAG whisperer.',
     ],
-    'yp': () => [
-      'Yonatan Sompolinsky.',
-      '> The brain behind the DAG.',
-      '> Proved that blocks don\'t need to wait in line.',
-      '> Performance is not a feature, it\'s the architecture.',
+    [_d('eXA=')]: () => [
+      _d('WW9uYXRhbiBTb21wb2xpbnNreS4='),
+      _d('PiBUaGUgYnJhaW4gYmVoaW5kIHRoZSBEQUcu'),
+      _d('PiBQcm92ZWQgdGhhdCBibG9ja3MgZG9uJ3QgbmVlZCB0byB3YWl0IGluIGxpbmUu'),
+      _d('PiBQZXJmb3JtYW5jZSBpcyBub3QgYSBmZWF0dXJlLCBpdCdzIHRoZSBhcmNoaXRlY3R1cmUu'),
     ],
     'lens': () => [
       'KaspaLens.',
@@ -1300,11 +1925,11 @@ export function processDiagnosticCommand(
       '> Adaptive. Responsive. Inevitable.',
       '> Some upgrades don\'t announce themselves.',
     ],
-    'yonatan': () => [
-      'Yonatan.',
-      '> Some people write papers.',
-      '> Some people change the rules.',
-      '> This one did both.',
+    [_d('eW9uYXRhbg==')]: () => [
+      _d('WW9uYXRhbi4='),
+      _d('PiBTb21lIHBlb3BsZSB3cml0ZSBwYXBlcnMu'),
+      _d('PiBTb21lIHBlb3BsZSBjaGFuZ2UgdGhlIHJ1bGVzLg=='),
+      _d('PiBUaGlzIG9uZSBkaWQgYm90aC4='),
     ],
     'silver': () => [
       'Silver.',
@@ -1688,25 +2313,25 @@ export function processDiagnosticCommand(
       '> The blockchain is already transparent.',
       '> That\'s the whole idea.',
     ],
-    'trace': () => [
+    [_d('dHJhY2U=')]: () => [
       'Tracing route to kas.me...',
       '> Hop 1: your browser',
       '> Hop 2: Cloudflare',
       '> Hop 3: here.',
       '> Connection: decentralized.',
     ],
-    'scan': () => [
+    [_d('c2Nhbg==')]: () => [
       'Scanning network...',
       '> Nodes found: thousands.',
       '> Status: healthy.',
       '> Consensus: GHOSTDAG.',
     ],
-    'inject': () => [
+    [_d('aW5qZWN0')]: () => [
       'SQL injection? XSS? Not here.',
       '> This terminal runs on vibes and state machines.',
       '> No database. No backend. Just React.',
     ],
-    'exploit': () => [
+    [_d('ZXhwbG9pdA==')]: () => [
       'No exploits found.',
       '> This system runs on trust and open source.',
       '> The only exploit is knowledge.',
