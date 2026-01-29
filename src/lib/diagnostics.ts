@@ -436,9 +436,6 @@ function getSubdirs(path: string): string[] {
   return [...dirs].sort()
 }
 
-// Root-level directory listing
-const ROOT_DIRS = getSubdirs('/')
-
 // Partition index — tier-gated segments
 const _LD1 = ['games', 'architecture', 'kaspa', 'business']
 const _LD2 = ['vault']
