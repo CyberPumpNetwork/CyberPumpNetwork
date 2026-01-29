@@ -480,6 +480,16 @@ const ALL_COMMANDS = [
   'wao', 'backpack', 'money', 'sol', 'eth', 'btc',
   'pump', 'decentralize', 'node', 'fork', 'whale', 'rekt', 'dyor', 'nfa',
   'lambo', 'airdrop', 'seed', 'hash',
+  'dagknight', 'yonatan', 'silver', 'sompi', 'halving', 'maxsupply',
+  'cypu', 'cypuv', 'mainnet', 'admin', 'maintenance', 'root',
+  '</3', 'h34r7l3s', 'call mama', 'call mom',
+  'bus', 'shuttle', 'qbcore', 'framework', 'fivem', 'trevor', 'franklin',
+  'michael', 'cj', 'grove', 'ballas', 'los santos', 'liberty city',
+  'respawn', 'headshot', 'clutch', 'gg', 'ez', 'noob', 'tryhard',
+  'creeper', 'enderman', 'nether', 'redstone', 'enchant', 'netherite',
+  'operationcwal', 'showmethemoney', 'noclip', 'idgaf', 'idkfa',
+  'poweroverwhelming', 'thereisnospoon', 'whosyourdaddy', 'iseedeadpeople',
+  'greedisgood', 'sv_cheats',
   'howdoyouturnthison', 'bigdaddy', 'wololo', 'aegis', 'marco', 'polo',
   'iddqd', 'konami', 'hesoyam', 'motherlode', 'rosebud',
   'ping', 'whoami', 'sudo', 'rm', 'man', 'grep', 'chmod',
@@ -548,10 +558,13 @@ export function processDiagnosticCommand(
   }
 
   if (command === 'ls') {
-    // Strip flags (ignore -la, -a, etc.)
-    const lsArg = arg.replace(/^-\S*\s*/, '').trim()
+    // Parse flags
+    const flagMatch = arg.match(/^(-\S*)\s*(.*)$/)
+    const flags = flagMatch ? flagMatch[1] : ''
+    const lsArg = flagMatch ? flagMatch[2].trim() : arg.trim()
     const target = lsArg ? resolvePath(state.cwd, lsArg) : state.cwd
-
+    const isRecursive = flags.includes('R')
+    const isLong = flags.includes('l')
 
     const rootSeg = target.split('/')[1]
     if (_chk(rootSeg, state, target)) {
@@ -560,26 +573,64 @@ export function processDiagnosticCommand(
 
     const exists = target === '/' || FILESYSTEM[target] !== undefined || getSubdirs(target).length > 0
     if (!exists) {
-      return { animated: false, output: [`ls: ${lsArg}: No such directory`], newState: state }
+      return { animated: false, output: [`ls: ${lsArg || target}: No such directory`], newState: state }
     }
 
-    const subdirs = getSubdirs(target)
-    const files = FILESYSTEM[target] ? Object.keys(FILESYSTEM[target]) : []
+    // Helper: list a single directory
+    const listDir = (path: string): string[] => {
+      const subdirs = getSubdirs(path)
+      const files = FILESYSTEM[path] ? Object.keys(FILESYSTEM[path]) : []
+      const lines: string[] = []
 
-    const lines: string[] = []
-    for (const dir of subdirs) {
-      const fullDir = target === '/' ? `/${dir}` : `${target}/${dir}`
-      const locked = _chk(target === '/' ? dir : target.split('/')[1], state, fullDir)
-      if (locked) {
-        lines.push(`[LOCKED]  ${dir}/`)
-      } else {
-        lines.push(`${dir}/`)
+      for (const dir of subdirs) {
+        const fullDir = path === '/' ? `/${dir}` : `${path}/${dir}`
+        const locked = _chk(path === '/' ? dir : path.split('/')[1], state, fullDir)
+        if (locked) {
+          lines.push(isLong
+            ? `drwx------  [LOCKED]  ${dir}/`
+            : `[LOCKED]  ${dir}/`)
+        } else {
+          lines.push(isLong ? `drwxr-xr-x  4096  ${dir}/` : `${dir}/`)
+        }
       }
-    }
-    for (const f of files) {
-      lines.push(f)
+      for (const f of files) {
+        if (isLong) {
+          const content = FILESYSTEM[path]?.[f] || ''
+          lines.push(`-rw-r--r--  ${String(content.length).padStart(4)}  ${f}`)
+        } else {
+          lines.push(f)
+        }
+      }
+      return lines
     }
 
+    if (isRecursive) {
+      // Recursive listing
+      const allLines: string[] = []
+      const queue = [target]
+      while (queue.length > 0) {
+        const dir = queue.shift()!
+        const dirRootSeg = dir.split('/')[1]
+        if (dir !== '/' && _chk(dirRootSeg, state, dir)) {
+          allLines.push(`${dir}:`, 'ls: permission denied', '')
+          continue
+        }
+        allLines.push(`${dir}:`)
+        allLines.push(...listDir(dir))
+        allLines.push('')
+        // Queue subdirectories
+        for (const sub of getSubdirs(dir)) {
+          const fullSub = dir === '/' ? `/${sub}` : `${dir}/${sub}`
+          const subRoot = fullSub.split('/')[1]
+          if (!_chk(subRoot, state, fullSub)) {
+            queue.push(fullSub)
+          }
+        }
+      }
+      return { animated: false, output: allLines, newState: state }
+    }
+
+    const lines = listDir(target)
     if (lines.length === 0) {
       return { animated: false, output: ['(empty)'], newState: state }
     }
@@ -1176,6 +1227,76 @@ export function processDiagnosticCommand(
       '> The algorithm that sees the light.',
       '> Literally.',
     ],
+    'dagknight': () => [
+      'DAGKnight.',
+      '> The protocol that needs no parameter tuning.',
+      '> Adaptive. Responsive. Inevitable.',
+      '> Some upgrades don\'t announce themselves.',
+    ],
+    'yonatan': () => [
+      'Yonatan.',
+      '> Some people write papers.',
+      '> Some people change the rules.',
+      '> This one did both.',
+    ],
+    'silver': () => [
+      'Silver.',
+      '> Not every metal needs to shine.',
+      '> Some just need to conduct.',
+      '> If you know, you know.',
+    ],
+    'sompi': () => [
+      '1 KAS = 100,000,000 sompi.',
+      '> The smallest unit. Named with intent.',
+      '> Every empire starts with a single grain.',
+    ],
+    'halving': () => [
+      'Kaspa doesn\'t halve. It smooths.',
+      '> Chromatic phase. Monthly reduction.',
+      '> No shock. No drama. Just math.',
+    ],
+    'maxsupply': () => [
+      '28.7 billion.',
+      '> Hard cap. No exceptions.',
+      '> Scarcity is a feature, not a bug.',
+      '> But whose supply are you really asking about?',
+    ],
+    'cypu': () => [
+      '$CYPU.',
+      '> Access. Not speculation.',
+      '> Hold it or don\'t. The code doesn\'t beg.',
+      '> Read the docs. Or don\'t. Your call.',
+    ],
+    'cypuv': () => [
+      '$CYPUV.',
+      '> Governance is earned, not given.',
+      '> You\'re closer than you think.',
+      '> Or maybe you\'re already inside.',
+    ],
+    'mainnet': () => [
+      'Mainnet.',
+      '> Live since 2021. No downtime.',
+      '> While others test, Kaspa runs.',
+      '> Production isn\'t a milestone. It\'s the default.',
+    ],
+    'admin': () => [
+      'admin: unrecognized credential.',
+      '> There are no admins in a decentralized system.',
+      '> But there are builders with access.',
+      '> Prove you\'re one of them.',
+    ],
+    'maintenance': () => [
+      'Maintenance window: NEVER.',
+      '> The DAG doesn\'t take breaks.',
+      '> Neither do we.',
+      '> But some systems... have scheduled downtime.',
+    ],
+    'root': () => [
+      'root: access denied.',
+      '> Escalation requires more than a word.',
+      '> Some doors open with knowledge, not keys.',
+      '> Keep digging.',
+    ],
     // === AoE cheats ===
     'howdoyouturnthison': () => [
       'VROOM VROOM.',
@@ -1267,6 +1388,223 @@ export function processDiagnosticCommand(
       '> Pattern found: build > talk',
       '> 1 match in /kaspa/why-kaspa.txt',
     ],
+    '</3': () => [
+      'Heartbroken.',
+      '> But the DAG keeps beating.',
+      '> 10 blocks per second. No pauses. No breaks.',
+      '> Even when it hurts.',
+    ],
+    'h34r7l3s': () => [
+      'H34R7L3S.',
+      '> No feelings. Only finality.',
+      '> Cold wallets. Cold code. Cold truth.',
+      '> The chain doesn\'t care. That\'s why it works.',
+    ],
+    // === GTA / FiveM ===
+    'bus': () => [
+      'Bus route not found.',
+      '> Public transport doesn\'t exist on the blockchain.',
+      '> Here we run nodes, not buses.',
+    ],
+    'shuttle': () => [
+      'Shuttle service suspended.',
+      '> No passengers. Only validators.',
+      '> Next departure: when you stop lurking.',
+    ],
+    'qbcore': () => [
+      'QBCore loaded.',
+      '> ox_inventory... ox_target... ox_lib...',
+      '> Lua scripting PTSD activated.',
+      '> At least Kaspa runs on Rust.',
+    ],
+    'framework': () => [
+      'Framework detected: life.',
+      '> No documentation. No support.',
+      '> Just vibes and deadlines.',
+    ],
+    'fivem': () => [
+      'FiveM server: OFFLINE.',
+      '> 30 players. 200 bugs. 0 donations.',
+      '> Running a RP server is a thankless job.',
+      '> Building kas.me is the sequel.',
+    ],
+    'trevor': () => [
+      'Trevor Phillips Industries.',
+      '> Volatile. Unpredictable. Effective.',
+      '> Reminds me of crypto Twitter.',
+    ],
+    'franklin': () => [
+      'Franklin.',
+      '> Started from the bottom.',
+      '> Lamar was wrong about everything.',
+      '> Except loyalty.',
+    ],
+    'michael': () => [
+      'Michael De Santa.',
+      '> Retired. Bored. Came back anyway.',
+      '> Some people can\'t stop building.',
+    ],
+    'cj': () => [
+      'All you had to do was follow the damn train, CJ.',
+      '> Big Smoke was the real enemy.',
+      '> In crypto: the real enemy is impatience.',
+    ],
+    'grove': () => [
+      'Grove Street. Home.',
+      '> At least it was before I messed everything up.',
+      '> Lesson: don\'t mess up your bags.',
+    ],
+    'ballas': () => [
+      'Ballas territory.',
+      '> Wrong side of the chain.',
+      '> We don\'t do purple here. We do teal.',
+    ],
+    'los santos': () => [
+      'Welcome to Los Santos.',
+      '> Where everyone pretends to be rich.',
+      '> Crypto Twitter is basically the same.',
+    ],
+    'liberty city': () => [
+      'Liberty City.',
+      '> Niko Bellic had one question:',
+      '> "What is the American Dream?"',
+      '> We have a better one: financial sovereignty.',
+    ],
+    // === Gaming culture ===
+    'respawn': () => [
+      'Respawning...',
+      '> In crypto there are no respawns.',
+      '> Guard your keys like your last life.',
+    ],
+    'headshot': () => [
+      'Headshot.',
+      '> Clean. Precise. One tap.',
+      '> Like a well-timed KAS buy.',
+    ],
+    'clutch': () => [
+      '1v5 clutch.',
+      '> No backup. No time. Pure instinct.',
+      '> That\'s what building in a bear market feels like.',
+    ],
+    'gg': () => [
+      'GG.',
+      '> Good game. Good grind.',
+      '> Now queue up for the next one.',
+    ],
+    'ez': () => [
+      'EZ.',
+      '> Nothing about this was easy.',
+      '> But we make it look like it.',
+    ],
+    'noob': () => [
+      'Everyone starts as a noob.',
+      '> The difference? Some keep playing.',
+      '> You\'re still here. That says enough.',
+    ],
+    'tryhard': () => [
+      'Tryhard detected.',
+      '> Good. The world needs more people who try.',
+      '> Casual doesn\'t ship products.',
+    ],
+    // === Minecraft ===
+    'creeper': () => [
+      'Ssssssss... BOOM.',
+      '> That\'s what happens to portfolios without research.',
+      '> DYOR or get blown up.',
+    ],
+    'enderman': () => [
+      'Don\'t look directly at it.',
+      '> Some things teleport when you stare too long.',
+      '> Like chart patterns.',
+    ],
+    'nether': () => [
+      'Entering the Nether.',
+      '> Hot. Dangerous. Full of gold.',
+      '> Sounds like a bull market.',
+    ],
+    'redstone': () => [
+      'Redstone engineering.',
+      '> The original smart contract.',
+      '> If you can build a CPU in Minecraft,',
+      '> you can understand a blockDAG.',
+    ],
+    'enchant': () => [
+      'Enchanting table: ᒷリ↸ᒷ∷ ⍑ᒷ∷ᒷ',
+      '> The galactic alphabet hides nothing.',
+      '> Neither does open source.',
+    ],
+    'netherite': () => [
+      'Netherite.',
+      '> Stronger than diamond. Fireproof.',
+      '> Like a conviction holder in a crash.',
+    ],
+    // === StarCraft / Warcraft / Source ===
+    'operationcwal': () => [
+      'Operation CWAL activated.',
+      '> Build speed: maximum.',
+      '> If only Rust compiled this fast.',
+      '> StarCraft veterans know the grind.',
+    ],
+    'showmethemoney': () => [
+      '+10,000 minerals. +10,000 gas.',
+      '> In StarCraft, resources are free.',
+      '> In crypto, they\'re earned.',
+      '> No cheat codes for conviction.',
+    ],
+    'poweroverwhelming': () => [
+      'God mode: ON.',
+      '> Your Archon is invincible.',
+      '> But markets are not.',
+      '> Stay humble. Stay building.',
+    ],
+    'thereisnospoon': () => [
+      'Unlimited energy.',
+      '> Matrix meets Warcraft III.',
+      '> Infinite mana won\'t save bad strategy.',
+      '> Same goes for infinite capital.',
+    ],
+    'whosyourdaddy': () => [
+      'Invincibility + one-hit kills.',
+      '> Warcraft III god mode.',
+      '> In real life: nobody is invincible.',
+      '> Build defenses. Stack conviction.',
+    ],
+    'iseedeadpeople': () => [
+      'Map hack activated.',
+      '> Full visibility.',
+      '> In crypto, the map is already open.',
+      '> It\'s called a block explorer.',
+    ],
+    'greedisgood': () => [
+      'greedisgood 999999.',
+      '> Gold and lumber overflow.',
+      '> Greed is not good in crypto.',
+      '> Patience is.',
+    ],
+    'noclip': () => [
+      'Noclip enabled.',
+      '> Walking through walls.',
+      '> In this terminal, there are no walls.',
+      '> Only doors you haven\'t found yet.',
+    ],
+    'idgaf': () => [
+      'IDGAF.',
+      '> Fair enough.',
+      '> The DAG doesn\'t care either.',
+      '> That\'s what makes it trustless.',
+    ],
+    'idkfa': () => [
+      'All weapons. All ammo. All keys.',
+      '> DOOM gave you everything.',
+      '> Kaspa gives you fairness.',
+      '> You still have to aim.',
+    ],
+    'sv_cheats': () => [
+      'sv_cheats 1',
+      '> Server-side cheats enabled.',
+      '> Except this isn\'t your server.',
+      '> And consensus doesn\'t have a console.',
+    ],
     'chmod': () => [
       'chmod 777: permission denied.',
       '> In decentralized systems, permissions are consensus.',
@@ -1344,7 +1682,220 @@ export function processDiagnosticCommand(
     ],
   }
 
-  const handler = responses[normalized]
+  // "call mama" (deutsch) / "call mom" (english) — animated cheat list Easter egg
+  if (normalized === 'call mama') {
+    return {
+      animated: true,
+      steps: [
+        { lines: ['Wähle...'], delayMs: 0 },
+        { lines: ['Wähle... ☎'], delayMs: 800, replaceLast: true },
+        { lines: ['Wähle... ☎ ☎'], delayMs: 600, replaceLast: true },
+        { lines: ['Wähle... ☎ ☎ ☎'], delayMs: 600, replaceLast: true },
+        { lines: [''], delayMs: 400 },
+        { lines: ['> Mama: "Ja hallo?"'], delayMs: 800 },
+        { lines: ['> Du: "Mama, ich häng in nem Terminal fest."'], delayMs: 1200 },
+        { lines: ['> Mama: "Hast du die Cheats probiert?"'], delayMs: 1500 },
+        { lines: ['> Du: "...welche Cheats?"'], delayMs: 1000 },
+        { lines: ['> Mama: "Na die von den Spielen. Du konntest die doch alle auswendig."'], delayMs: 1800 },
+        { lines: ['> Du: "Das war Age of Empires, Mama..."'], delayMs: 1200 },
+        { lines: ['> Mama: "Und GTA. Und StarCraft. Und dieses Ballerspiel."'], delayMs: 1500 },
+        { lines: ['> Mama: "Du hast immer die Codes gefunden."'], delayMs: 1200 },
+        { lines: ['> Mama: "Vielleicht hat dieses Terminal auch welche."'], delayMs: 1500 },
+        { lines: ['> Mama: "Und räum dein Zimmer auf."'], delayMs: 1200 },
+        { lines: [''], delayMs: 600 },
+        { lines: ['> Verbindung unterbrochen.'], delayMs: 800 },
+        { lines: [''], delayMs: 600 },
+        { lines: ['> ...'], delayMs: 800 },
+        { lines: ['> Sie wusste immer mehr als sie zugab.'], delayMs: 1200 },
+        { lines: [''], delayMs: 500 },
+        { lines: ['> CHEAT MEMORY DUMP:'], delayMs: 800 },
+        { lines: ['> ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░'], delayMs: 400 },
+        { lines: ['> ▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░'], delayMs: 300, replaceLast: true },
+        { lines: ['> ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░'], delayMs: 300, replaceLast: true },
+        { lines: ['> ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓'], delayMs: 300, replaceLast: true },
+        { lines: [''], delayMs: 400 },
+        { lines: ['  AoE:       howdoyouturnthison, bigdaddy, wololo, aegis'], delayMs: 600 },
+        { lines: ['  GTA:       hesoyam, grove, cj, trevor'], delayMs: 500 },
+        { lines: ['  StarCraft: operationcwal, showmethemoney, poweroverwhelming'], delayMs: 500 },
+        { lines: ['  Warcraft:  whosyourdaddy, iseedeadpeople, greedisgood'], delayMs: 500 },
+        { lines: ['  DOOM:      iddqd, idkfa'], delayMs: 500 },
+        { lines: ['  Sims:      rosebud, motherlode'], delayMs: 500 },
+        { lines: ['  Source:    noclip, sv_cheats'], delayMs: 500 },
+        { lines: [''], delayMs: 600 },
+        { lines: ['> ...aber welcher öffnet DIESE Tür?'], delayMs: 1200 },
+        { lines: ['> Vielleicht ist es keiner aus der Liste.'], delayMs: 1000 },
+        { lines: ['> Vielleicht war es nie ein Cheat.'], delayMs: 1000 },
+        { lines: ['> Vielleicht ist es einfach... ein Wort das zählt.'], delayMs: 1200 },
+      ],
+      newState: state,
+    }
+  }
+
+  if (normalized === 'call mom') {
+    return {
+      animated: true,
+      steps: [
+        { lines: ['Dialing...'], delayMs: 0 },
+        { lines: ['Dialing... ☎'], delayMs: 800, replaceLast: true },
+        { lines: ['Dialing... ☎ ☎'], delayMs: 600, replaceLast: true },
+        { lines: ['Dialing... ☎ ☎ ☎'], delayMs: 600, replaceLast: true },
+        { lines: [''], delayMs: 400 },
+        { lines: ['> Mom: "Hello?"'], delayMs: 800 },
+        { lines: ['> You: "Mom, I\'m stuck in a terminal."'], delayMs: 1200 },
+        { lines: ['> Mom: "Have you tried the cheats?"'], delayMs: 1500 },
+        { lines: ['> You: "...what cheats?"'], delayMs: 1000 },
+        { lines: ['> Mom: "The ones from the games. You used to know them all."'], delayMs: 1800 },
+        { lines: ['> You: "That was Age of Empires..."'], delayMs: 1200 },
+        { lines: ['> Mom: "And GTA. And StarCraft. And DOOM."'], delayMs: 1500 },
+        { lines: ['> Mom: "You always found the codes."'], delayMs: 1200 },
+        { lines: ['> Mom: "Maybe this terminal has some too."'], delayMs: 1500 },
+        { lines: [''], delayMs: 600 },
+        { lines: ['> connection lost.'], delayMs: 800 },
+        { lines: [''], delayMs: 600 },
+        { lines: ['> ...'], delayMs: 800 },
+        { lines: ['> She always knew more than she let on.'], delayMs: 1200 },
+        { lines: [''], delayMs: 500 },
+        { lines: ['> CHEAT MEMORY DUMP:'], delayMs: 800 },
+        { lines: ['> ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░'], delayMs: 400 },
+        { lines: ['> ▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░'], delayMs: 300, replaceLast: true },
+        { lines: ['> ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░'], delayMs: 300, replaceLast: true },
+        { lines: ['> ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓'], delayMs: 300, replaceLast: true },
+        { lines: [''], delayMs: 400 },
+        { lines: ['  AoE:       howdoyouturnthison, bigdaddy, wololo, aegis'], delayMs: 600 },
+        { lines: ['  GTA:       hesoyam, grove, cj, trevor'], delayMs: 500 },
+        { lines: ['  StarCraft: operationcwal, showmethemoney, poweroverwhelming'], delayMs: 500 },
+        { lines: ['  Warcraft:  whosyourdaddy, iseedeadpeople, greedisgood'], delayMs: 500 },
+        { lines: ['  DOOM:      iddqd, idkfa'], delayMs: 500 },
+        { lines: ['  Sims:      rosebud, motherlode'], delayMs: 500 },
+        { lines: ['  Source:    noclip, sv_cheats'], delayMs: 500 },
+        { lines: [''], delayMs: 600 },
+        { lines: ['> ...but which one opens THIS door?'], delayMs: 1200 },
+        { lines: ['> Maybe it\'s not in the list.'], delayMs: 1000 },
+        { lines: ['> Maybe it never was a cheat.'], delayMs: 1000 },
+        { lines: ['> Maybe it\'s just... a word that matters.'], delayMs: 1200 },
+      ],
+      newState: state,
+    }
+  }
+
+  // sudo with argument: realistic denial
+  if (command === 'sudo' && arg) {
+    const innerParts = arg.split(/\s+/)
+    const innerCmd = innerParts[0].toLowerCase()
+    const innerArg = innerParts.slice(1).join(' ')
+    if (innerCmd === 'rm' && arg.toLowerCase().includes('-rf')) {
+      return { animated: false, output: [
+        '[sudo] password for anon: ********',
+        'rm: you really sudo rm -rf\'d a stranger\'s terminal.',
+        '> Balls of steel. Brain of mush.',
+        '> Denied. But we respect the audacity.',
+      ], newState: state }
+    }
+    if (innerCmd === 'su' || innerArg.includes('root')) {
+      return { animated: false, output: [
+        '[sudo] password for anon: ********',
+        'su: authentication failure.',
+        '> Root doesn\'t exist here.',
+        '> In decentralized systems, nobody is root.',
+        '> That\'s the whole point.',
+      ], newState: state }
+    }
+    return { animated: false, output: [
+      '[sudo] password for anon: ********',
+      'Sorry, user anon is not in the sudoers file.',
+      '> This incident will be reported.',
+      '> Just kidding. But also: no.',
+      '> There is no sudo in a trustless system.',
+    ], newState: state }
+  }
+
+  // cat with system paths (pro users probing the filesystem)
+  if (command === 'cat' && arg && /^\/?(?:etc|proc|dev|var|tmp|sys)\//.test(arg)) {
+    const fakeFiles: Record<string, string[]> = {
+      '/etc/passwd': [
+        'root:x:0:0:kas.me:/root:/bin/dag',
+        'anon:x:1000:1000:curious:/home/anon:/bin/explore',
+        'satoshi:x:1337:1337:gone:/dev/null:/sbin/nologin',
+        '> Classic move. We respect it.',
+      ],
+      '/etc/shadow': [
+        'cat: /etc/shadow: Permission denied.',
+        '> Even in a fake terminal, we respect permissions.',
+      ],
+      '/etc/hosts': [
+        '127.0.0.1  localhost',
+        '127.0.0.1  kas.me',
+        '0.0.0.0    fud.io',
+        '0.0.0.0    shitcoin.exchange',
+        '> Some hosts are blocked by conviction.',
+      ],
+      '/proc/cpuinfo': [
+        'processor  : 0',
+        'model name : kHeavyHash ASIC v3',
+        'cpu MHz    : over 9000',
+        'bogomips   : not enough',
+        '> This CPU mines blocks, not data.',
+      ],
+      '/dev/null': [
+        '> You just tried to read nothing.',
+        '> /dev/null: where FUD goes to die.',
+      ],
+      '/dev/random': [
+        '4. // chosen by fair dice roll.',
+        '   // guaranteed to be random.',
+        '> xkcd #221. A person of culture.',
+      ],
+      '/dev/urandom': [
+        'kHeavyHash output stream:',
+        '> a3f7c2...9b1d04...e8f2a1...',
+        '> Randomness is easy. Consensus is hard.',
+      ],
+      '/var/log/syslog': [
+        'Jan 29 03:14:15 kas.me kernel: blockDAG online',
+        'Jan 29 03:14:15 kas.me ghostdag: consensus healthy',
+        'Jan 29 03:14:16 kas.me anon: someone is snooping',
+        '> Busted. But we like the initiative.',
+      ],
+    }
+    const normalizedPath = arg.startsWith('/') ? arg.toLowerCase() : `/${arg.toLowerCase()}`
+    const content = fakeFiles[normalizedPath]
+    if (content) {
+      return { animated: false, output: content, newState: state }
+    }
+    return { animated: false, output: [
+      `cat: ${arg}: No such file or directory`,
+      '> This filesystem is sandboxed.',
+      '> But your instincts are solid. @CyberPumpNet on X',
+    ], newState: state }
+  }
+
+  // chmod/chown with arguments
+  if ((command === 'chmod' || command === 'chown') && arg) {
+    return { animated: false, output: [
+      `${command}: changing permissions of '${arg.split(/\s+/).pop()}': Operation not permitted`,
+      '> Permissions here are consensus-based.',
+      `> You don't ${command}. The network decides.`,
+    ], newState: state }
+  }
+
+  // grep with argument: special handling
+  if (command === 'grep' && arg) {
+    if (arg.toLowerCase() === 'rabbit') {
+      return { animated: false, output: [
+        'grep: rabbit: no direct match.',
+        '> But rabbits follow holes.',
+        '> And holes follow cheats.',
+        '> Try cheating.',
+      ], newState: state }
+    }
+    return { animated: false, output: [
+      `grep: searching for '${arg}'...`,
+      '> 0 results. But nice pattern.',
+      '> This filesystem is smaller than you think.',
+    ], newState: state }
+  }
+
+  const handler = responses[normalized] || (command !== normalized ? responses[command] : undefined)
   if (handler) {
     return { animated: false, output: handler(), newState: state }
   }
