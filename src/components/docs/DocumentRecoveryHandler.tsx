@@ -508,7 +508,7 @@ function DiagnosticOverlay({
     _stp('f1')
   }, [])
 
-  const runAnimation = useCallback(async (result: CommandResult & { animated: true }, prompt: string) => {
+  const runAnimation = useCallback(async (result: CommandResult & { animated: true }) => {
     setAnimating(true)
     setTermState(result.newState)
 
@@ -634,7 +634,7 @@ function DiagnosticOverlay({
           setOutputStart(prev.length)
           return [...prev, `${prompt} ${cmd}`]
         })
-        runAnimation(result, prompt)
+        runAnimation(result)
       } else {
         setTermState(result.newState)
         setHistory(prev => {
