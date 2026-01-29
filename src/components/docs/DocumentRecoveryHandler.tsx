@@ -168,7 +168,8 @@ function DiagnosticOverlay({
   const [termState, setTermState] = useState<TerminalState>({ cwd: '/', _l1: false, _l2: false })
   const [animating, setAnimating] = useState(false)
   const [copyFeedback, setCopyFeedback] = useState<'idle' | 'ok' | 'fail'>('idle')
-  const [_tp, _stp] = useState<'idle' | 'p1' | 'p2' | 'p3' | 'p4' | 'r1' | 'r2' | 'r3' | 'r4' | 'b1' | 'b2' | 'b3' | 'b4' | 'f1' | 'f2'>('idle')
+  const [_tp, _stp] = useState<'idle' | 'p1' | 'p2' | 'p3' | 'p4' | 'r1' | 'r2' | 'r3' | 'r4' | 'b1' | 'b2' | 'b3' | 'b4' | 'f1' | 'f2' | 'j1' | 'j2' | 'j3' | 'l1' | 'l2' | 'n1' | 'n2' | 'n3' | 'n4' | 'n5'>('idle')
+  const [_sy, _ssy] = useState(0)
   const [_ox, _sox] = useState(-50)
   const [_ofr, _sofr] = useState(0)
   const [_rx, _srx] = useState(700)
@@ -184,6 +185,7 @@ function DiagnosticOverlay({
   // Command history for arrow-up/down navigation
   const cmdHistoryRef = useRef<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
+  const _t0Ref = useRef(Date.now())
 
   // Diagnostic visualization state
   const [spriteState, setSpriteState] = useState({ x: -40, step: 0 })
@@ -417,6 +419,216 @@ function DiagnosticOverlay({
       }, 1200)
       return () => clearTimeout(timer)
     }
+
+    // j1: convergence sequence with vertical offset compensation
+    if (_tp === 'j1') {
+      // const _AX = _axRef.current
+      // const _SW2 = 14 * 3
+      // const _BW2 = 18 * 3
+      // No-halt passthrough — assets bypass anchor point
+      const carEnd = 700
+      const busEnd = 700
+      const rocketEnd = -80
+      const { _a: carS, _b: busS, _c: rocketS } = _fStartRef.current
+      const totalTicks = 60
+      const carSpeed = (carEnd - carS) / totalTicks
+      const busSpeed = (busEnd - busS) / totalTicks
+      const rocketSpeed = (rocketS - rocketEnd) / totalTicks
+      // Vertical offset curve parameters
+      const _vs = 12
+      // const _vp = 30
+      const _ve = 48
+      const _vh = 50
+      let tick = 0
+      const interval = setInterval(() => {
+        tick++
+        if (tick >= totalTicks) {
+          _sox(carEnd)
+          _sbx(busEnd)
+          _srx(rocketEnd)
+          _ssy(0)
+          clearInterval(interval)
+          _stp('j2')
+          return
+        }
+        _sox(Math.round(carS + carSpeed * tick))
+        _sbx(Math.round(busS + busSpeed * tick))
+        _srx(Math.round(rocketS - rocketSpeed * tick))
+        _sofr(prev => (prev + 1) % _SQ2.length)
+        _sbfr(prev => (prev + 1) % _SQ4.length)
+        _srfr(prev => (prev + 1) % _SQ3.length)
+        // Quadratic offset interpolation
+        if (tick >= _vs && tick <= _ve) {
+          const _mid = (_vs + _ve) / 2
+          const _t = (tick - _mid) / (_mid - _vs)
+          _ssy(Math.round(_vh * (1 - _t * _t)))
+        } else {
+          _ssy(0)
+        }
+      }, 35)
+      return () => clearInterval(interval)
+    }
+
+    // j2: post-offset recovery frames
+    if (_tp === 'j2') {
+      _ssy(0)
+      const frames = [_TF.FLAT, _TF.RECOVERING, 3, 4, 0]
+      let i = 0
+      const interval = setInterval(() => {
+        if (i >= frames.length) {
+          clearInterval(interval)
+          _stp('j3')
+          return
+        }
+        setSpriteState(prev => ({ ...prev, step: i }))
+        i++
+      }, 300)
+      setSpriteState(prev => ({ ...prev, step: 0 }))
+      return () => clearInterval(interval)
+    }
+
+    // j3: reset and resume
+    if (_tp === 'j3') {
+      _ssy(0)
+      setAnimating(false)
+      setTimeout(() => inputRef.current?.focus(), 50)
+      _stp('idle')
+    }
+
+    // l1: multi-vehicle convergence — all assets from left
+    if (_tp === 'l1') {
+      const _AX = _axRef.current
+      const _SW2 = 14 * 3
+      const carTarget = _AX - _SW2
+      const { _a: carS, _b: busS, _c: rocketS } = _fStartRef.current
+      const totalTicks = 40
+      const carSpeed = (carTarget - carS) / totalTicks
+      const busSpeed = (carTarget - _SW2 - busS) / totalTicks
+      const rocketSpeed = (carTarget + _SW2 - rocketS) / totalTicks
+      let tick = 0
+      const interval = setInterval(() => {
+        tick++
+        if (tick >= totalTicks) {
+          _sox(carTarget)
+          _sbx(carTarget - _SW2)
+          _srx(carTarget + _SW2)
+          clearInterval(interval)
+          _stp('l2')
+          return
+        }
+        _sox(Math.round(carS + carSpeed * tick))
+        _sbx(Math.round(busS + busSpeed * tick))
+        _srx(Math.round(rocketS + rocketSpeed * tick))
+        _sofr(prev => (prev + 1) % _SQ2.length)
+        _sbfr(prev => (prev + 1) % _SQ2.length)
+        _srfr(prev => (prev + 1) % _SQ2.length)
+      }, 35)
+      return () => clearInterval(interval)
+    }
+
+    // l2: impact — terminal teardown
+    if (_tp === 'l2') {
+      setSpriteState(prev => ({ ...prev, step: 0 }))
+      const timer = setTimeout(() => {
+        onClose()
+      }, 1200)
+      return () => clearTimeout(timer)
+    }
+
+    // n1: approach vector — horizontal asset from right
+    if (_tp === 'n1') {
+      const _AX = _axRef.current
+      // const _RW = 14 * 3
+      const rocketTarget = _AX + 12 * 3
+      const { _c: rocketS } = _fStartRef.current
+      const totalTicks = 35
+      const rocketSpeed = (rocketS - rocketTarget) / totalTicks
+      let tick = 0
+      const interval = setInterval(() => {
+        tick++
+        if (tick >= totalTicks) {
+          _srx(rocketTarget)
+          clearInterval(interval)
+          _stp('n2')
+          return
+        }
+        _srx(Math.round(rocketS - rocketSpeed * tick))
+        _srfr(prev => (prev + 1) % _SQ3.length)
+      }, 40)
+      return () => clearInterval(interval)
+    }
+
+    // n2: vertical launch — rapid ascent
+    if (_tp === 'n2') {
+      let tick = 0
+      const totalTicks = 20
+      const maxHeight = 250
+      const interval = setInterval(() => {
+        tick++
+        if (tick >= totalTicks) {
+          _ssy(maxHeight)
+          clearInterval(interval)
+          _stp('n3')
+          return
+        }
+        const _t = tick / totalTicks
+        _ssy(Math.round(maxHeight * _t * _t))
+      }, 50)
+      // secondary asset continues drift
+      const rInterval = setInterval(() => {
+        _srx(prev => prev - 8)
+        _srfr(prev => (prev + 1) % _SQ3.length)
+      }, 40)
+      return () => { clearInterval(interval); clearInterval(rInterval) }
+    }
+
+    // n3: apex hold — orbital pause
+    if (_tp === 'n3') {
+      const timer = setTimeout(() => {
+        _stp('n4')
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+
+    // n4: descent — gravity return with impact
+    if (_tp === 'n4') {
+      let tick = 0
+      const totalTicks = 15
+      const startHeight = 250
+      const interval = setInterval(() => {
+        tick++
+        if (tick >= totalTicks) {
+          _ssy(0)
+          clearInterval(interval)
+          _stp('n5')
+          return
+        }
+        const _t = tick / totalTicks
+        _ssy(Math.round(startHeight * (1 - _t * _t)))
+      }, 40)
+      return () => clearInterval(interval)
+    }
+
+    // n5: impact recovery — ground state restoration
+    if (_tp === 'n5') {
+      _ssy(0)
+      setHistory(prev => [...prev, '> ...', '> Ouch.', '> Gravity wins. Always.', ''])
+      const frames = [_TF.FLAT, _TF.FLAT, _TF.FLAT, _TF.RECOVERING, _TF.RECOVERING, 3, 4, 0]
+      let i = 0
+      const interval = setInterval(() => {
+        if (i >= frames.length) {
+          clearInterval(interval)
+          setAnimating(false)
+          setTimeout(() => inputRef.current?.focus(), 50)
+          _stp('idle')
+          return
+        }
+        setSpriteState(prev => ({ ...prev, step: i }))
+        i++
+      }, 400)
+      setSpriteState(prev => ({ ...prev, step: 0 }))
+      return () => clearInterval(interval)
+    }
   }, [_tp])
 
   // Initialize terminal
@@ -508,13 +720,63 @@ function DiagnosticOverlay({
     _stp('f1')
   }, [])
 
+  // Bulk asset convergence — multi-lane approach
+  const _rn6 = useCallback(() => {
+    const currentX = spriteXRef.current
+    _axRef.current = currentX
+    const carStart = Math.min(-60, currentX - 280)
+    const busStart = Math.min(-130, currentX - 350)
+    const rocketStart = Math.min(-200, currentX - 420)
+    _fStartRef.current = { _a: carStart, _b: busStart, _c: rocketStart }
+    _sox(carStart)
+    _sofr(0)
+    _sbx(busStart)
+    _sbfr(0)
+    _srx(rocketStart)
+    _srfr(0)
+    _stp('l1')
+  }, [])
+
+  // Trajectory escape — vertical launch sequence
+  const _rn7 = useCallback(() => {
+    const currentX = spriteXRef.current
+    _axRef.current = currentX
+    const rocketStart = Math.max(650, currentX + 300)
+    _fStartRef.current = { _a: 0, _b: 0, _c: rocketStart }
+    _srx(rocketStart)
+    _srfr(0)
+    _ssy(0)
+    _stp('n1')
+  }, [])
+
+  // Alternate recovery path — vertical offset sequence
+  const _rn5 = useCallback(() => {
+    const currentX = spriteXRef.current
+    _axRef.current = currentX
+    const carStart = Math.min(-60, currentX - 250)
+    const busStart = Math.min(-130, currentX - 320)
+    const rocketStart = Math.max(650, currentX + 250)
+    _fStartRef.current = { _a: carStart, _b: busStart, _c: rocketStart }
+    _sox(carStart)
+    _sofr(0)
+    _sbx(busStart)
+    _sbfr(0)
+    _srx(rocketStart)
+    _srfr(0)
+    _ssy(0)
+    _stp('j1')
+  }, [])
+
   const runAnimation = useCallback(async (result: CommandResult & { animated: true }) => {
     setAnimating(true)
     setTermState(result.newState)
 
     const isClose = '_close' in result && result._close
+    const isJump = '_jump' in result && result._jump
+    const _isML = '_lambo' in result && result._lambo
+    const _isTR = '_moon' in result && result._moon
 
-    if (!isClose) {
+    if (!isClose && !isJump && !_isML && !_isTR) {
       if ((result.newState._q ?? 0) >= 20 && (termState._q ?? 0) < 20) {
         _rn3()
       } else if (result.newState._l2 && !termState._l2) {
@@ -548,6 +810,21 @@ function DiagnosticOverlay({
       return
     }
 
+    if (isJump) {
+      _rn5()
+      return
+    }
+
+    if (_isML) {
+      _rn6()
+      return
+    }
+
+    if (_isTR) {
+      _rn7()
+      return
+    }
+
     setHistory(prev => [...prev, ''])
     setAnimating(false)
     setTimeout(() => inputRef.current?.focus(), 50)
@@ -555,6 +832,25 @@ function DiagnosticOverlay({
 
   const handleCommand = (e: React.KeyboardEvent) => {
     if (animating) return
+
+    // Ctrl-sequence passthrough for input state reset
+    if (e.ctrlKey && e.key === 'c') {
+      e.preventDefault()
+      setHistory(prev => { setOutputStart(prev.length); return [...prev, `${termState.cwd} $ ${input}^C`] })
+      setInput('')
+      return
+    }
+    if (e.ctrlKey && e.key === 'l') {
+      e.preventDefault()
+      setHistory([])
+      setOutputStart(0)
+      return
+    }
+    if (e.ctrlKey && e.key === 'u') {
+      e.preventDefault()
+      setInput('')
+      return
+    }
 
     if (e.key === 'ArrowUp') {
       e.preventDefault()
@@ -581,8 +877,12 @@ function DiagnosticOverlay({
 
     if (e.key === 'Tab') {
       e.preventDefault()
-      const completed = getCompletions(input, termState)
-      if (completed) setInput(completed)
+      const { match, alternatives } = getCompletions(input, termState)
+      if (match) {
+        setInput(match)
+      } else if (alternatives.length > 0) {
+        setHistory(prev => [...prev, `${termState.cwd} $ ${input}`, alternatives.join('  ')])
+      }
       return
     }
 
@@ -595,7 +895,37 @@ function DiagnosticOverlay({
         return
       }
 
-      const cmd = input.trim()
+      let cmd = input.trim()
+
+      // resolve ref-token substitution from input buffer
+      const _bangN = cmd.match(/^!(\d+)$/)
+      if (_bangN) {
+        const _idx = parseInt(_bangN[1], 10) - 1
+        const _ref = cmdHistoryRef.current[_idx]
+        if (_ref) {
+          cmd = _ref
+        } else {
+          setHistory(prev => {
+            setOutputStart(prev.length)
+            return [...prev, `${termState.cwd} $ ${input.trim()}`, `!${_bangN[1]}: event not found`]
+          })
+          setInput('')
+          return
+        }
+      } else if (cmd.includes('!!')) {
+        const _prev = cmdHistoryRef.current[cmdHistoryRef.current.length - 1]
+        if (_prev) {
+          cmd = cmd.replace('!!', _prev)
+        } else {
+          setHistory(prev => {
+            setOutputStart(prev.length)
+            return [...prev, `${termState.cwd} $ ${input.trim()}`, '!!: event not found']
+          })
+          setInput('')
+          return
+        }
+      }
+
       cmdHistoryRef.current = [...cmdHistoryRef.current, cmd].slice(-50)
       setHistoryIndex(-1)
 
@@ -626,7 +956,7 @@ function DiagnosticOverlay({
         return
       }
 
-      const result = processDiagnosticCommand(cmd, termState)
+      const result = processDiagnosticCommand(cmd, termState, cmdHistoryRef.current, _t0Ref.current)
       setInput('')
 
       if (result.animated) {
@@ -754,14 +1084,21 @@ function DiagnosticOverlay({
                 {/* Sprite layer */}
                 {(() => {
                   let _fi: number
-                  if (_tp === 'f2') {
+                  if (_tp === 'f2' || _tp === 'l2') {
                     _fi = _TF.FLAT
+                  } else if (_tp === 'j1') {
+                    _fi = _sy > 30 ? 3 : _sy > 10 ? 2 : _sy > 0 ? 4 : 0
+                  } else if (_tp === 'n2' || _tp === 'n3' || _tp === 'n4') {
+                    _fi = _sy > 200 ? 3 : _sy > 100 ? 2 : _sy > 30 ? 3 : _sy > 0 ? 4 : 0
+                  } else if (_tp === 'j2' || _tp === 'n5') {
+                    const recoverFrames = [_TF.FLAT, _TF.RECOVERING, 3, 4, 0]
+                    _fi = recoverFrames[Math.max(0, Math.min(spriteState.step, recoverFrames.length - 1))]
                   } else if (_tp === 'p2' || _tp === 'p3' || _tp === 'r2' || _tp === 'r3' || _tp === 'b2' || _tp === 'b3') {
                     _fi = _TF.FLAT
                   } else if (_tp === 'p4' || _tp === 'r4' || _tp === 'b4') {
                     const recoverFrames = [_TF.FLAT, _TF.RECOVERING, 3, 4, 0]
                     _fi = recoverFrames[Math.max(0, Math.min(spriteState.step, recoverFrames.length - 1))]
-                  } else if (_tp === 'p1' || _tp === 'r1' || _tp === 'b1' || _tp === 'f1') {
+                  } else if (_tp === 'p1' || _tp === 'r1' || _tp === 'b1' || _tp === 'f1' || _tp === 'l1' || _tp === 'n1') {
                     _fi = 0
                   } else {
                     const idx = ((spriteState.step % DIAGNOSTIC_SEQUENCE.length) + DIAGNOSTIC_SEQUENCE.length) % DIAGNOSTIC_SEQUENCE.length
@@ -773,7 +1110,7 @@ function DiagnosticOverlay({
                     <>
                       <div
                         className="absolute bottom-8 pointer-events-none z-0"
-                        style={{ left: `${spriteState.x}px` }}
+                        style={{ left: `${spriteState.x}px`, transform: _sy > 0 ? `translateY(-${_sy}px)` : undefined, transition: (_tp === 'j1' || _tp === 'n2' || _tp === 'n4') ? 'none' : undefined }}
                       >
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 3px)', gap: 0 }}>
                           {DIAGNOSTIC_PATTERNS[_fi].flat().map((pixel, i) => (
@@ -781,7 +1118,7 @@ function DiagnosticOverlay({
                           ))}
                         </div>
                       </div>
-                      {(_tp === 'p1' || _tp === 'p2' || _tp === 'p3' || _tp === 'p4' || _tp === 'f1' || _tp === 'f2') && (
+                      {(_tp === 'p1' || _tp === 'p2' || _tp === 'p3' || _tp === 'p4' || _tp === 'f1' || _tp === 'f2' || _tp === 'j1' || _tp === 'j2' || _tp === 'l1' || _tp === 'l2') && (
                         <div
                           className="absolute bottom-8 pointer-events-none z-10"
                           style={{ left: `${_ox}px` }}
@@ -793,7 +1130,7 @@ function DiagnosticOverlay({
                           </div>
                         </div>
                       )}
-                      {(_tp === 'r1' || _tp === 'r2' || _tp === 'r3' || _tp === 'r4' || _tp === 'f1' || _tp === 'f2') && (
+                      {(_tp === 'r1' || _tp === 'r2' || _tp === 'r3' || _tp === 'r4' || _tp === 'f1' || _tp === 'f2' || _tp === 'j1' || _tp === 'j2' || _tp === 'n1' || _tp === 'n2') && (
                         <div
                           className="absolute bottom-8 pointer-events-none z-10"
                           style={{ left: `${_rx}px` }}
@@ -805,7 +1142,7 @@ function DiagnosticOverlay({
                           </div>
                         </div>
                       )}
-                      {(_tp === 'b1' || _tp === 'b2' || _tp === 'b3' || _tp === 'b4' || _tp === 'f1' || _tp === 'f2') && (
+                      {(_tp === 'b1' || _tp === 'b2' || _tp === 'b3' || _tp === 'b4' || _tp === 'f1' || _tp === 'f2' || _tp === 'j1' || _tp === 'j2') && (
                         <div
                           className="absolute bottom-8 pointer-events-none z-10"
                           style={{ left: `${_bx}px` }}
@@ -816,6 +1153,31 @@ function DiagnosticOverlay({
                             ))}
                           </div>
                         </div>
+                      )}
+                      {/* Multi-lane convergence overlay — secondary asset slots */}
+                      {(_tp === 'l1' || _tp === 'l2') && (
+                        <>
+                          <div
+                            className="absolute bottom-8 pointer-events-none z-10"
+                            style={{ left: `${_bx}px` }}
+                          >
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(14, 3px)', gap: 0 }}>
+                              {_SP2[_SQ2[_bfr % _SQ2.length]].flat().map((pixel, i) => (
+                                <div key={i} style={{ width: 3, height: 3, backgroundColor: DIAGNOSTIC_PALETTE[pixel] }} />
+                              ))}
+                            </div>
+                          </div>
+                          <div
+                            className="absolute bottom-8 pointer-events-none z-10"
+                            style={{ left: `${_rx}px` }}
+                          >
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(14, 3px)', gap: 0 }}>
+                              {_SP2[_SQ2[_rfr % _SQ2.length]].flat().map((pixel, i) => (
+                                <div key={i} style={{ width: 3, height: 3, backgroundColor: DIAGNOSTIC_PALETTE[pixel] }} />
+                              ))}
+                            </div>
+                          </div>
+                        </>
                       )}
                     </>
                   )
