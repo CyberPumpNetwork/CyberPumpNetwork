@@ -498,7 +498,7 @@ const ALL_COMMANDS = [
   'echo', 'history', 'touch', 'mkdir', 'find', 'which', 'env', 'alias',
   'ssh', 'curl', 'wget', 'python', 'vim', 'nano', 'emacs',
   'neofetch', 'top', 'ps', 'uname', 'uptime', 'date', 'id',
-  'fair', 'community', 'trustless', 'pioneer', 'elon', 'armanti',
+  'fair', 'community', 'trustless', 'pioneer', 'elon', 'armani',
   'vitalik', 'saylor', 'nakamoto', 'consensus', 'genesis', 'block',
   'mining', 'asic', 'gpu', 'pow', 'pos', 'defi', 'nft', 'web3',
   'gm ser', 'sir', 'fren', 'alpha', 'beta', 'sigma', 'chad',
@@ -1717,11 +1717,11 @@ export function processDiagnosticCommand(
       '> But we prefer DAGs over Dogecoin.',
       '> Different mission. Same audacity.',
     ],
-    'armanti': () => [
-      'Armanti.',
-      '> Grüße gehen raus.',
+    'armani': () => [
+      'Armani Ferrante.',
+      '> Shoutout. Respect.',
       '> Real ones know. Real ones build.',
-      '> Respekt.',
+      '> Anchor Protocol changed the game.',
     ],
     'vitalik': () => [
       'Vitalik.',
