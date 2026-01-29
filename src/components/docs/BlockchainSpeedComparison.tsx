@@ -291,7 +291,7 @@ export function BlockchainSpeedComparison() {
             <div className="relative h-16 bg-card/30 rounded-lg overflow-hidden border border-border/30">
               {/* Progress fill */}
               <div
-                className="absolute inset-y-0 left-0 transition-all duration-100"
+                className="absolute inset-y-0 left-0"
                 style={{
                   width: `${progress}%`,
                   backgroundColor: `${chains[0].color}30`,
@@ -314,13 +314,13 @@ export function BlockchainSpeedComparison() {
               {kasmeSamples.map((sample, i) => (
                 <div
                   key={i}
-                  className={`absolute transition-opacity duration-300 ${
+                  className={`absolute inset-y-0 transition-opacity duration-300 ${
                     progress >= sample ? 'opacity-100' : 'opacity-0'
                   }`}
                   style={{ left: `${sample}%` }}
                 >
                   {/* Needle with icon */}
-                  <div className="absolute top-0 bottom-0 w-1 bg-red-500 shadow-lg shadow-red-500/50">
+                  <div className="absolute inset-y-0 w-1 bg-red-500 shadow-lg shadow-red-500/50">
                     <Activity
                       className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 text-white"
                       style={{ filter: 'drop-shadow(0 0 4px rgba(239, 68, 68, 0.8))' }}
@@ -332,7 +332,7 @@ export function BlockchainSpeedComparison() {
               {/* Current position indicator */}
               {!showResults && isRunning && (
                 <div
-                  className="absolute top-0 bottom-0 w-1 bg-accent shadow-lg shadow-accent/50 transition-all duration-100 z-10"
+                  className="absolute top-0 bottom-0 w-1 bg-accent shadow-lg shadow-accent/50 z-10"
                   style={{ left: `${progress}%` }}
                 />
               )}

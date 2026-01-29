@@ -36,6 +36,7 @@ import { AuditsContent } from '@/components/docs/AuditsContent'
 import { CommunityContent } from '@/components/docs/CommunityContent'
 import { DevelopmentContent } from '@/components/docs/DevelopmentContent'
 import { StoryContent } from '@/components/docs/StoryContent'
+import { DocumentRecoveryHandler } from '@/components/docs/DocumentRecoveryHandler'
 import { getDocBySlug, getCategories, getDocsByCategory } from '@/lib/docs'
 import { useMarkdownContent } from '@/lib/useMarkdown'
 import {
@@ -49,6 +50,24 @@ import {
   Code2,
   ExternalLink
 } from 'lucide-react'
+
+function GhostRabbit() {
+  const [phase, setPhase] = useState<'visible' | 'fading' | 'gone'>('visible')
+  useEffect(() => {
+    const fadeTimer = setTimeout(() => setPhase('fading'), 3000)
+    const goneTimer = setTimeout(() => setPhase('gone'), 4000)
+    return () => { clearTimeout(fadeTimer); clearTimeout(goneTimer) }
+  }, [])
+  if (phase === 'gone') return null
+  return (
+    <div
+      className="pointer-events-none select-none flex justify-center"
+      style={{ marginTop: '-50px', marginBottom: '0px', opacity: phase === 'fading' ? 0 : 1, transition: 'opacity 0.6s ease-out' }}
+    >
+      <span className="text-xs text-white opacity-[0.15] tracking-widest">1x.0x.xxx9</span>
+    </div>
+  )
+}
 
 function DocsHomePage() {
   const categories = getCategories()
@@ -312,7 +331,8 @@ function MarkdownDocPage({ slug }: { slug: string }) {
     slug === 'community' ||
     slug === 'community/hub/story' ||
     slug === 'community/hub/audits' ||
-    slug === 'development'
+    slug === 'development' ||
+    slug === 'tokenomics/det-token/cypuv'
 
   if (loading && !hasCustomComponent) {
     return (
@@ -325,7 +345,7 @@ function MarkdownDocPage({ slug }: { slug: string }) {
     )
   }
 
-  if (error || (!content && !hasCustomComponent)) {
+  if (!hasCustomComponent && (error || !content)) {
     return (
       <div className="text-center py-20">
         <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
@@ -349,25 +369,39 @@ function MarkdownDocPage({ slug }: { slug: string }) {
     <div className="flex gap-12">
       {/* Main Content */}
       <div className="flex-1 min-w-0">
+        {/* Ghost rabbit — briefly visible before header covers it on page load */}
+        {slug === 'tokenomics/det-token/cypuv' && (
+          <GhostRabbit />
+        )}
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-          <Link to="/docs" className="hover:text-accent transition-colors font-medium">Docs</Link>
-          <span>/</span>
-          {doc?.category && (
+          {slug === 'tokenomics/det-token/cypuv' ? (
+            <span className="text-foreground font-medium">🐇</span>
+          ) : (
             <>
-              <span className="text-foreground/60">{doc.category}</span>
+              <Link to="/docs" className="hover:text-accent transition-colors font-medium">Docs</Link>
               <span>/</span>
+              {doc?.category && (
+                <>
+                  <span className="text-foreground/60">{doc.category}</span>
+                  <span>/</span>
+                </>
+              )}
+              <span className="text-foreground font-medium">{doc?.title || slug}</span>
             </>
           )}
-          <span className="text-foreground font-medium">{doc?.title || slug}</span>
         </nav>
 
         {/* Category Badge */}
-        {doc?.category && (
+        {slug === 'tokenomics/det-token/cypuv' ? (
+          <Badge className="mb-6 bg-gradient-to-r from-accent/20 to-blue-500/20 text-accent border-accent/30 backdrop-blur-sm">
+            🐇
+          </Badge>
+        ) : doc?.category ? (
           <Badge className="mb-6 bg-gradient-to-r from-accent/20 to-blue-500/20 text-accent border-accent/30 backdrop-blur-sm">
             {doc.category}
           </Badge>
-        )}
+        ) : null}
 
         {/* Article Container - Custom Component or Markdown */}
         <article className="max-w-none">
@@ -389,6 +423,8 @@ function MarkdownDocPage({ slug }: { slug: string }) {
             <PegContent />
           ) : slug === 'tokenomics/det-token/lock' ? (
             <LockContent />
+          ) : slug === 'tokenomics/det-token/cypuv' ? (
+            <DocumentRecoveryHandler />
           ) : slug === 'tokenomics/publicmarket/mint' ? (
             <MintContent />
           ) : slug === 'platform/infocenter/features' ? (
