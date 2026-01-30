@@ -142,7 +142,7 @@ export function ClaimPage() {
           <div className="flex items-center gap-4">
             <div className="w-12 h-px bg-gradient-to-r from-accent/50 to-transparent" />
             <span className="text-xs font-mono text-accent/70">
-              <AnimatedCounter target={CLAIMS.filter(e => e.name !== '???').length} /> registered
+              <AnimatedCounter target={CLAIMS.filter(e => e.date !== '\u2014').length} /> registered
             </span>
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent" />
           </div>
