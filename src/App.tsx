@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { LandingPage } from './pages/LandingPage'
 import { DocsPage } from './pages/DocsPage'
 import { BlogPage } from './pages/BlogPage'
@@ -14,6 +14,7 @@ function App() {
         <Route path="/docs/*" element={<DocsPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/0x" element={<ClaimPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )
