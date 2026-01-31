@@ -227,9 +227,9 @@ export function Tokenomics() {
             {/* Bonding Curve Progress */}
             <div className="text-center space-y-2">
               <div className="text-xs text-muted-foreground uppercase tracking-wide">Bonding Curve</div>
-              <div className="text-3xl font-bold text-red-500">34%</div>
+              <div className="text-3xl font-bold text-red-500">60%</div>
               <div className="w-full h-1.5 bg-red-500/20 rounded-full overflow-hidden">
-                <div className="h-full bg-red-500 rounded-full" style={{ width: '34%' }} />
+                <div className="h-full bg-red-500 rounded-full" style={{ width: '60%' }} />
               </div>
               <div className="text-xs text-muted-foreground">Complete</div>
             </div>
@@ -252,7 +252,7 @@ export function Tokenomics() {
             {/* Curve Rest */}
             <div className="text-center space-y-2">
               <div className="text-xs text-muted-foreground uppercase tracking-wide">Curve</div>
-              <div className="text-3xl font-bold text-foreground">53.40%</div>
+              <div className="text-3xl font-bold text-foreground">38.94%</div>
               <div className="text-xs text-muted-foreground">Remaining</div>
             </div>
 
